@@ -21,7 +21,7 @@ public class MainScreenController extends ScreenController {
     @FXML
     private ListView<Plank> requiredPlanksList;
     @FXML
-    private Canvas visualBoardPlan;
+    private Canvas visualPlankCuttingPlan;
     @FXML
     private CheckedIntegerSpinner plankWidthField;
     @FXML
@@ -38,9 +38,9 @@ public class MainScreenController extends ScreenController {
 
     @FXML
     private void initialize() {
-        GraphicsContext graphicsContext = visualBoardPlan.getGraphicsContext2D();
+        GraphicsContext graphicsContext = visualPlankCuttingPlan.getGraphicsContext2D();
         graphicsContext.setFill(Color.GHOSTWHITE);
-        graphicsContext.fillRect(0, 0, visualBoardPlan.getWidth(), visualBoardPlan.getHeight());
+        graphicsContext.fillRect(0, 0, visualPlankCuttingPlan.getWidth(), visualPlankCuttingPlan.getHeight());
 
         requiredPlanksList.itemsProperty()
                 .bind(plankProblem.requiredPlanksProperty());
@@ -57,6 +57,15 @@ public class MainScreenController extends ScreenController {
                 }
             }
         });
+
+        plankProblem.proposedSolutionProperty()
+                .addListener((obs, oldSolution, newSolution) -> {
+                    updateVisualPlankCuttingPlan();
+                });
+    }
+
+    private void updateVisualPlankCuttingPlan(){
+        // FIXME Update canvas
     }
 
     @FXML
