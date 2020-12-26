@@ -61,7 +61,6 @@ public class MainScreenController extends ScreenController {
 
     @FXML
     private void createBasePlank() {
-        clearAllPlanks();
         plankProblem.setBasePlank(
                 new Plank(
                         basePlankHeightField.getValue(),
