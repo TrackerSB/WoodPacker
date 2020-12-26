@@ -1,4 +1,4 @@
-package bayern.steinbrecher.woodPacker.utility;
+package bayern.steinbrecher.woodPacker.elements;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
