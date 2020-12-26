@@ -2,6 +2,13 @@
 ![Java CI with Gradle](https://github.com/TrackerSB/WoodPacker/workflows/Java%20CI%20with%20Gradle/badge.svg)
 ![CodeQL](https://github.com/TrackerSB/WoodPacker/workflows/CodeQL/badge.svg)
 ![Codacy Security Scan](https://github.com/TrackerSB/WoodPacker/workflows/Codacy%20Security%20Scan/badge.svg)
+### Statistics (master branch)
+[![Total](https://tokei.rs/b1/github/TrackerSB/WoodPacker?category=lines)](https://github.com/TrackerSB/WoodPacker)
+[![LoC](https://tokei.rs/b1/github/TrackerSB/WoodPacker?category=code)](https://github.com/TrackerSB/WoodPacker)
+[![comments](https://tokei.rs/b1/github/TrackerSB/WoodPacker?category=comments)](https://github.com/TrackerSB/WoodPacker)
+[![blank lines](https://tokei.rs/b1/github/TrackerSB/WoodPacker?category=blanks)](https://github.com/TrackerSB/WoodPacker)
+[![files](https://tokei.rs/b1/github/TrackerSB/WoodPacker?category=files)](https://github.com/TrackerSB/WoodPacker)
+[![Github All Releases](https://img.shields.io/github/downloads/TrackerSB/WoodPacker/total.svg)](https://github.com/TrackerSB/WoodPacker)
 ## Motivation
 Carpenters have to cut big wooden boards every day and all the time into potentially many pieces.
 At this point there are a couple of targets carpenters want to archive when cutting the wooden board.
