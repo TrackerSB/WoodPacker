@@ -11,45 +11,46 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<HBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="bayern.steinbrecher.woodPacker.screens.MainScreenController">
-    <VBox>
-        <ScrollPane fitToHeight="true"
-                    fitToWidth="true"
-                    hbarPolicy="NEVER"
-                    VBox.vgrow="ALWAYS">
-            <ListView fx:id="requiredPlanksList"
-                      minWidth="300"/>
-        </ScrollPane>
-        <HBox spacing="10">
-            <CheckedIntegerSpinner fx:id="plankWidthField"
-                                   promptText="%newWidth"
-                                   editable="true"
-                                   initialValue="100"
-                                   max="10000"
-                                   min="1"
-                                   amountToStepBy="1"/>
-            <Label text="&#10761;"/>
-            <CheckedIntegerSpinner fx:id="plankHeightField"
-                                   promptText="%newHeight"
-                                   editable="true"
-                                   initialValue="100"
-                                   max="10000"
-                                   min="1"
-                                   amountToStepBy="1"/>
-            <PlankGrainDirectionIndicator fx:id="plankGrainDirIndicator"/>
-        </HBox>
-        <ButtonBar>
-            <buttons>
-                <Button text="%add"
-                        onAction="#addPlank"/>
-                <Button text="%clearAll"
-                        onAction="#clearAllPlanks"/>
-            </buttons>
-        </ButtonBar>
-    </VBox>
-    <Canvas fx:id="visualBoardPlan"
-            height="800"
-            width="800"/>
-</HBox>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="bayern.steinbrecher.woodPacker.screens.MainScreenController">
+    <HBox>
+        <VBox>
+            <ScrollPane fitToHeight="true"
+                        fitToWidth="true"
+                        VBox.vgrow="ALWAYS">
+                <ListView fx:id="requiredPlanksList"
+                          minWidth="300"/>
+            </ScrollPane>
+            <HBox spacing="10">
+                <CheckedIntegerSpinner fx:id="plankWidthField"
+                                       promptText="%newWidth"
+                                       editable="true"
+                                       initialValue="100"
+                                       max="10000"
+                                       min="1"
+                                       amountToStepBy="1"/>
+                <Label text="&#10761;"/>
+                <CheckedIntegerSpinner fx:id="plankHeightField"
+                                       promptText="%newHeight"
+                                       editable="true"
+                                       initialValue="100"
+                                       max="10000"
+                                       min="1"
+                                       amountToStepBy="1"/>
+                <PlankGrainDirectionIndicator fx:id="plankGrainDirIndicator"/>
+            </HBox>
+            <ButtonBar>
+                <buttons>
+                    <Button text="%add"
+                            onAction="#addPlank"/>
+                    <Button text="%clearAll"
+                            onAction="#clearAllPlanks"/>
+                </buttons>
+            </ButtonBar>
+        </VBox>
+        <Canvas fx:id="visualBoardPlan"
+                height="800"
+                width="800"/>
+    </HBox>
+</ScrollPane>
