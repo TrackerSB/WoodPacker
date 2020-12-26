@@ -64,7 +64,7 @@ public class MainScreenController extends ScreenController {
                 });
     }
 
-    private void updateVisualPlankCuttingPlan(){
+    private void updateVisualPlankCuttingPlan() {
         // FIXME Update canvas
     }
 
@@ -81,13 +81,13 @@ public class MainScreenController extends ScreenController {
 
     @FXML
     private void addPlank() {
-        plankProblem.addRequiredPlank(
-                new Plank(
-                        plankHeightField.getValue(),
-                        plankWidthField.getValue(),
-                        plankGrainDirIndicator.getValue()
-                )
-        );
+        plankProblem.getRequiredPlanks()
+                .add(new Plank(
+                                plankHeightField.getValue(),
+                                plankWidthField.getValue(),
+                                plankGrainDirIndicator.getValue()
+                        )
+                );
     }
 
     @FXML
