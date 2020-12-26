@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.FlowPane?>
-<FlowPane xmlns="http://javafx.com/javafx"
-          xmlns:fx="http://javafx.com/fxml"
-          fx:controller="bayern.steinbrecher.woodPacker.screens.MainScreenController">
-</FlowPane>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="bayern.steinbrecher.woodPacker.screens.MainScreenController">
+    <ScrollPane fitToHeight="true"
+                hbarPolicy="NEVER">
+        <ListView fx:id="requiredBoardList"
+                  minWidth="300"/>
+    </ScrollPane>
+    <Canvas fx:id="visualBoardPlan"
+            height="800"
+            width="800"/>
+</HBox>
