@@ -12,6 +12,10 @@ import javafx.collections.ObservableList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Stefan Huber
+ * @since 0.1
+ */
 public class PlankProblem {
     private final ListProperty<Plank> requiredPlanks = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Plank> basePlank = new SimpleObjectProperty<>(null);
