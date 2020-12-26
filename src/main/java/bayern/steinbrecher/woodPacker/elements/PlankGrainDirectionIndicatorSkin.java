@@ -1,10 +1,8 @@
 package bayern.steinbrecher.woodPacker.elements;
 
-import bayern.steinbrecher.javaUtility.SupplyingMap;
 import bayern.steinbrecher.woodPacker.data.PlankGrainDirection;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.ImageView;
@@ -24,9 +22,6 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
             PlankGrainDirection.HORIZONTAL, "plankGrainHorizontal.png",
             PlankGrainDirection.VERTICAL, "plankGrainVertical.png"
     );
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private static final Map<PlankGrainDirection, Node> GRAIN_DIRECTION_SYMBOLS
-            = new SupplyingMap<>(PlankGrainDirectionIndicatorSkin::generateImageView);
     private final ReadOnlyObjectWrapper<PlankGrainDirection> plankGrainDirection
             = new ReadOnlyObjectWrapper<>(PlankGrainDirection.IRRELEVANT);
 
@@ -45,7 +40,7 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         });
 
         Consumer<PlankGrainDirection> updateIndicatorGraphic = direction -> {
-            indicatorButton.setGraphic(GRAIN_DIRECTION_SYMBOLS.get(direction));
+            indicatorButton.setGraphic(generateImageView(direction));
         };
         plankGrainDirectionProperty()
                 .addListener((obs, previousDirection, currentDirection) -> {
@@ -57,7 +52,7 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
                 .add(indicatorButton);
     }
 
-    public static ImageView generateImageView(PlankGrainDirection direction){
+    public static ImageView generateImageView(PlankGrainDirection direction) {
         String imageName = GRAIN_DIRECTION_SYMBOL_FILE_NAMES.get(direction);
         URL symbolResource = PlankGrainDirectionIndicatorSkin.class
                 .getResource(imageName);

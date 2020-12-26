@@ -16,7 +16,6 @@ repositories {
 
 dependencies {
     implementation "bayern.steinbrecher:CheckedElements:0.11.10-SNAPSHOT"
-    implementation "bayern.steinbrecher:JavaUtility:0.16"
     implementation "bayern.steinbrecher:ScreenSwitcher:0.2.1-SNAPSHOT"
     implementation 'org.jetbrains:annotations:20.1.0'
 }
