@@ -7,6 +7,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
 
+/**
+ * @author Stefan Huber
+ * @since 0.1
+ */
 public class MainScreenController extends ScreenController {
     @FXML
     private ListView<?> requiredBoardList;

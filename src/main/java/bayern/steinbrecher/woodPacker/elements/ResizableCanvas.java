@@ -4,6 +4,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+/**
+ * @author Stefan Huber
+ * @since 0.1
+ */
 public class ResizableCanvas extends Canvas {
 
     public ResizableCanvas() {
