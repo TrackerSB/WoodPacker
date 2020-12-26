@@ -42,7 +42,7 @@ public class MainScreenController extends ScreenController {
                     setText("");
                     setGraphic(null);
                 } else {
-                    setText(String.format("%d x %d", item.getHeight(), item.getWidth()));
+                    setText(String.format("%d mm x %d mm", item.getHeight(), item.getWidth()));
                     setGraphic(PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection()));
                 }
             }
