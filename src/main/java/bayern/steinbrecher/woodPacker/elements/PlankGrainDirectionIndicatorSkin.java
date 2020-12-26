@@ -1,5 +1,6 @@
 package bayern.steinbrecher.woodPacker.elements;
 
+import bayern.steinbrecher.javaUtility.SupplyingMap;
 import bayern.steinbrecher.woodPacker.data.PlankGrainDirection;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -18,11 +19,14 @@ import java.util.function.Consumer;
  */
 public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirectionIndicator> {
 
-    private static final Map<PlankGrainDirection, Node> GRAIN_DIRECTION_SYMBOLS = Map.of(
-            PlankGrainDirection.IRRELEVANT, generateImageView("plankGrainIrrelevant.png"),
-            PlankGrainDirection.HORIZONTAL, generateImageView("plankGrainHorizontal.png"),
-            PlankGrainDirection.VERTICAL, generateImageView("plankGrainVertical.png")
+    private static final Map<PlankGrainDirection, String> GRAIN_DIRECTION_SYMBOL_FILE_NAMES = Map.of(
+            PlankGrainDirection.IRRELEVANT, "plankGrainIrrelevant.png",
+            PlankGrainDirection.HORIZONTAL, "plankGrainHorizontal.png",
+            PlankGrainDirection.VERTICAL, "plankGrainVertical.png"
     );
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private static final Map<PlankGrainDirection, Node> GRAIN_DIRECTION_SYMBOLS
+            = new SupplyingMap<>(PlankGrainDirectionIndicatorSkin::generateImageView);
     private final ReadOnlyObjectWrapper<PlankGrainDirection> plankGrainDirection
             = new ReadOnlyObjectWrapper<>(PlankGrainDirection.IRRELEVANT);
 
@@ -53,7 +57,8 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
                 .add(indicatorButton);
     }
 
-    private static ImageView generateImageView(String imageName) {
+    public static ImageView generateImageView(PlankGrainDirection direction){
+        String imageName = GRAIN_DIRECTION_SYMBOL_FILE_NAMES.get(direction);
         URL symbolResource = PlankGrainDirectionIndicatorSkin.class
                 .getResource(imageName);
         if (symbolResource == null) {

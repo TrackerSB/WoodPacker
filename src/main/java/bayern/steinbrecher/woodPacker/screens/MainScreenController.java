@@ -4,6 +4,7 @@ import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodPacker.data.Plank;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator;
+import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicatorSkin;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -32,6 +33,20 @@ public class MainScreenController extends ScreenController {
         GraphicsContext graphicsContext = visualBoardPlan.getGraphicsContext2D();
         graphicsContext.setFill(Color.GHOSTWHITE);
         graphicsContext.fillRect(0, 0, visualBoardPlan.getWidth(), visualBoardPlan.getHeight());
+
+        requiredPlanksList.setCellFactory(list -> new ListCell<>(){
+            @Override
+            protected void updateItem(Plank item, boolean empty) {
+                super.updateItem(item, empty);
+                if(item == null){
+                    setText("");
+                    setGraphic(null);
+                } else {
+                    setText(String.format("%d x %d", item.getHeight(), item.getWidth()));
+                    setGraphic(PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection()));
+                }
+            }
+        });
     }
 
     @FXML
