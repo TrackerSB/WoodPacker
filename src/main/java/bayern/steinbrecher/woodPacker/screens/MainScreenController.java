@@ -3,10 +3,11 @@ package bayern.steinbrecher.woodPacker.screens;
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodPacker.data.Plank;
-import bayern.steinbrecher.woodPacker.data.PlankGrainDirection;
+import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
 
@@ -23,6 +24,8 @@ public class MainScreenController extends ScreenController {
     private CheckedIntegerSpinner plankWidthField;
     @FXML
     private CheckedIntegerSpinner plankHeightField;
+    @FXML
+    private PlankGrainDirectionIndicator plankGrainDirIndicator;
 
     @FXML
     private void initialize() {
@@ -33,10 +36,9 @@ public class MainScreenController extends ScreenController {
 
     @FXML
     private void addPlank() {
-        // FIXME Allow configuring grain direction
         requiredPlanksList.getItems()
                 .add(new Plank(plankHeightField.getValue(), plankWidthField
-                        .getValue(), PlankGrainDirection.IRRELEVANT));
+                        .getValue(), plankGrainDirIndicator.getValue()));
     }
 
     @FXML

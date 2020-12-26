@@ -30,11 +30,11 @@ public class PlankGrainDirectionIndicator extends Control {
         }
     }
 
-    public ReadOnlyObjectProperty<PlankGrainDirection> plankGrainDirectionProperty() {
+    public ReadOnlyObjectProperty<PlankGrainDirection> valueProperty() {
         return getCastedSkin().plankGrainDirectionProperty();
     }
 
-    public PlankGrainDirection getPlankGrainDirection() {
+    public PlankGrainDirection getValue() {
         return getCastedSkin().getPlankGrainDirection();
     }
 }
