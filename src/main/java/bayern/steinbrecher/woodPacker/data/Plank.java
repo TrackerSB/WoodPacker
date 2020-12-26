@@ -5,13 +5,19 @@ package bayern.steinbrecher.woodPacker.data;
  * @since 0.1
  */
 public class Plank {
-    private int height; // in mm
-    private int width; // in mm
-    private PlankGrainDirection grainDirection;
+    private final int height; // in mm
+    private final int width; // in mm
+    private final PlankGrainDirection grainDirection;
 
     public Plank(int height, int width, PlankGrainDirection grainDirection) {
-        setHeight(height);
-        setWidth(width);
+        if (height <= 0) {
+            throw new IllegalArgumentException("Height has to be positive");
+        }
+        this.height = height;
+        if (width <= 0) {
+            throw new IllegalArgumentException("Width has to be positive");
+        }
+        this.width = width;
         this.grainDirection = grainDirection;
     }
 
@@ -19,29 +25,11 @@ public class Plank {
         return height;
     }
 
-    public void setHeight(int height) {
-        if (height <= 0) {
-            throw new IllegalArgumentException("Height has to be positive");
-        }
-        this.height = height;
-    }
-
     public int getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
-        if (width <= 0) {
-            throw new IllegalArgumentException("Width has to be positive");
-        }
-        this.width = width;
-    }
-
     public PlankGrainDirection getGrainDirection() {
         return grainDirection;
-    }
-
-    public void setGrainDirection(PlankGrainDirection grainDirection) {
-        this.grainDirection = grainDirection;
     }
 }

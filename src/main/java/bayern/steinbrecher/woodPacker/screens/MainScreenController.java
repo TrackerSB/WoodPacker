@@ -3,6 +3,7 @@ package bayern.steinbrecher.woodPacker.screens;
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodPacker.data.Plank;
+import bayern.steinbrecher.woodPacker.data.PlankProblem;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicatorSkin;
 import javafx.fxml.FXML;
@@ -27,6 +28,7 @@ public class MainScreenController extends ScreenController {
     private CheckedIntegerSpinner plankHeightField;
     @FXML
     private PlankGrainDirectionIndicator plankGrainDirIndicator;
+    private final PlankProblem plankProblem = new PlankProblem();
 
     @FXML
     private void initialize() {
@@ -34,11 +36,13 @@ public class MainScreenController extends ScreenController {
         graphicsContext.setFill(Color.GHOSTWHITE);
         graphicsContext.fillRect(0, 0, visualBoardPlan.getWidth(), visualBoardPlan.getHeight());
 
-        requiredPlanksList.setCellFactory(list -> new ListCell<>(){
+        requiredPlanksList.itemsProperty()
+                .bind(plankProblem.requiredPlanksProperty());
+        requiredPlanksList.setCellFactory(list -> new ListCell<>() {
             @Override
             protected void updateItem(Plank item, boolean empty) {
                 super.updateItem(item, empty);
-                if(item == null){
+                if (item == null) {
                     setText("");
                     setGraphic(null);
                 } else {
@@ -50,15 +54,20 @@ public class MainScreenController extends ScreenController {
     }
 
     @FXML
-    private void addPlank() {
-        requiredPlanksList.getItems()
-                .add(new Plank(plankHeightField.getValue(), plankWidthField
-                        .getValue(), plankGrainDirIndicator.getValue()));
+    private void createBasePlank() {
+        clearAllPlanks();
+        // FIXME Create empty base plank on canvas
     }
 
     @FXML
-    private void clearAllPlanks(){
-        requiredPlanksList.getItems()
+    private void addPlank() {
+        plankProblem.addRequiredPlank(
+                new Plank(plankHeightField.getValue(), plankWidthField.getValue(), plankGrainDirIndicator.getValue()));
+    }
+
+    @FXML
+    private void clearAllPlanks() {
+        plankProblem.requiredPlanksProperty()
                 .clear();
     }
 }
