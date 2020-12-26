@@ -1,4 +1,7 @@
 # WoodPacker
+![Java CI with Gradle](https://github.com/TrackerSB/WoodPacker/workflows/Java%20CI%20with%20Gradle/badge.svg)
+![CodeQL](https://github.com/TrackerSB/WoodPacker/workflows/CodeQL/badge.svg)
+![Codacy Security Scan](https://github.com/TrackerSB/WoodPacker/workflows/Codacy%20Security%20Scan/badge.svg)
 ## Motivation
 Carpenters have to cut big wooden boards every day and all the time into potentially many pieces.
 At this point there are a couple of targets carpenters want to archive when cutting the wooden board.
