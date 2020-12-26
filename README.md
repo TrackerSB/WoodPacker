@@ -1,7 +1,7 @@
 # WoodPacker
-![Java CI with Gradle](https://github.com/TrackerSB/WoodPacker/workflows/Java%20CI%20with%20Gradle/badge.svg)
-![CodeQL](https://github.com/TrackerSB/WoodPacker/workflows/CodeQL/badge.svg)
-![Codacy Security Scan](https://github.com/TrackerSB/WoodPacker/workflows/Codacy%20Security%20Scan/badge.svg)
+[![Java CI with Gradle](https://github.com/TrackerSB/WoodPacker/workflows/Java%20CI%20with%20Gradle/badge.svg)](https://github.com/TrackerSB/WoodPacker)
+[![CodeQL](https://github.com/TrackerSB/WoodPacker/workflows/CodeQL/badge.svg)](https://github.com/TrackerSB/WoodPacker)
+[![Codacy Security Scan](https://github.com/TrackerSB/WoodPacker/workflows/Codacy%20Security%20Scan/badge.svg)](https://github.com/TrackerSB/WoodPacker)
 ### Statistics (master branch)
 [![Total](https://tokei.rs/b1/github/TrackerSB/WoodPacker?category=lines)](https://github.com/TrackerSB/WoodPacker)
 [![LoC](https://tokei.rs/b1/github/TrackerSB/WoodPacker?category=code)](https://github.com/TrackerSB/WoodPacker)
