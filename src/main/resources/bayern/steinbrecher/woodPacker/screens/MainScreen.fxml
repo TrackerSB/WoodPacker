@@ -50,7 +50,7 @@
             </ButtonBar>
         </VBox>
         <VBox>
-            <Canvas fx:id="visualBoardPlan"
+            <Canvas fx:id="visualPlankCuttingPlan"
                     height="800"
                     width="800"/>
             <HBox>
