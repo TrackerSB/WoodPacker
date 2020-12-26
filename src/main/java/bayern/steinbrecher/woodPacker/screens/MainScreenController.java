@@ -1,6 +1,9 @@
 package bayern.steinbrecher.woodPacker.screens;
 
+import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
+import bayern.steinbrecher.woodPacker.data.Plank;
+import bayern.steinbrecher.woodPacker.data.PlankGrainDirection;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,14 +16,32 @@ import javafx.scene.paint.Color;
  */
 public class MainScreenController extends ScreenController {
     @FXML
-    private ListView<?> requiredBoardList;
+    private ListView<Plank> requiredPlanksList;
     @FXML
     private Canvas visualBoardPlan;
+    @FXML
+    private CheckedIntegerSpinner plankWidthField;
+    @FXML
+    private CheckedIntegerSpinner plankHeightField;
 
     @FXML
-    private void initialize(){
+    private void initialize() {
         GraphicsContext graphicsContext = visualBoardPlan.getGraphicsContext2D();
         graphicsContext.setFill(Color.GHOSTWHITE);
         graphicsContext.fillRect(0, 0, visualBoardPlan.getWidth(), visualBoardPlan.getHeight());
+    }
+
+    @FXML
+    private void addPlank() {
+        // FIXME Allow configuring grain direction
+        requiredPlanksList.getItems()
+                .add(new Plank(plankHeightField.getValue(), plankWidthField
+                        .getValue(), PlankGrainDirection.IRRELEVANT));
+    }
+
+    @FXML
+    private void clearAllPlanks(){
+        requiredPlanksList.getItems()
+                .clear();
     }
 }
