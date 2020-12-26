@@ -28,6 +28,12 @@ public class MainScreenController extends ScreenController {
     private CheckedIntegerSpinner plankHeightField;
     @FXML
     private PlankGrainDirectionIndicator plankGrainDirIndicator;
+    @FXML
+    private CheckedIntegerSpinner basePlankWidthField;
+    @FXML
+    private CheckedIntegerSpinner basePlankHeightField;
+    @FXML
+    private PlankGrainDirectionIndicator basePlankGrainDirIndicator;
     private final PlankProblem plankProblem = new PlankProblem();
 
     @FXML
@@ -56,13 +62,24 @@ public class MainScreenController extends ScreenController {
     @FXML
     private void createBasePlank() {
         clearAllPlanks();
-        // FIXME Create empty base plank on canvas
+        plankProblem.setBasePlank(
+                new Plank(
+                        basePlankHeightField.getValue(),
+                        basePlankWidthField.getValue(),
+                        basePlankGrainDirIndicator.getValue()
+                )
+        );
     }
 
     @FXML
     private void addPlank() {
         plankProblem.addRequiredPlank(
-                new Plank(plankHeightField.getValue(), plankWidthField.getValue(), plankGrainDirIndicator.getValue()));
+                new Plank(
+                        plankHeightField.getValue(),
+                        plankWidthField.getValue(),
+                        plankGrainDirIndicator.getValue()
+                )
+        );
     }
 
     @FXML

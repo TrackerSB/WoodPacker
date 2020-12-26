@@ -70,6 +70,7 @@
                                        max="10000"
                                        min="1"
                                        amountToStepBy="1"/>
+                <PlankGrainDirectionIndicator fx:id="basePlankGrainDirIndicator"/>
                 <Button text="%create"
                         onAction="#createBasePlank"/>
             </HBox>
