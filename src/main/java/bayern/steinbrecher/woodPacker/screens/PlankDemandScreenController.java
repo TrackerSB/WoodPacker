@@ -127,8 +127,8 @@ public class PlankDemandScreenController extends ScreenController {
     private void addPlank() {
         plankProblem.getRequiredPlanks().add(
                 new Plank(
-                        plankHeightField.getValue(),
                         plankWidthField.getValue(),
+                        plankHeightField.getValue(),
                         plankGrainDirIndicator.getValue()
                 )
         );

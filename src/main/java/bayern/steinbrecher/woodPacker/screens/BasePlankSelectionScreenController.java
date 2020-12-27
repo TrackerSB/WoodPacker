@@ -25,8 +25,8 @@ public class BasePlankSelectionScreenController extends ScreenController {
     @FXML
     private void confirmBasePlank() throws ScreenSwitchFailedException {
         Plank basePlank = new Plank(
-                basePlankHeightField.getValue(),
                 basePlankWidthField.getValue(),
+                basePlankHeightField.getValue(),
                 basePlankGrainDirIndicator.getValue()
         );
 
