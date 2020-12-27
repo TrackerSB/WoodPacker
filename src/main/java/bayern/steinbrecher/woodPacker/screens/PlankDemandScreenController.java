@@ -25,7 +25,7 @@ import java.util.List;
  * @author Stefan Huber
  * @since 0.1
  */
-public class MainScreenController extends ScreenController {
+public class PlankDemandScreenController extends ScreenController {
     @FXML
     private ListView<Plank> requiredPlanksList;
     @FXML

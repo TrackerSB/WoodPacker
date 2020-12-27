@@ -2,7 +2,7 @@ package bayern.steinbrecher.woodPacker;
 
 import bayern.steinbrecher.screenSwitcher.ScreenManager;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
-import bayern.steinbrecher.woodPacker.screens.MainScreen;
+import bayern.steinbrecher.woodPacker.screens.PlankDemandScreen;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -18,7 +18,7 @@ public class WoodPacker extends Application {
     @Override
     public void start(Stage primaryStage) throws ScreenSwitchFailedException {
         ScreenManager screenManager = new ScreenManager(primaryStage);
-        screenManager.switchTo(new MainScreen());
+        screenManager.switchTo(new PlankDemandScreen());
         primaryStage.show();
     }
 }
