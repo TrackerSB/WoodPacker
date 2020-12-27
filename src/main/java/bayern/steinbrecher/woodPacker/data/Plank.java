@@ -32,4 +32,24 @@ public class Plank {
     public PlankGrainDirection getGrainDirection() {
         return grainDirection;
     }
+
+    /**
+     * @param direction The direction of the plank this plank might be cut out of.
+     * @return {@code true} iff this planks grain direction is compatible with direction of a plank from which this
+     * plank might be cut out of.
+     */
+    public boolean matchesGrainDirection(PlankGrainDirection direction) {
+        return direction == PlankGrainDirection.IRRELEVANT
+                || getGrainDirection() == PlankGrainDirection.IRRELEVANT
+                || getGrainDirection() == direction;
+    }
+
+    public Plank rotated() {
+        PlankGrainDirection rotatedGrainDirection = switch (getGrainDirection()) {
+            case HORIZONTAL -> PlankGrainDirection.VERTICAL;
+            case VERTICAL -> PlankGrainDirection.HORIZONTAL;
+            case IRRELEVANT -> PlankGrainDirection.IRRELEVANT;
+        };
+        return new Plank(getWidth(), getHeight(), rotatedGrainDirection);
+    }
 }

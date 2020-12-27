@@ -8,13 +8,15 @@ public class PlankRow {
     private final double startY;
     private final double height;
     private final double maxWidth;
+    private final PlankGrainDirection grainDirection;
     private final List<Plank> planks = new ArrayList<>();
     private double currentWidth = 0;
 
-    public PlankRow(double startY, double height, double maxWidth) {
+    public PlankRow(double startY, double height, double maxWidth, PlankGrainDirection grainDirection) {
         this.startY = startY;
         this.height = height;
         this.maxWidth = maxWidth;
+        this.grainDirection = grainDirection;
     }
 
     public double getStartY() {
@@ -29,15 +31,19 @@ public class PlankRow {
         return maxWidth;
     }
 
+    public PlankGrainDirection getGrainDirection() {
+        return grainDirection;
+    }
+
     public List<Plank> getPlanks() {
         return Collections.unmodifiableList(planks);
     }
 
     public boolean addPlank(Plank plank) {
-        // FIXME Rotation based on the required grain is missing
         double rowWidthAfterAddition = getCurrentWidth() + plank.getWidth();
         if (plank.getHeight() > getHeight()
-                || rowWidthAfterAddition > getMaxWidth()) {
+                || rowWidthAfterAddition > getMaxWidth()
+                || !plank.matchesGrainDirection(getGrainDirection())) {
             return false;
         } else {
             planks.add(plank);

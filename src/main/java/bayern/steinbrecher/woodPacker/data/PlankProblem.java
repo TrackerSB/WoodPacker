@@ -13,8 +13,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.stream.Collectors;
 
 /**
  * @author Stefan Huber
@@ -54,12 +53,12 @@ public class PlankProblem {
             ignoredPlanks = requiredPlanks;
         } else {
             ignoredPlanks = new ArrayList<>();
-            // FIXME Rotation based on the required grain is missing
-            Queue<Plank> planksToPlace = new PriorityQueue<>((p1, p2) -> p2.getHeight() - p1.getHeight());
-            planksToPlace.addAll(requiredPlanks);
+            List<Plank> planksToPlace = requiredPlanks.stream()
+                    .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
+                    .sorted((p1, p2) -> p2.getHeight() - p1.getHeight())
+                    .collect(Collectors.toList());
             double heightOfAddedRows = 0;
-            while (!planksToPlace.isEmpty()) {
-                Plank plank = planksToPlace.poll();
+            for (Plank plank : planksToPlace) {
                 boolean placedInExistingRow = false;
                 for (PlankRow row : placedPlanks) {
                     if (row.addPlank(plank)) {
@@ -70,7 +69,8 @@ public class PlankProblem {
                 if (!placedInExistingRow) {
                     double expectedEndY = heightOfAddedRows + plank.getHeight();
                     if (expectedEndY <= basePlank.getHeight()) {
-                        PlankRow newRow = new PlankRow(heightOfAddedRows, plank.getHeight(), basePlank.getWidth());
+                        PlankRow newRow = new PlankRow(heightOfAddedRows, plank.getHeight(), basePlank.getWidth(),
+                                basePlank.getGrainDirection());
                         newRow.addPlank(plank);
                         placedPlanks.add(newRow);
                         heightOfAddedRows = expectedEndY;
