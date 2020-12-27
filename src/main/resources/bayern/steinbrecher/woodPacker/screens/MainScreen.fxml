@@ -9,6 +9,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <ScrollPane xmlns="http://javafx.com/javafx"
@@ -50,9 +51,10 @@
             </ButtonBar>
         </VBox>
         <VBox>
-            <Canvas fx:id="visualPlankCuttingPlan"
-                    height="800"
-                    width="800"/>
+            <FlowPane HBox.hgrow="ALWAYS"
+                      VBox.vgrow="ALWAYS">
+                <Canvas fx:id="visualPlankCuttingPlan"/>
+            </FlowPane>
             <HBox>
                 <Label text="%basePlank"/>
                 <CheckedIntegerSpinner fx:id="basePlankWidthField"

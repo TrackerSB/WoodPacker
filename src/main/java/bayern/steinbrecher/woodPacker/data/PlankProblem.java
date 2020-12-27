@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,8 +44,19 @@ public class PlankProblem {
                 });
     }
 
+    /**
+     * @return If a solution can be found it contains placements for all required planks. It does NOT contain the base
+     * plank itself.
+     */
     private static Optional<List<Pair<Plank, Point2D>>> determineSolution(Plank basePlank, List<Plank> requiredPlanks) {
-        return Optional.empty();
+        List<Pair<Plank, Point2D>> solution;
+        if (basePlank == null) {
+            solution = null;
+        } else {
+            solution = new ArrayList<>();
+            // FIXME Place required planks on base plank, i.e. do the actual packing
+        }
+        return Optional.ofNullable(solution);
     }
 
     public ListProperty<Plank> requiredPlanksProperty() {
