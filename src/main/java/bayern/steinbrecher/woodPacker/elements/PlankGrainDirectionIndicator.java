@@ -25,8 +25,9 @@ public class PlankGrainDirectionIndicator extends Control {
             return (PlankGrainDirectionIndicatorSkin) uncastedSkin;
         } else {
             throw new IllegalStateException(
-                    String.format("The currently set skin is not of type '%s'",
-                            uncastedSkin.getClass().getCanonicalName()));
+                    String.format("The currently set skin is of type '%s' (Expected '%s')",
+                            uncastedSkin.getClass().getCanonicalName(),
+                            PlankGrainDirectionIndicatorSkin.class.getCanonicalName()));
         }
     }
 
