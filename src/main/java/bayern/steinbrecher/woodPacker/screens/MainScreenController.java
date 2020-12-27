@@ -7,11 +7,15 @@ import bayern.steinbrecher.woodPacker.data.PlankProblem;
 import bayern.steinbrecher.woodPacker.data.PlankRow;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicatorSkin;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.NumberBinding;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
@@ -26,6 +30,8 @@ public class MainScreenController extends ScreenController {
     private ListView<Plank> requiredPlanksList;
     @FXML
     private Canvas visualPlankCuttingPlan;
+    @FXML
+    private StackPane cuttingPlanContainer;
     @FXML
     private CheckedIntegerSpinner plankWidthField;
     @FXML
@@ -45,6 +51,16 @@ public class MainScreenController extends ScreenController {
         GraphicsContext graphicsContext = visualPlankCuttingPlan.getGraphicsContext2D();
         graphicsContext.setFill(Color.GHOSTWHITE);
         graphicsContext.fillRect(0, 0, visualPlankCuttingPlan.getWidth(), visualPlankCuttingPlan.getHeight());
+
+        DoubleBinding cuttingPlanHeightRatio = cuttingPlanContainer.heightProperty()
+                .divide(visualPlankCuttingPlan.heightProperty());
+        DoubleBinding cuttingPlanWidthRatio = cuttingPlanContainer.widthProperty()
+                .divide(visualPlankCuttingPlan.widthProperty());
+        NumberBinding cuttingPlanFitScale = Bindings.min(cuttingPlanHeightRatio, cuttingPlanWidthRatio);
+        visualPlankCuttingPlan.scaleXProperty()
+                .bind(cuttingPlanFitScale);
+        visualPlankCuttingPlan.scaleYProperty()
+                .bind(cuttingPlanFitScale);
 
         requiredPlanksList.itemsProperty()
                 .bind(plankProblem.requiredPlanksProperty());
