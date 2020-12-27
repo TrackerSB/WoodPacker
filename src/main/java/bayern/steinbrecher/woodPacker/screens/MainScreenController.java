@@ -4,10 +4,10 @@ import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodPacker.data.Plank;
 import bayern.steinbrecher.woodPacker.data.PlankProblem;
+import bayern.steinbrecher.woodPacker.data.PlankRow;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicatorSkin;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
@@ -16,7 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Stefan Huber
@@ -64,36 +63,45 @@ public class MainScreenController extends ScreenController {
         });
 
         plankProblem.basePlankProperty()
-                .addListener((obs, oldBasePlank, newBasePlank) -> {
-                    updateVisualPlankCuttingPlan(newBasePlank, plankProblem.getProposedSolution());
-                });
+                .addListener((obs, oldBasePlank, newBasePlank)
+                        -> updateVisualPlankCuttingPlan(newBasePlank, plankProblem.getProposedSolution()));
         plankProblem.proposedSolutionProperty()
-                .addListener((obs, oldSolution, newSolution) -> {
-                    updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution);
-                });
-    }
-
-    private void drawPlankCuttingPlanBackground(Plank basePlank) {
-        visualPlankCuttingPlan.setHeight(basePlank.getHeight());
-        visualPlankCuttingPlan.setWidth(basePlank.getWidth());
-        GraphicsContext graphicsContext = visualPlankCuttingPlan.getGraphicsContext2D();
-        graphicsContext.setFill(Color.BURLYWOOD);
-        graphicsContext.fillRect(0, 0, basePlank.getWidth(), basePlank.getHeight());
-        final double backgroundAngleBottom = Math.toRadians(45);
-        final double topBottomXDelta = basePlank.getHeight() / Math.tan(backgroundAngleBottom);
-        final int stepSize = 10;
-        graphicsContext.setStroke(Color.GRAY);
-        for (double x = -topBottomXDelta + stepSize; x < basePlank.getWidth(); x += stepSize) {
-            graphicsContext.strokeLine(x, basePlank.getHeight(), x + topBottomXDelta, 0);
-        }
+                .addListener((obs, oldSolution, newSolution)
+                        -> updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution));
     }
 
     private void updateVisualPlankCuttingPlan(
-            Plank newBasePlank, Optional<List<Pair<Plank, Point2D>>> proposedSolution) {
+            Plank newBasePlank, Pair<List<PlankRow>, List<Plank>> proposedSolution) {
         if (newBasePlank != null) {
-            drawPlankCuttingPlanBackground(newBasePlank);
-            if (proposedSolution.isPresent()) {
-                // TODO Draw proposed
+            visualPlankCuttingPlan.setHeight(newBasePlank.getHeight());
+            visualPlankCuttingPlan.setWidth(newBasePlank.getWidth());
+
+            // Draw background
+            GraphicsContext graphicsContext = visualPlankCuttingPlan.getGraphicsContext2D();
+            graphicsContext.setFill(Color.BURLYWOOD);
+            graphicsContext.fillRect(0, 0, newBasePlank.getWidth(), newBasePlank.getHeight());
+            final double backgroundAngleBottom = Math.toRadians(45);
+            final double topBottomXDelta = newBasePlank.getHeight() / Math.tan(backgroundAngleBottom);
+            final int stepSize = 10;
+            graphicsContext.setStroke(Color.GRAY);
+            for (double x = -topBottomXDelta + stepSize; x < newBasePlank.getWidth(); x += stepSize) {
+                graphicsContext.strokeLine(x, newBasePlank.getHeight(), x + topBottomXDelta, 0);
+            }
+
+            // Draw planks
+            List<PlankRow> placedPlankRows = proposedSolution.getKey();
+            if (placedPlankRows != null) {
+                graphicsContext.setStroke(Color.BLACK);
+                for (PlankRow row : placedPlankRows) {
+                    double currentStartX = 0;
+                    for (Plank plank : row.getPlanks()) {
+                        graphicsContext.beginPath();
+                        graphicsContext.rect(currentStartX, row.getStartY(), plank.getWidth(), plank.getHeight());
+                        graphicsContext.stroke();
+                        graphicsContext.fill();
+                        currentStartX += plank.getWidth();
+                    }
+                }
             }
         }
     }
@@ -111,13 +119,13 @@ public class MainScreenController extends ScreenController {
 
     @FXML
     private void addPlank() {
-        plankProblem.getRequiredPlanks()
-                .add(new Plank(
-                                plankHeightField.getValue(),
-                                plankWidthField.getValue(),
-                                plankGrainDirIndicator.getValue()
-                        )
-                );
+        plankProblem.getRequiredPlanks().add(
+                new Plank(
+                        plankHeightField.getValue(),
+                        plankWidthField.getValue(),
+                        plankGrainDirIndicator.getValue()
+                )
+        );
     }
 
     @FXML

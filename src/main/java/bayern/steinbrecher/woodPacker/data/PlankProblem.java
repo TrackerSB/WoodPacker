@@ -9,12 +9,12 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * @author Stefan Huber
@@ -23,8 +23,8 @@ import java.util.Optional;
 public class PlankProblem {
     private final ListProperty<Plank> requiredPlanks = new SimpleListProperty<>(null);
     private final ObjectProperty<Plank> basePlank = new SimpleObjectProperty<>(null);
-    private final ReadOnlyObjectWrapper<Optional<List<Pair<Plank, Point2D>>>> proposedSolution
-            = new ReadOnlyObjectWrapper<>(Optional.empty());
+    private final ReadOnlyObjectWrapper<Pair<List<PlankRow>, List<Plank>>> proposedSolution
+            = new ReadOnlyObjectWrapper<>(null);
 
     public PlankProblem() {
         requiredPlanksProperty()
@@ -36,8 +36,7 @@ public class PlankProblem {
                         });
                     }
                 });
-        requiredPlanksProperty()
-                .set(FXCollections.observableArrayList()); // Ensure initial state
+        setRequiredPlanks(FXCollections.observableArrayList()); // Ensure initial state
         basePlankProperty()
                 .addListener((obs, previousBasePlank, currentBasePlank) -> {
                     proposedSolution.set(determineSolution(currentBasePlank, getRequiredPlanks()));
@@ -45,18 +44,43 @@ public class PlankProblem {
     }
 
     /**
-     * @return If a solution can be found it contains placements for all required planks. It does NOT contain the base
-     * plank itself.
+     * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
+     * not fit onto the base plank (besides the already added ones).
      */
-    private static Optional<List<Pair<Plank, Point2D>>> determineSolution(Plank basePlank, List<Plank> requiredPlanks) {
-        List<Pair<Plank, Point2D>> solution;
+    private static Pair<List<PlankRow>, List<Plank>> determineSolution(Plank basePlank, List<Plank> requiredPlanks) {
+        List<PlankRow> placedPlanks = new ArrayList<>();
+        List<Plank> ignoredPlanks;
         if (basePlank == null) {
-            solution = null;
+            ignoredPlanks = requiredPlanks;
         } else {
-            solution = new ArrayList<>();
-            // FIXME Place required planks on base plank, i.e. do the actual packing
+            ignoredPlanks = new ArrayList<>();
+            // FIXME Rotation based on the required grain is missing
+            Queue<Plank> planksToPlace = new PriorityQueue<>((p1, p2) -> p2.getHeight() - p1.getHeight());
+            planksToPlace.addAll(requiredPlanks);
+            double heightOfAddedRows = 0;
+            while (!planksToPlace.isEmpty()) {
+                Plank plank = planksToPlace.poll();
+                boolean placedInExistingRow = false;
+                for (PlankRow row : placedPlanks) {
+                    if (row.addPlank(plank)) {
+                        placedInExistingRow = true;
+                        break;
+                    }
+                }
+                if (!placedInExistingRow) {
+                    double expectedEndY = heightOfAddedRows + plank.getHeight();
+                    if (expectedEndY <= basePlank.getHeight()) {
+                        PlankRow newRow = new PlankRow(heightOfAddedRows, plank.getHeight(), basePlank.getWidth());
+                        newRow.addPlank(plank);
+                        placedPlanks.add(newRow);
+                        heightOfAddedRows = expectedEndY;
+                    } else {
+                        ignoredPlanks.add(plank);
+                    }
+                }
+            }
         }
-        return Optional.ofNullable(solution);
+        return new Pair<>(placedPlanks, ignoredPlanks);
     }
 
     public ListProperty<Plank> requiredPlanksProperty() {
@@ -83,11 +107,11 @@ public class PlankProblem {
         basePlankProperty().set(basePlank);
     }
 
-    public ReadOnlyObjectProperty<Optional<List<Pair<Plank, Point2D>>>> proposedSolutionProperty() {
+    public ReadOnlyObjectProperty<Pair<List<PlankRow>, List<Plank>>> proposedSolutionProperty() {
         return proposedSolution.getReadOnlyProperty();
     }
 
-    public Optional<List<Pair<Plank, Point2D>>> getProposedSolution() {
+    public Pair<List<PlankRow>, List<Plank>> getProposedSolution() {
         return proposedSolutionProperty().get();
     }
 }
