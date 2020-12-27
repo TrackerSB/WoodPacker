@@ -38,12 +38,6 @@ public class PlankDemandScreenController extends ScreenController {
     private CheckedIntegerSpinner plankHeightField;
     @FXML
     private PlankGrainDirectionIndicator plankGrainDirIndicator;
-    @FXML
-    private CheckedIntegerSpinner basePlankWidthField;
-    @FXML
-    private CheckedIntegerSpinner basePlankHeightField;
-    @FXML
-    private PlankGrainDirectionIndicator basePlankGrainDirIndicator;
     private final PlankProblem plankProblem = new PlankProblem();
 
     @FXML
@@ -122,15 +116,11 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
-    @FXML
-    private void createBasePlank() {
-        plankProblem.setBasePlank(
-                new Plank(
-                        basePlankHeightField.getValue(),
-                        basePlankWidthField.getValue(),
-                        basePlankGrainDirIndicator.getValue()
-                )
-        );
+    /**
+     * NOTE Only {@link PlankDemandScreen} should be allowed to call this method.
+     */
+    void setBasePlank(Plank basePlank) {
+        plankProblem.setBasePlank(basePlank);
     }
 
     @FXML

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- author: Stefan Huber -->
+<!--
+author: Stefan Huber
+since: 0.1
+-->
 
 <?import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner?>
 <?import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator?>
@@ -47,37 +50,17 @@
                             onAction="#addPlank"/>
                     <Button text="%clearAll"
                             onAction="#clearAllPlanks"/>
+                    <Button text="%backToBasePlankScreen"
+                            onAction="#switchToPreviousScreen"
+                            ButtonBar.buttonData="BACK_PREVIOUS"/>
                 </buttons>
             </ButtonBar>
         </VBox>
-        <VBox>
-            <StackPane fx:id="cuttingPlanContainer"
-                       HBox.hgrow="ALWAYS"
-                       VBox.vgrow="ALWAYS"
-                       style="-fx-border-color: black">
-                <Canvas fx:id="visualPlankCuttingPlan"/>
-            </StackPane>
-            <HBox>
-                <Label text="%basePlank"/>
-                <CheckedIntegerSpinner fx:id="basePlankWidthField"
-                                       promptText="%width"
-                                       editable="true"
-                                       initialValue="100"
-                                       max="10000"
-                                       min="1"
-                                       amountToStepBy="1"/>
-                <Label text="&#10761;"/>
-                <CheckedIntegerSpinner fx:id="basePlankHeightField"
-                                       promptText="%height"
-                                       editable="true"
-                                       initialValue="100"
-                                       max="10000"
-                                       min="1"
-                                       amountToStepBy="1"/>
-                <PlankGrainDirectionIndicator fx:id="basePlankGrainDirIndicator"/>
-                <Button text="%create"
-                        onAction="#createBasePlank"/>
-            </HBox>
-        </VBox>
+        <StackPane fx:id="cuttingPlanContainer"
+                   HBox.hgrow="ALWAYS"
+                   VBox.vgrow="ALWAYS"
+                   style="-fx-border-color: black">
+            <Canvas fx:id="visualPlankCuttingPlan"/>
+        </StackPane>
     </HBox>
 </ScrollPane>
