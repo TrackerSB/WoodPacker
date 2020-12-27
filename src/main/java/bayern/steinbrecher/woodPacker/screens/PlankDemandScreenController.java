@@ -1,11 +1,10 @@
 package bayern.steinbrecher.woodPacker.screens;
 
-import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodPacker.data.Plank;
 import bayern.steinbrecher.woodPacker.data.PlankProblem;
 import bayern.steinbrecher.woodPacker.data.PlankRow;
-import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator;
+import bayern.steinbrecher.woodPacker.elements.PlankField;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicatorSkin;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -33,11 +32,7 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private StackPane cuttingPlanContainer;
     @FXML
-    private CheckedIntegerSpinner plankWidthField;
-    @FXML
-    private CheckedIntegerSpinner plankHeightField;
-    @FXML
-    private PlankGrainDirectionIndicator plankGrainDirIndicator;
+    private PlankField newPlankField;
     private final PlankProblem plankProblem = new PlankProblem();
 
     @FXML
@@ -125,13 +120,8 @@ public class PlankDemandScreenController extends ScreenController {
 
     @FXML
     private void addPlank() {
-        plankProblem.getRequiredPlanks().add(
-                new Plank(
-                        plankWidthField.getValue(),
-                        plankHeightField.getValue(),
-                        plankGrainDirIndicator.getValue()
-                )
-        );
+        plankProblem.getRequiredPlanks()
+                .add(newPlankField.createPlank());
     }
 
     @FXML

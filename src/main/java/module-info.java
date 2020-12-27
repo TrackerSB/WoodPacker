@@ -1,6 +1,7 @@
 module bayern.steinbrecher.WoodPacker {
     requires bayern.steinbrecher.CheckedElements;
     requires bayern.steinbrecher.ScreenSwitcher;
+    requires java.logging;
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;

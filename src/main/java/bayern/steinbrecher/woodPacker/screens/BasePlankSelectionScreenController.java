@@ -1,10 +1,8 @@
 package bayern.steinbrecher.woodPacker.screens;
 
-import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
-import bayern.steinbrecher.woodPacker.data.Plank;
-import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator;
+import bayern.steinbrecher.woodPacker.elements.PlankField;
 import javafx.fxml.FXML;
 
 /**
@@ -13,25 +11,15 @@ import javafx.fxml.FXML;
  */
 public class BasePlankSelectionScreenController extends ScreenController {
     @FXML
-    private CheckedIntegerSpinner basePlankWidthField;
-    @FXML
-    private CheckedIntegerSpinner basePlankHeightField;
-    @FXML
-    private PlankGrainDirectionIndicator basePlankGrainDirIndicator;
+    private PlankField basePlankField;
 
     public BasePlankSelectionScreenController() {
     }
 
     @FXML
     private void confirmBasePlank() throws ScreenSwitchFailedException {
-        Plank basePlank = new Plank(
-                basePlankWidthField.getValue(),
-                basePlankHeightField.getValue(),
-                basePlankGrainDirIndicator.getValue()
-        );
-
         // FIXME Notify user about occurred exceptions
         getScreenManager()
-                .switchTo(new PlankDemandScreen(basePlank));
+                .switchTo(new PlankDemandScreen(basePlankField.createPlank()));
     }
 }

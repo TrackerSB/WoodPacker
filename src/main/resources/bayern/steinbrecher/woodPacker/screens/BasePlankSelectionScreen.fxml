@@ -4,30 +4,16 @@ author: Stefan Huber
 since: 0.1
 -->
 
-<?import javafx.scene.layout.HBox?>
-<?import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner?>
-<?import javafx.scene.control.Label?>
-<?import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicator?>
+<?import bayern.steinbrecher.woodPacker.elements.PlankField?>
 <?import javafx.scene.control.Button?>
-<HBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="bayern.steinbrecher.woodPacker.screens.BasePlankSelectionScreenController">
-    <CheckedIntegerSpinner fx:id="basePlankWidthField"
-                           promptText="%width"
-                           editable="true"
-                           initialValue="100"
-                           max="10000"
-                           min="1"
-                           amountToStepBy="1"/>
-    <Label text="&#10761;"/>
-    <CheckedIntegerSpinner fx:id="basePlankHeightField"
-                           promptText="%height"
-                           editable="true"
-                           initialValue="100"
-                           max="10000"
-                           min="1"
-                           amountToStepBy="1"/>
-    <PlankGrainDirectionIndicator fx:id="basePlankGrainDirIndicator"/>
-    <Button text="%confirm"
-            onAction="#confirmBasePlank"/>
-</HBox>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<FlowPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="bayern.steinbrecher.woodPacker.screens.BasePlankSelectionScreenController">
+    <HBox>
+        <PlankField fx:id="basePlankField"/>
+        <Button text="%confirm"
+                onAction="#confirmBasePlank"/>
+    </HBox>
+</FlowPane>
