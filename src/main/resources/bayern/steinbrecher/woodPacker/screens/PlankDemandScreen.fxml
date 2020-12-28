@@ -10,13 +10,13 @@ since: 0.1
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<ScrollPane xmlns="http://javafx.com/javafx"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodPacker.screens.PlankDemandScreenController">
-    <HBox>
+    <left>
         <VBox>
             <ScrollPane fitToHeight="true"
                         fitToWidth="true"
@@ -37,11 +37,12 @@ since: 0.1
                 </buttons>
             </ButtonBar>
         </VBox>
+    </left>
+    <center>
         <StackPane fx:id="cuttingPlanContainer"
-                   HBox.hgrow="ALWAYS"
-                   VBox.vgrow="ALWAYS"
+                   BorderPane.alignment="CENTER"
                    style="-fx-border-color: black">
             <Canvas fx:id="visualPlankCuttingPlan"/>
         </StackPane>
-    </HBox>
-</ScrollPane>
+    </center>
+</BorderPane>
