@@ -31,7 +31,9 @@ import javafx.scene.layout.StackPane;
  * occur automatically if and when the content changes size.
  *
  * @author michaelellis
+ * @deprecated This class has not the effects it was expected to have and therefore is unused.
  */
+@Deprecated(since = "0.1")
 public class AutoScalingStackPane extends StackPane {
 
     /**
