@@ -41,16 +41,18 @@ public class PlankDemandScreenController extends ScreenController {
         graphicsContext.setFill(Color.GHOSTWHITE);
         graphicsContext.fillRect(0, 0, visualPlankCuttingPlan.getWidth(), visualPlankCuttingPlan.getHeight());
 
-        DoubleBinding cuttingPlanHeightRatio = cuttingPlanContainer.heightProperty()
-                .divide(visualPlankCuttingPlan.heightProperty());
+        // Grow visual cutting plan to cutting plan container
         DoubleBinding cuttingPlanWidthRatio = cuttingPlanContainer.widthProperty()
                 .divide(visualPlankCuttingPlan.widthProperty());
-        NumberBinding cuttingPlanFitScale = Bindings.min(cuttingPlanHeightRatio, cuttingPlanWidthRatio);
+        DoubleBinding cuttingPlanHeightRatio = cuttingPlanContainer.heightProperty()
+                .divide(visualPlankCuttingPlan.heightProperty());
+        NumberBinding cuttingPlanFitScale = Bindings.min(cuttingPlanWidthRatio, cuttingPlanHeightRatio);
         visualPlankCuttingPlan.scaleXProperty()
                 .bind(cuttingPlanFitScale);
         visualPlankCuttingPlan.scaleYProperty()
                 .bind(cuttingPlanFitScale);
 
+        // Setup required planks list and its visualization
         requiredPlanksList.itemsProperty()
                 .bind(plankProblem.requiredPlanksProperty());
         requiredPlanksList.setCellFactory(list -> new ListCell<>() {
@@ -67,6 +69,7 @@ public class PlankDemandScreenController extends ScreenController {
             }
         });
 
+        // Trigger updates of visual cutting plank
         plankProblem.basePlankProperty()
                 .addListener((obs, oldBasePlank, newBasePlank)
                         -> updateVisualPlankCuttingPlan(newBasePlank, plankProblem.getProposedSolution()));
