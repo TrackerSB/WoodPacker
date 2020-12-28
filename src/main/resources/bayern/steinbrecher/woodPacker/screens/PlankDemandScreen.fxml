@@ -5,13 +5,12 @@ since: 0.1
 -->
 
 <?import bayern.steinbrecher.woodPacker.elements.PlankField?>
-<?import javafx.scene.canvas.Canvas?>
+<?import bayern.steinbrecher.woodPacker.elements.ScaledCanvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -39,10 +38,6 @@ since: 0.1
         </VBox>
     </left>
     <center>
-        <StackPane fx:id="cuttingPlanContainer"
-                   BorderPane.alignment="CENTER"
-                   style="-fx-border-color: black">
-            <Canvas fx:id="visualPlankCuttingPlan"/>
-        </StackPane>
+        <ScaledCanvas fx:id="visualPlankCuttingPlan"/>
     </center>
 </BorderPane>

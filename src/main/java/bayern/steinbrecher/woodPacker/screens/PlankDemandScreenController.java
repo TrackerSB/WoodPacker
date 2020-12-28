@@ -6,19 +6,16 @@ import bayern.steinbrecher.woodPacker.data.PlankProblem;
 import bayern.steinbrecher.woodPacker.data.PlankRow;
 import bayern.steinbrecher.woodPacker.elements.PlankField;
 import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicatorSkin;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.NumberBinding;
+import bayern.steinbrecher.woodPacker.elements.ScaledCanvas;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author Stefan Huber
@@ -28,29 +25,18 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private ListView<Plank> requiredPlanksList;
     @FXML
-    private Canvas visualPlankCuttingPlan;
-    @FXML
-    private StackPane cuttingPlanContainer;
+    private ScaledCanvas visualPlankCuttingPlan;
     @FXML
     private PlankField newPlankField;
     private final PlankProblem plankProblem = new PlankProblem();
 
     @FXML
     private void initialize() {
-        GraphicsContext graphicsContext = visualPlankCuttingPlan.getGraphicsContext2D();
-        graphicsContext.setFill(Color.GHOSTWHITE);
-        graphicsContext.fillRect(0, 0, visualPlankCuttingPlan.getWidth(), visualPlankCuttingPlan.getHeight());
-
-        // Grow visual cutting plan to cutting plan container
-        DoubleBinding cuttingPlanWidthRatio = cuttingPlanContainer.widthProperty()
-                .divide(visualPlankCuttingPlan.widthProperty());
-        DoubleBinding cuttingPlanHeightRatio = cuttingPlanContainer.heightProperty()
-                .divide(visualPlankCuttingPlan.heightProperty());
-        NumberBinding cuttingPlanFitScale = Bindings.min(cuttingPlanWidthRatio, cuttingPlanHeightRatio);
-        visualPlankCuttingPlan.scaleXProperty()
-                .bind(cuttingPlanFitScale);
-        visualPlankCuttingPlan.scaleYProperty()
-                .bind(cuttingPlanFitScale);
+        // FIXME Adapt size to available size on screen
+        visualPlankCuttingPlan.setMaxWidth(100);
+        visualPlankCuttingPlan.setMaxHeight(100);
+        visualPlankCuttingPlan.setMaxWidth(800);
+        visualPlankCuttingPlan.setMaxHeight(800);
 
         // Setup required planks list and its visualization
         requiredPlanksList.itemsProperty()
@@ -81,36 +67,38 @@ public class PlankDemandScreenController extends ScreenController {
     private void updateVisualPlankCuttingPlan(
             Plank newBasePlank, Pair<List<PlankRow>, List<Plank>> proposedSolution) {
         if (newBasePlank != null) {
-            visualPlankCuttingPlan.setHeight(newBasePlank.getHeight());
-            visualPlankCuttingPlan.setWidth(newBasePlank.getWidth());
+            visualPlankCuttingPlan.setTheoreticalWidth(newBasePlank.getWidth());
+            visualPlankCuttingPlan.setTheoreticalHeight(newBasePlank.getHeight());
 
-            // Draw background
-            GraphicsContext graphicsContext = visualPlankCuttingPlan.getGraphicsContext2D();
-            graphicsContext.setFill(Color.BURLYWOOD);
-            graphicsContext.fillRect(0, 0, newBasePlank.getWidth(), newBasePlank.getHeight());
-            final double backgroundAngleBottom = Math.toRadians(45);
-            final double topBottomXDelta = newBasePlank.getHeight() / Math.tan(backgroundAngleBottom);
-            final int stepSize = 10;
-            graphicsContext.setStroke(Color.GRAY);
-            for (double x = -topBottomXDelta + stepSize; x < newBasePlank.getWidth(); x += stepSize) {
-                graphicsContext.strokeLine(x, newBasePlank.getHeight(), x + topBottomXDelta, 0);
-            }
+            Consumer<GraphicsContext> drawingActions = gc -> {
+                // Draw background
+                gc.setFill(Color.BURLYWOOD);
+                gc.fillRect(0, 0, newBasePlank.getWidth(), newBasePlank.getHeight());
+                final double backgroundAngleBottom = Math.toRadians(45);
+                final double topBottomXDelta = newBasePlank.getHeight() / Math.tan(backgroundAngleBottom);
+                final int stepSize = 10;
+                gc.setStroke(Color.GRAY);
+                for (double x = -topBottomXDelta + stepSize; x < newBasePlank.getWidth(); x += stepSize) {
+                    gc.strokeLine(x, newBasePlank.getHeight(), x + topBottomXDelta, 0);
+                }
 
-            // Draw planks
-            List<PlankRow> placedPlankRows = proposedSolution.getKey();
-            if (placedPlankRows != null) {
-                graphicsContext.setStroke(Color.BLACK);
-                for (PlankRow row : placedPlankRows) {
-                    double currentStartX = 0;
-                    for (Plank plank : row.getPlanks()) {
-                        graphicsContext.beginPath();
-                        graphicsContext.rect(currentStartX, row.getStartY(), plank.getWidth(), plank.getHeight());
-                        graphicsContext.stroke();
-                        graphicsContext.fill();
-                        currentStartX += plank.getWidth();
+                // Draw planks
+                List<PlankRow> placedPlankRows = proposedSolution.getKey();
+                if (placedPlankRows != null) {
+                    gc.setStroke(Color.BLACK);
+                    for (PlankRow row : placedPlankRows) {
+                        double currentStartX = 0;
+                        for (Plank plank : row.getPlanks()) {
+                            gc.beginPath();
+                            gc.rect(currentStartX, row.getStartY(), plank.getWidth(), plank.getHeight());
+                            gc.stroke();
+                            gc.fill();
+                            currentStartX += plank.getWidth();
+                        }
                     }
                 }
-            }
+            };
+            visualPlankCuttingPlan.setDrawingActions(drawingActions);
         }
     }
 
