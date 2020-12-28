@@ -1,7 +1,7 @@
-package bayern.steinbrecher.woodPacker.elements;
+package bayern.steinbrecher.woodpacker.elements;
 
-import bayern.steinbrecher.woodPacker.data.Plank;
-import bayern.steinbrecher.woodPacker.data.PlankGrainDirection;
+import bayern.steinbrecher.woodpacker.data.Plank;
+import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;

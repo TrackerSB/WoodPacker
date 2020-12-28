@@ -1,8 +1,8 @@
-package bayern.steinbrecher.woodPacker.screens;
+package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.Screen;
-import bayern.steinbrecher.woodPacker.WoodPacker;
-import bayern.steinbrecher.woodPacker.data.Plank;
+import bayern.steinbrecher.woodpacker.WoodPacker;
+import bayern.steinbrecher.woodpacker.data.Plank;
 import org.jetbrains.annotations.NotNull;
 
 /**

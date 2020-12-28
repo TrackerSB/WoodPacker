@@ -1,7 +1,7 @@
-package bayern.steinbrecher.woodPacker.elements;
+package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
-import bayern.steinbrecher.woodPacker.WoodPacker;
+import bayern.steinbrecher.woodpacker.WoodPacker;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;

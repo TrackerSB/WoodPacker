@@ -1,7 +1,7 @@
 /*
  * Based on http://gillius.org/blog/2013/02/javafx-window-scaling-on-resize.html
  */
-package bayern.steinbrecher.woodPacker.elements;
+package bayern.steinbrecher.woodpacker.elements;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

@@ -1,4 +1,4 @@
-package bayern.steinbrecher.woodPacker.elements;
+package bayern.steinbrecher.woodpacker.elements;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;

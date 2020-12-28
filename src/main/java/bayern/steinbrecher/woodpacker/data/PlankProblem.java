@@ -1,4 +1,4 @@
-package bayern.steinbrecher.woodPacker.data;
+package bayern.steinbrecher.woodpacker.data;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ListProperty;

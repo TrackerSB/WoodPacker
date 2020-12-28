@@ -4,13 +4,13 @@ author: Stefan Huber
 since: 0.1
 -->
 
-<?import bayern.steinbrecher.woodPacker.elements.PlankField?>
+<?import bayern.steinbrecher.woodpacker.elements.PlankField?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <FlowPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
-          fx:controller="bayern.steinbrecher.woodPacker.screens.BasePlankSelectionScreenController">
+          fx:controller="bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreenController">
     <HBox>
         <PlankField fx:id="basePlankField"/>
         <Button text="%confirm"

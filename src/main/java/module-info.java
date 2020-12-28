@@ -7,7 +7,7 @@ module bayern.steinbrecher.WoodPacker {
     requires javafx.graphics;
     requires org.jetbrains.annotations;
 
-    opens bayern.steinbrecher.woodPacker to javafx.graphics;
-    opens bayern.steinbrecher.woodPacker.elements to javafx.fxml;
-    opens bayern.steinbrecher.woodPacker.screens to javafx.fxml;
+    opens bayern.steinbrecher.woodpacker to javafx.graphics;
+    opens bayern.steinbrecher.woodpacker.elements to javafx.fxml;
+    opens bayern.steinbrecher.woodpacker.screens to javafx.fxml;
 }

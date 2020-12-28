@@ -1,12 +1,12 @@
-package bayern.steinbrecher.woodPacker.screens;
+package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.ScreenController;
-import bayern.steinbrecher.woodPacker.data.Plank;
-import bayern.steinbrecher.woodPacker.data.PlankProblem;
-import bayern.steinbrecher.woodPacker.data.PlankRow;
-import bayern.steinbrecher.woodPacker.elements.PlankField;
-import bayern.steinbrecher.woodPacker.elements.PlankGrainDirectionIndicatorSkin;
-import bayern.steinbrecher.woodPacker.elements.ScaledCanvas;
+import bayern.steinbrecher.woodpacker.data.Plank;
+import bayern.steinbrecher.woodpacker.data.PlankProblem;
+import bayern.steinbrecher.woodpacker.data.PlankRow;
+import bayern.steinbrecher.woodpacker.elements.PlankField;
+import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
+import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;

@@ -1,8 +1,8 @@
-package bayern.steinbrecher.woodPacker;
+package bayern.steinbrecher.woodpacker;
 
 import bayern.steinbrecher.screenSwitcher.ScreenManager;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
-import bayern.steinbrecher.woodPacker.screens.BasePlankSelectionScreen;
+import bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreen;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

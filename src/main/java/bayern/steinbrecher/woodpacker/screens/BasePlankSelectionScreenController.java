@@ -1,8 +1,8 @@
-package bayern.steinbrecher.woodPacker.screens;
+package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
-import bayern.steinbrecher.woodPacker.elements.PlankField;
+import bayern.steinbrecher.woodpacker.elements.PlankField;
 import javafx.fxml.FXML;
 
 /**

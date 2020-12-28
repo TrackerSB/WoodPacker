@@ -1,7 +1,7 @@
-package bayern.steinbrecher.woodPacker.screens;
+package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.Screen;
-import bayern.steinbrecher.woodPacker.WoodPacker;
+import bayern.steinbrecher.woodpacker.WoodPacker;
 
 /**
  * @author Stefan Huber
