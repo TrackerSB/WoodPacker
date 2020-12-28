@@ -6,6 +6,8 @@ import javafx.scene.paint.Color;
 
 /**
  * @author Stefan Huber
+ * @see https://stackoverflow.com/a/31761362/230513
+ * @see https://stackoverflow.com/a/8616169/230513
  * @since 0.1
  */
 public class ResizableCanvas extends Canvas {
