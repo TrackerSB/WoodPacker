@@ -1,8 +1,6 @@
 package bayern.steinbrecher.woodPacker.elements;
 
 import bayern.steinbrecher.woodPacker.data.PlankGrainDirection;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.Button;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.ImageView;
@@ -22,16 +20,14 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
             PlankGrainDirection.HORIZONTAL, "plankGrainHorizontal.png",
             PlankGrainDirection.VERTICAL, "plankGrainVertical.png"
     );
-    private final ReadOnlyObjectWrapper<PlankGrainDirection> plankGrainDirection
-            = new ReadOnlyObjectWrapper<>(PlankGrainDirection.IRRELEVANT);
 
     protected PlankGrainDirectionIndicatorSkin(PlankGrainDirectionIndicator control) {
         super(control);
 
         Button indicatorButton = new Button();
         indicatorButton.setOnAction(aevt -> {
-            plankGrainDirection.set(
-                    switch (getPlankGrainDirection()) {
+            control.setValue(
+                    switch (control.getValue()) {
                         case HORIZONTAL -> PlankGrainDirection.IRRELEVANT;
                         case IRRELEVANT -> PlankGrainDirection.VERTICAL;
                         case VERTICAL -> PlankGrainDirection.HORIZONTAL;
@@ -42,11 +38,11 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         Consumer<PlankGrainDirection> updateIndicatorGraphic = direction -> {
             indicatorButton.setGraphic(generateImageView(direction));
         };
-        plankGrainDirectionProperty()
+        control.valueProperty()
                 .addListener((obs, previousDirection, currentDirection) -> {
                     updateIndicatorGraphic.accept(currentDirection);
                 });
-        updateIndicatorGraphic.accept(getPlankGrainDirection()); // Ensure initial state
+        updateIndicatorGraphic.accept(control.getValue()); // Ensure initial state
 
         getChildren()
                 .add(indicatorButton);
@@ -61,13 +57,5 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         } else {
             return new ImageView(symbolResource.toExternalForm());
         }
-    }
-
-    public ReadOnlyObjectProperty<PlankGrainDirection> plankGrainDirectionProperty() {
-        return plankGrainDirection.getReadOnlyProperty();
-    }
-
-    public PlankGrainDirection getPlankGrainDirection() {
-        return plankGrainDirectionProperty().get();
     }
 }
