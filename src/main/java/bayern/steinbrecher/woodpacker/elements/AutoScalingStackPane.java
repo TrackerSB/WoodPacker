@@ -36,6 +36,9 @@ import javafx.scene.layout.StackPane;
 @Deprecated(since = "0.1")
 public class AutoScalingStackPane extends StackPane {
 
+    private final ObjectProperty<AutoScale> autoScale
+            = new SimpleObjectProperty<AutoScale>(this, "autoScale", AutoScale.FIT);
+
     /**
      * Force scale transformation to be recomputed based on the size of this
      * {@link AutoScalingStackPane} and the size of the contents.
@@ -93,9 +96,6 @@ public class AutoScalingStackPane extends StackPane {
          */
         FIT
     }
-
-    private final ObjectProperty<AutoScale> autoScale
-            = new SimpleObjectProperty<AutoScale>(this, "autoScale", AutoScale.FIT);
 
     public ObjectProperty<AutoScale> autoScaleProperty() {
         return autoScale;
