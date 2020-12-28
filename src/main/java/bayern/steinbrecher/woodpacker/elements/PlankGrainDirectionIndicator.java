@@ -14,10 +14,6 @@ public class PlankGrainDirectionIndicator extends Control {
     private final ObjectProperty<PlankGrainDirection> value
             = new SimpleObjectProperty<>(PlankGrainDirection.IRRELEVANT);
 
-    public PlankGrainDirectionIndicator() {
-        super();
-    }
-
     @Override
     protected Skin<PlankGrainDirectionIndicator> createDefaultSkin() {
         return new PlankGrainDirectionIndicatorSkin(this);

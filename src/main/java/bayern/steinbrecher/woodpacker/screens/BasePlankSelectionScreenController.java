@@ -13,9 +13,6 @@ public class BasePlankSelectionScreenController extends ScreenController {
     @FXML
     private PlankField basePlankField;
 
-    public BasePlankSelectionScreenController() {
-    }
-
     @FXML
     private void confirmBasePlank() throws ScreenSwitchFailedException {
         // FIXME Notify user about occurred exceptions

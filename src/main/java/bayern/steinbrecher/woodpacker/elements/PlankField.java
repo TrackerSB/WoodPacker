@@ -18,10 +18,6 @@ public class PlankField extends Control {
     private final IntegerProperty plankHeight = new SimpleIntegerProperty();
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
 
-    public PlankField() {
-        super();
-    }
-
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PlankFieldSkin(this);
