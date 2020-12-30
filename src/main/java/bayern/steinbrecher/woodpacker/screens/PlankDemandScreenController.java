@@ -8,10 +8,17 @@ import bayern.steinbrecher.woodpacker.elements.PlankField;
 import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 import javafx.util.Pair;
 
 import java.util.List;
@@ -29,6 +36,15 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private PlankField newPlankField;
     private final PlankProblem plankProblem = new PlankProblem();
+
+    // NOTE Can this method be reused for showing the same ID circles on the visual plank cutting plan?
+    private Node createIdCircle(int id){
+        Circle idContainer = new Circle(10, Color.BLACK);
+        Text idText = new Text(String.valueOf(id));
+        idText.setFill(Color.WHITE);
+        idText.setBoundsType(TextBoundsType.LOGICAL_VERTICAL_CENTER);
+        return new StackPane(idContainer, idText);
+    }
 
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
@@ -53,8 +69,10 @@ public class PlankDemandScreenController extends ScreenController {
                     setText("");
                     setGraphic(null);
                 } else {
-                    setText(String.format("%d: %d mm x %d mm", item.getId(), item.getHeight(), item.getWidth()));
-                    setGraphic(PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection()));
+                    setText(String.format("%d mm x %d mm", item.getHeight(), item.getWidth()));
+                    ImageView grainDirectionIcon
+                            = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
+                    setGraphic(new HBox(createIdCircle(item.getId()), grainDirectionIcon));
                 }
             }
         });
