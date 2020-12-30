@@ -69,7 +69,7 @@ public class PlankDemandScreenController extends ScreenController {
                     setText("");
                     setGraphic(null);
                 } else {
-                    setText(String.format("%d mm x %d mm", item.getHeight(), item.getWidth()));
+                    setText(String.format("%d mm x %d mm", item.getWidth(), item.getHeight()));
                     ImageView grainDirectionIcon
                             = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
                     setGraphic(new HBox(createIdCircle(item.getId()), grainDirectionIcon));
