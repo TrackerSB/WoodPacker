@@ -31,6 +31,7 @@ public class PlankDemandScreenController extends ScreenController {
     private final PlankProblem plankProblem = new PlankProblem();
 
     @FXML
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void initialize() {
         // FIXME Adapt size to available size on screen
         visualPlankCuttingPlan.setMaxWidth(100);
@@ -117,12 +118,14 @@ public class PlankDemandScreenController extends ScreenController {
     }
 
     @FXML
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void addPlank() {
         plankProblem.getRequiredPlanks()
                 .add(newPlankField.createPlank(plankProblem.getRequiredPlanks().size() + 1));
     }
 
     @FXML
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void clearAllPlanks() {
         plankProblem.requiredPlanksProperty()
                 .clear();

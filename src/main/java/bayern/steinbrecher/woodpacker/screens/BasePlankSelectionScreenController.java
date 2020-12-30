@@ -23,6 +23,7 @@ public class BasePlankSelectionScreenController extends ScreenController {
     private PlankField basePlankField;
 
     @FXML
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void confirmBasePlank() {
         try {
             getScreenManager()
