@@ -46,7 +46,8 @@ public class PlankProblem {
      * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
      * not fit onto the base plank (besides the already added ones).
      */
-    private static Pair<List<PlankSolutionRow>, List<Plank>> determineSolution(Plank basePlank, List<Plank> requiredPlanks) {
+    private static Pair<List<PlankSolutionRow>, List<Plank>> determineSolution(
+            Plank basePlank, List<Plank> requiredPlanks) {
         List<PlankSolutionRow> placedPlanks = new ArrayList<>();
         List<Plank> ignoredPlanks;
         if (basePlank == null) {
@@ -69,8 +70,8 @@ public class PlankProblem {
                 if (!placedInExistingRow) {
                     double expectedEndY = heightOfAddedRows + plank.getHeight();
                     if (expectedEndY <= basePlank.getHeight()) {
-                        PlankSolutionRow newRow = new PlankSolutionRow(heightOfAddedRows, plank.getHeight(), basePlank.getWidth(),
-                                basePlank.getGrainDirection());
+                        PlankSolutionRow newRow = new PlankSolutionRow(heightOfAddedRows, plank.getHeight(),
+                                basePlank.getWidth(), basePlank.getGrainDirection());
                         newRow.addPlank(plank);
                         placedPlanks.add(newRow);
                         heightOfAddedRows = expectedEndY;
