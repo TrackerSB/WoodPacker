@@ -59,7 +59,7 @@ public class PlankField extends Control {
         grainDirectionProperty().set(direction);
     }
 
-    public Plank createPlank() {
-        return new Plank(getPlankWidth(), getPlankHeight(), getGrainDirection());
+    public Plank createPlank(int id) {
+        return new Plank(id, getPlankWidth(), getPlankHeight(), getGrainDirection());
     }
 }

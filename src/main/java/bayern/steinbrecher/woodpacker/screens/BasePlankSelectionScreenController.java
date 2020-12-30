@@ -26,7 +26,7 @@ public class BasePlankSelectionScreenController extends ScreenController {
     private void confirmBasePlank() {
         try {
             getScreenManager()
-                    .switchTo(new PlankDemandScreen(basePlankField.createPlank()));
+                    .switchTo(new PlankDemandScreen(basePlankField.createPlank(-1)));
         } catch (ScreenSwitchFailedException ex) {
             LOGGER.log(Level.SEVERE, "Could not switch to plank demand screen", ex);
             String basePlankConfirmationFailed = WoodPacker.LANGUAGE_BUNDLE.getString("basePlankConfirmationFailed");

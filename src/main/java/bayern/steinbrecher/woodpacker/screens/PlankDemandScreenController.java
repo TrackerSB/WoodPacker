@@ -45,11 +45,11 @@ public class PlankDemandScreenController extends ScreenController {
             @Override
             protected void updateItem(Plank item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null) {
+                if (item == null || empty) {
                     setText("");
                     setGraphic(null);
                 } else {
-                    setText(String.format("%d mm x %d mm", item.getHeight(), item.getWidth()));
+                    setText(String.format("%d: %d mm x %d mm", item.getId(), item.getHeight(), item.getWidth()));
                     setGraphic(PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection()));
                 }
             }
@@ -85,14 +85,21 @@ public class PlankDemandScreenController extends ScreenController {
                 // Draw planks
                 List<PlankSolutionRow> placedPlankRows = proposedSolution.getKey();
                 if (placedPlankRows != null) {
-                    gc.setStroke(Color.BLACK);
                     for (PlankSolutionRow row : placedPlankRows) {
                         double currentStartX = 0;
                         for (Plank plank : row.getPlanks()) {
                             gc.beginPath();
                             gc.rect(currentStartX, row.getStartY(), plank.getWidth(), plank.getHeight());
+                            gc.setStroke(Color.BLACK);
                             gc.stroke();
+                            gc.setFill(Color.BURLYWOOD);
                             gc.fill();
+                            gc.setFill(Color.BLACK);
+                            gc.fillText(
+                                    String.valueOf(plank.getId()),
+                                    currentStartX + plank.getWidth() / 2d,
+                                    row.getStartY() + plank.getHeight() / 2d
+                            );
                             currentStartX += plank.getWidth();
                         }
                     }
@@ -112,7 +119,7 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private void addPlank() {
         plankProblem.getRequiredPlanks()
-                .add(newPlankField.createPlank());
+                .add(newPlankField.createPlank(plankProblem.getRequiredPlanks().size() + 1));
     }
 
     @FXML
