@@ -33,11 +33,14 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void initialize() {
-        // FIXME Adapt size to available size on screen
-        visualPlankCuttingPlan.setMaxWidth(100);
-        visualPlankCuttingPlan.setMaxHeight(100);
+        visualPlankCuttingPlan.setMinWidth(300);
+        visualPlankCuttingPlan.setMinHeight(300);
         visualPlankCuttingPlan.setMaxWidth(800);
-        visualPlankCuttingPlan.setMaxHeight(800);
+        visualPlankCuttingPlan.sceneProperty()
+                .addListener((obs, previousScene, currentScene) -> {
+                    visualPlankCuttingPlan.maxHeightProperty()
+                            .bind(currentScene.heightProperty());
+                });
 
         // Setup required planks list and its visualization
         requiredPlanksList.itemsProperty()

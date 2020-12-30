@@ -12,32 +12,35 @@ since: 0.1
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-<BorderPane xmlns="http://javafx.com/javafx"
+<ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController">
-    <left>
-        <VBox>
-            <ScrollPane fitToHeight="true"
-                        fitToWidth="true"
-                        VBox.vgrow="ALWAYS">
-                <ListView fx:id="requiredPlanksList"
-                          minWidth="300"/>
-            </ScrollPane>
-            <PlankField fx:id="newPlankField"/>
-            <ButtonBar>
-                <buttons>
-                    <Button text="%add"
-                            onAction="#addPlank"/>
-                    <Button text="%clearAll"
-                            onAction="#clearAllPlanks"/>
-                    <Button text="%backToBasePlankScreen"
-                            onAction="#switchToPreviousScreen"
-                            ButtonBar.buttonData="BACK_PREVIOUS"/>
-                </buttons>
-            </ButtonBar>
-        </VBox>
-    </left>
-    <center>
-        <ScaledCanvas fx:id="visualPlankCuttingPlan"/>
-    </center>
-</BorderPane>
+            fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
+            fitToWidth="true"
+            fitToHeight="true">
+    <BorderPane>
+        <left>
+            <VBox>
+                <ScrollPane fitToHeight="true"
+                            fitToWidth="true"
+                            VBox.vgrow="ALWAYS">
+                    <ListView fx:id="requiredPlanksList"/>
+                </ScrollPane>
+                <PlankField fx:id="newPlankField"/>
+                <ButtonBar>
+                    <buttons>
+                        <Button text="%add"
+                                onAction="#addPlank"/>
+                        <Button text="%clearAll"
+                                onAction="#clearAllPlanks"/>
+                        <Button text="%backToBasePlankScreen"
+                                onAction="#switchToPreviousScreen"
+                                ButtonBar.buttonData="BACK_PREVIOUS"/>
+                    </buttons>
+                </ButtonBar>
+            </VBox>
+        </left>
+        <center>
+            <ScaledCanvas fx:id="visualPlankCuttingPlan"/>
+        </center>
+    </BorderPane>
+</ScrollPane>
