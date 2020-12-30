@@ -3,7 +3,7 @@ package bayern.steinbrecher.woodpacker.screens;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
-import bayern.steinbrecher.woodpacker.data.PlankRow;
+import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.PlankField;
 import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
@@ -65,7 +65,7 @@ public class PlankDemandScreenController extends ScreenController {
     }
 
     private void updateVisualPlankCuttingPlan(
-            Plank newBasePlank, Pair<List<PlankRow>, List<Plank>> proposedSolution) {
+            Plank newBasePlank, Pair<List<PlankSolutionRow>, List<Plank>> proposedSolution) {
         if (newBasePlank != null) {
             visualPlankCuttingPlan.setTheoreticalWidth(newBasePlank.getWidth());
             visualPlankCuttingPlan.setTheoreticalHeight(newBasePlank.getHeight());
@@ -83,10 +83,10 @@ public class PlankDemandScreenController extends ScreenController {
                 }
 
                 // Draw planks
-                List<PlankRow> placedPlankRows = proposedSolution.getKey();
+                List<PlankSolutionRow> placedPlankRows = proposedSolution.getKey();
                 if (placedPlankRows != null) {
                     gc.setStroke(Color.BLACK);
-                    for (PlankRow row : placedPlankRows) {
+                    for (PlankSolutionRow row : placedPlankRows) {
                         double currentStartX = 0;
                         for (Plank plank : row.getPlanks()) {
                             gc.beginPath();

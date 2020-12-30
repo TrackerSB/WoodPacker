@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class PlankProblem {
     private final ListProperty<Plank> requiredPlanks = new SimpleListProperty<>(null);
     private final ObjectProperty<Plank> basePlank = new SimpleObjectProperty<>(null);
-    private final ReadOnlyObjectWrapper<Pair<List<PlankRow>, List<Plank>>> proposedSolution
+    private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, List<Plank>>> proposedSolution
             = new ReadOnlyObjectWrapper<>(null);
 
     public PlankProblem() {
@@ -46,8 +46,8 @@ public class PlankProblem {
      * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
      * not fit onto the base plank (besides the already added ones).
      */
-    private static Pair<List<PlankRow>, List<Plank>> determineSolution(Plank basePlank, List<Plank> requiredPlanks) {
-        List<PlankRow> placedPlanks = new ArrayList<>();
+    private static Pair<List<PlankSolutionRow>, List<Plank>> determineSolution(Plank basePlank, List<Plank> requiredPlanks) {
+        List<PlankSolutionRow> placedPlanks = new ArrayList<>();
         List<Plank> ignoredPlanks;
         if (basePlank == null) {
             ignoredPlanks = requiredPlanks;
@@ -60,7 +60,7 @@ public class PlankProblem {
             double heightOfAddedRows = 0;
             for (Plank plank : planksToPlace) {
                 boolean placedInExistingRow = false;
-                for (PlankRow row : placedPlanks) {
+                for (PlankSolutionRow row : placedPlanks) {
                     if (row.addPlank(plank)) {
                         placedInExistingRow = true;
                         break;
@@ -69,7 +69,7 @@ public class PlankProblem {
                 if (!placedInExistingRow) {
                     double expectedEndY = heightOfAddedRows + plank.getHeight();
                     if (expectedEndY <= basePlank.getHeight()) {
-                        PlankRow newRow = new PlankRow(heightOfAddedRows, plank.getHeight(), basePlank.getWidth(),
+                        PlankSolutionRow newRow = new PlankSolutionRow(heightOfAddedRows, plank.getHeight(), basePlank.getWidth(),
                                 basePlank.getGrainDirection());
                         newRow.addPlank(plank);
                         placedPlanks.add(newRow);
@@ -107,11 +107,11 @@ public class PlankProblem {
         basePlankProperty().set(basePlank);
     }
 
-    public ReadOnlyObjectProperty<Pair<List<PlankRow>, List<Plank>>> proposedSolutionProperty() {
+    public ReadOnlyObjectProperty<Pair<List<PlankSolutionRow>, List<Plank>>> proposedSolutionProperty() {
         return proposedSolution.getReadOnlyProperty();
     }
 
-    public Pair<List<PlankRow>, List<Plank>> getProposedSolution() {
+    public Pair<List<PlankSolutionRow>, List<Plank>> getProposedSolution() {
         return proposedSolutionProperty().get();
     }
 }

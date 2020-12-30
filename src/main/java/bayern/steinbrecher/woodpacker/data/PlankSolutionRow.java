@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PlankRow {
+/**
+ * @author Stefan Huber
+ * @since 0.1
+ */
+public class PlankSolutionRow {
     private final double startY;
     private final double height;
     private final double maxWidth;
@@ -12,7 +16,7 @@ public class PlankRow {
     private final List<Plank> planks = new ArrayList<>();
     private double currentWidth = 0;
 
-    public PlankRow(double startY, double height, double maxWidth, PlankGrainDirection grainDirection) {
+    public PlankSolutionRow(double startY, double height, double maxWidth, PlankGrainDirection grainDirection) {
         this.startY = startY;
         this.height = height;
         this.maxWidth = maxWidth;
