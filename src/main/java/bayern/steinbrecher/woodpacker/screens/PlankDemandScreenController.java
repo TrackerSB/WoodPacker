@@ -38,7 +38,7 @@ public class PlankDemandScreenController extends ScreenController {
     private final PlankProblem plankProblem = new PlankProblem();
 
     // NOTE Can this method be reused for showing the same ID circles on the visual plank cutting plan?
-    private Node createIdCircle(int id){
+    private Node createIdCircle(int id) {
         Circle idContainer = new Circle(10, Color.BLACK);
         Text idText = new Text(String.valueOf(id));
         idText.setFill(Color.WHITE);
@@ -54,8 +54,10 @@ public class PlankDemandScreenController extends ScreenController {
         visualPlankCuttingPlan.setMaxWidth(800);
         visualPlankCuttingPlan.sceneProperty()
                 .addListener((obs, previousScene, currentScene) -> {
-                    visualPlankCuttingPlan.maxHeightProperty()
-                            .bind(currentScene.heightProperty());
+                    if (currentScene != null) {
+                        visualPlankCuttingPlan.maxHeightProperty()
+                                .bind(currentScene.heightProperty());
+                    }
                 });
 
         // Setup required planks list and its visualization
