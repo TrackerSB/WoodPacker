@@ -1,16 +1,18 @@
 package bayern.steinbrecher.woodpacker.data;
 
+import java.io.Serializable;
+
 /**
  * @author Stefan Huber
  * @since 0.1
  */
-public class Plank {
-    private final int id;
+public class Plank implements Serializable {
+    private final String id;
     private final int width; // in mm
     private final int height; // in mm
     private final PlankGrainDirection grainDirection;
 
-    public Plank(int id, int width, int height, PlankGrainDirection grainDirection) {
+    public Plank(String id, int width, int height, PlankGrainDirection grainDirection) {
         this.id = id;
         if (width <= 0) {
             throw new IllegalArgumentException("Width has to be positive");
@@ -23,7 +25,7 @@ public class Plank {
         this.grainDirection = grainDirection;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

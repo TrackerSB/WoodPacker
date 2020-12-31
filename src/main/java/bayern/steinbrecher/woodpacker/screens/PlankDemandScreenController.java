@@ -38,9 +38,9 @@ public class PlankDemandScreenController extends ScreenController {
     private final PlankProblem plankProblem = new PlankProblem();
 
     // NOTE Can this method be reused for showing the same ID circles on the visual plank cutting plan?
-    private Node createIdCircle(int id) {
+    private Node createIdCircle(String id) {
         Circle idContainer = new Circle(10, Color.BLACK);
-        Text idText = new Text(String.valueOf(id));
+        Text idText = new Text(id);
         idText.setFill(Color.WHITE);
         idText.setBoundsType(TextBoundsType.LOGICAL_VERTICAL_CENTER);
         return new StackPane(idContainer, idText);
@@ -120,7 +120,7 @@ public class PlankDemandScreenController extends ScreenController {
                             gc.fill();
                             gc.setFill(Color.BLACK);
                             gc.fillText(
-                                    String.valueOf(plank.getId()),
+                                    plank.getId(),
                                     currentStartX + plank.getWidth() / 2d,
                                     row.getStartY() + plank.getHeight() / 2d
                             );
@@ -144,7 +144,7 @@ public class PlankDemandScreenController extends ScreenController {
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void addPlank() {
         plankProblem.getRequiredPlanks()
-                .add(newPlankField.createPlank(plankProblem.getRequiredPlanks().size() + 1));
+                .add(newPlankField.createPlank(String.valueOf(plankProblem.getRequiredPlanks().size() + 1)));
     }
 
     @FXML

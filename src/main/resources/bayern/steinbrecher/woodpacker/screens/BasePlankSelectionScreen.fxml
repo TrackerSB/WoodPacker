@@ -4,16 +4,39 @@ author: Stefan Huber
 since: 0.1
 -->
 
-<?import bayern.steinbrecher.woodpacker.elements.PlankField?>
+<?import bayern.steinbrecher.woodpacker.elements.ScaledCanvas?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import bayern.steinbrecher.woodpacker.elements.PlankField?>
 <?import javafx.scene.layout.HBox?>
-<FlowPane xmlns="http://javafx.com/javafx"
-          xmlns:fx="http://javafx.com/fxml"
-          fx:controller="bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreenController">
-    <HBox>
-        <PlankField fx:id="basePlankField"/>
-        <Button text="%confirm"
-                onAction="#confirmBasePlank"/>
-    </HBox>
-</FlowPane>
+<?import bayern.steinbrecher.checkedElements.textfields.CheckedTextField?>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreenController"
+            fitToHeight="true"
+            fitToWidth="true">
+    <BorderPane>
+        <left>
+            <VBox>
+                <ListView fx:id="predefinedBasePlanksView"/>
+                <PlankField fx:id="newBasePlankField"/>
+                <HBox>
+                    <CheckedTextField fx:id="basePlankNameField"/>
+                    <Button text="%createBasePlank"
+                            onAction="#createBasePlank"/>
+                </HBox>
+            </VBox>
+        </left>
+        <center>
+            <VBox>
+                <ScaledCanvas fx:id="basePlankPreview"
+                              VBox.vgrow="ALWAYS"/>
+                <Button text="%confirm"
+                        onAction="#confirmBasePlank"/>
+            </VBox>
+        </center>
+    </BorderPane>
+</ScrollPane>
