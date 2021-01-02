@@ -1,5 +1,7 @@
 package bayern.steinbrecher.woodpacker.screens;
 
+import bayern.steinbrecher.checkedElements.report.ReportEntry;
+import bayern.steinbrecher.checkedElements.report.ReportType;
 import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
@@ -7,6 +9,12 @@ import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.elements.PlankField;
 import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -32,7 +40,9 @@ public class BasePlankSelectionScreenController extends ScreenController {
             .node("bayern/steinbrecher/woodpacker");
     private static final Preferences USER_DEFINED_BASE_PLANKS = USER_PREFERENCES_ROOT.node("baseplanks");
     private static final Logger LOGGER = Logger.getLogger(BasePlankSelectionScreenController.class.getName());
-
+    // FIXME Move the next property to FXML
+    private final ReadOnlyBooleanWrapper basePlankSelected = new ReadOnlyBooleanWrapper();
+    private final ReadOnlyBooleanWrapper validNewBasePlank = new ReadOnlyBooleanWrapper();
     @FXML
     private ListView<Plank> predefinedBasePlanksView;
     @FXML
@@ -93,6 +103,31 @@ public class BasePlankSelectionScreenController extends ScreenController {
         });
         predefinedBasePlanksView.getSelectionModel()
                 .setSelectionMode(SelectionMode.SINGLE);
+        basePlankSelected.bind(
+                Bindings.select(predefinedBasePlanksView, "selectionModel", "selectedItem")
+                        .isNotNull());
+
+        BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
+        InvalidationListener updateBasePlankNameAlreadyExists = obs -> {
+            basePlankNameAlreadyExists.set(
+                    predefinedBasePlanksView.getItems()
+                            .stream()
+                            .anyMatch(plank -> plank.getId().equals(basePlankNameField.getText()))
+            );
+        };
+        basePlankNameField.textProperty()
+                .addListener(updateBasePlankNameAlreadyExists);
+        predefinedBasePlanksView.itemsProperty()
+                .addListener((obs, previousItemList, currentItemList) -> {
+                    updateBasePlankNameAlreadyExists.invalidated(null);
+                    currentItemList.addListener(updateBasePlankNameAlreadyExists);
+                });
+        basePlankNameField.addReport(
+                new ReportEntry("basePlankNameAlreadyExists", ReportType.ERROR, basePlankNameAlreadyExists));
+
+        validNewBasePlank.bind(
+                newBasePlankField.validProperty()
+                        .and(basePlankNameField.validProperty()));
 
         readUserDefinedBasePlanks();
     }
@@ -100,16 +135,18 @@ public class BasePlankSelectionScreenController extends ScreenController {
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void createBasePlank() {
-        Plank newBasePlank = newBasePlankField.createPlank(basePlankNameField.getText());
-        predefinedBasePlanksView.getItems()
-                .add(newBasePlank);
-        ByteArrayOutputStream serializedBasePlank = new ByteArrayOutputStream();
-        try (ObjectOutputStream serializer = new ObjectOutputStream(serializedBasePlank)) {
-            serializer.writeObject(newBasePlank);
-            USER_DEFINED_BASE_PLANKS.putByteArray(newBasePlank.getId(), serializedBasePlank.toByteArray());
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "Could not persistently store new base plank", ex);
-            // FIXME Show stacktrace alert to user
+        if (isValidNewBasePlank()) {
+            Plank newBasePlank = newBasePlankField.createPlank(basePlankNameField.getText());
+            predefinedBasePlanksView.getItems()
+                    .add(newBasePlank);
+            ByteArrayOutputStream serializedBasePlank = new ByteArrayOutputStream();
+            try (ObjectOutputStream serializer = new ObjectOutputStream(serializedBasePlank)) {
+                serializer.writeObject(newBasePlank);
+                USER_DEFINED_BASE_PLANKS.putByteArray(newBasePlank.getId(), serializedBasePlank.toByteArray());
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Could not persistently store new base plank", ex);
+                // FIXME Show stacktrace alert to user
+            }
         }
     }
 
@@ -118,8 +155,26 @@ public class BasePlankSelectionScreenController extends ScreenController {
     private void confirmBasePlank() throws ScreenSwitchFailedException {
         Plank selectedBasePlank = predefinedBasePlanksView.getSelectionModel()
                 .getSelectedItem();
-        // FIXME Show warning to user
-        getScreenManager()
-                .switchTo(new PlankDemandScreen(selectedBasePlank));
+        if (selectedBasePlank != null) {
+            // FIXME Show warning to user
+            getScreenManager()
+                    .switchTo(new PlankDemandScreen(selectedBasePlank));
+        }
+    }
+
+    public ReadOnlyBooleanProperty basePlankSelectedProperty() {
+        return basePlankSelected.getReadOnlyProperty();
+    }
+
+    public boolean isBasePlankSelected() {
+        return basePlankSelectedProperty().get();
+    }
+
+    public ReadOnlyBooleanProperty validNewBasePlankProperty() {
+        return validNewBasePlank.getReadOnlyProperty();
+    }
+
+    public boolean isValidNewBasePlank() {
+        return validNewBasePlankProperty().get();
     }
 }

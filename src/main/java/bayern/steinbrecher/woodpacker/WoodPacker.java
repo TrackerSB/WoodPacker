@@ -18,6 +18,9 @@ public class WoodPacker extends Application {
     @Override
     public void start(Stage primaryStage) throws ScreenSwitchFailedException {
         ScreenManager screenManager = new ScreenManager(primaryStage);
+        primaryStage.getScene()
+                .getStylesheets()
+                .add(getClass().getResource("styles.css").toExternalForm());
         screenManager.switchTo(new BasePlankSelectionScreen());
         primaryStage.setFullScreen(true);
         primaryStage.show();

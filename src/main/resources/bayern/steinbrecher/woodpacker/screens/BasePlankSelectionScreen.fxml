@@ -27,7 +27,8 @@ since: 0.1
                 <HBox>
                     <CheckedTextField fx:id="basePlankNameField"/>
                     <Button text="%createBasePlank"
-                            onAction="#createBasePlank"/>
+                            onAction="#createBasePlank"
+                            disable="${!controller.validNewBasePlank}"/>
                 </HBox>
             </VBox>
         </left>
@@ -35,8 +36,9 @@ since: 0.1
             <VBox>
                 <ScaledCanvas fx:id="basePlankPreview"
                               VBox.vgrow="ALWAYS"/>
-                <Button text="%confirm"
-                        onAction="#confirmBasePlank"/>
+                <Button text="%selectBasePlank"
+                        onAction="#confirmBasePlank"
+                        disable="${!controller.basePlankSelected}"/>
             </VBox>
         </center>
     </BorderPane>

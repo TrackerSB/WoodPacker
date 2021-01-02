@@ -70,6 +70,7 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
             lengthField.getEditor()
                     .setText(String.valueOf(newLength));
         });
+        control.addValidityConstraint(lengthField.validProperty());
 
         String externalIconPath = getClass()
                 .getResource(forWidth ? "plankWidth.png" : "plankHeight.png")
