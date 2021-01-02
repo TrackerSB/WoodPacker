@@ -5,6 +5,8 @@ import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @author Stefan Huber
  * @since 0.1
@@ -14,7 +16,7 @@ public class PlankDemandScreen extends Screen<PlankDemandScreenController> {
 
     public PlankDemandScreen(Plank basePlank) {
         super(PlankDemandScreen.class.getResource("PlankDemandScreen.fxml"), WoodPacker.LANGUAGE_BUNDLE);
-        this.basePlank = basePlank;
+        this.basePlank = Objects.requireNonNull(basePlank);
     }
 
     @Override
