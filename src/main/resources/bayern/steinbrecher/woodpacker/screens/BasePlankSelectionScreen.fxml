@@ -41,8 +41,7 @@ since: 0.1
             <VBox>
                 <ScaledCanvas fx:id="basePlankPreview"
                               VBox.vgrow="ALWAYS"/>
-                <Button fx:id="selectBasePlankButton"
-                        text="%selectBasePlank"
+                <Button text="%selectBasePlank"
                         onAction="#confirmBasePlank"
                         disable="${!controller.basePlankSelected}"/>
             </VBox>

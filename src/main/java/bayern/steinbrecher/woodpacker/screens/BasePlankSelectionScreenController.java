@@ -22,11 +22,12 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -57,14 +58,14 @@ public class BasePlankSelectionScreenController extends ScreenController {
     private final ReadOnlyBooleanWrapper validNewBasePlank = new ReadOnlyBooleanWrapper();
     @FXML
     private ListView<Plank> predefinedBasePlanksView;
+    private /* final */ ObjectBinding<Plank> selectedBasePlankBinding;
+
     @FXML
     private ScaledCanvas basePlankPreview;
     @FXML
     private PlankField newBasePlankField;
     @FXML
     private CheckedTextField basePlankNameField;
-    @FXML
-    private Button selectBasePlankButton;
     @FXML
     private CheckedComboBox<PlankMaterial> materialSelection;
 
@@ -99,9 +100,7 @@ public class BasePlankSelectionScreenController extends ScreenController {
         }
     }
 
-    @FXML
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private void initialize() {
+    private void initializePredefinedBasePlanksList() {
         predefinedBasePlanksView.setCellFactory(list -> new ListCell<>() {
             @Override
             protected void updateItem(Plank item, boolean empty) {
@@ -109,19 +108,31 @@ public class BasePlankSelectionScreenController extends ScreenController {
                 if (item == null || empty) {
                     setText("");
                     setGraphic(null);
+                    setContextMenu(null);
                 } else {
                     setText(item.toString());
                     ImageView grainDirectionIcon
                             = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
                     setGraphic(grainDirectionIcon);
+                    ImageView deletePlankItemGraphic
+                            = new ImageView(getClass().getResource("trash.png").toExternalForm());
+                    deletePlankItemGraphic.setFitHeight(20);
+                    deletePlankItemGraphic.setPreserveRatio(true);
+                    MenuItem deletePlankItem
+                            = new MenuItem(WoodPacker.LANGUAGE_BUNDLE.getString("delete"), deletePlankItemGraphic);
+                    deletePlankItem.setOnAction(evt -> {
+                        predefinedBasePlanksView.getItems().remove(item);
+                        USER_DEFINED_BASE_PLANKS.remove(item.getId());
+                    });
+                    setContextMenu(new ContextMenu(deletePlankItem));
                 }
             }
         });
         predefinedBasePlanksView.getSelectionModel()
                 .setSelectionMode(SelectionMode.SINGLE);
-        ObjectBinding<Plank> selectedBasePlankBinding
-                = Bindings.select(predefinedBasePlanksView, "selectionModel", "selectedItem");
+    }
 
+    private void setupBasePlankPreviewUpdate() {
         // FIXME Specify max width and height of base plank preview dynamically
         basePlankPreview.setMaxWidth(800);
         basePlankPreview.setMaxHeight(800);
@@ -155,8 +166,19 @@ public class BasePlankSelectionScreenController extends ScreenController {
         selectedBasePlankBinding.addListener(updateBasePlankPreview);
         updateBasePlankPreview.changed(
                 null, null, predefinedBasePlanksView.getSelectionModel().getSelectedItem()); // Ensure initial state
+    }
+
+    @FXML
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private void initialize() {
+        selectedBasePlankBinding = Bindings.select(predefinedBasePlanksView, "selectionModel", "selectedItem");
+
+        initializePredefinedBasePlanksList();
+        setupBasePlankPreviewUpdate();
+
         basePlankSelected.bind(selectedBasePlankBinding.isNotNull());
 
+        // Add report checking whether a new base plank can be added with the currently specified data
         BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
         InvalidationListener updateBasePlankNameAlreadyExists =
                 obs -> basePlankNameAlreadyExists.set(
@@ -166,14 +188,17 @@ public class BasePlankSelectionScreenController extends ScreenController {
                 );
         basePlankNameField.textProperty()
                 .addListener(updateBasePlankNameAlreadyExists);
+        ChangeListener<ObservableList<Plank>> onItemsPropertyUpdate = (obs, previousItemList, currentItemList) -> {
+            updateBasePlankNameAlreadyExists.invalidated(null);
+            currentItemList.addListener(updateBasePlankNameAlreadyExists);
+        };
         predefinedBasePlanksView.itemsProperty()
-                .addListener((obs, previousItemList, currentItemList) -> {
-                    updateBasePlankNameAlreadyExists.invalidated(null);
-                    currentItemList.addListener(updateBasePlankNameAlreadyExists);
-                });
+                .addListener(onItemsPropertyUpdate);
+        onItemsPropertyUpdate.changed(null, null, predefinedBasePlanksView.getItems()); // Ensure initial state
         basePlankNameField.addReport(
                 new ReportEntry("basePlankNameAlreadyExists", ReportType.ERROR, basePlankNameAlreadyExists));
 
+        // Configure dropdown element for the base planks material
         materialSelection.setItems(FXCollections.observableArrayList(PlankMaterial.values()));
         materialSelection.setEditable(false);
         materialSelection.getSelectionModel().select(PlankMaterial.UNDEFINED); // Ensure initial state
@@ -194,6 +219,7 @@ public class BasePlankSelectionScreenController extends ScreenController {
                     basePlankNameField.getText(), materialSelection.getValue());
             predefinedBasePlanksView.getItems()
                     .add(newBasePlank);
+            basePlankNameField.clear();
             ByteArrayOutputStream serializedBasePlank = new ByteArrayOutputStream();
             try (ObjectOutputStream serializer = new ObjectOutputStream(serializedBasePlank)) {
                 serializer.writeObject(newBasePlank);
