@@ -4,6 +4,7 @@ author: Stefan Huber
 since: 0.1
 -->
 
+<?import bayern.steinbrecher.checkedElements.CheckedComboBox?>
 <?import bayern.steinbrecher.checkedElements.textfields.CheckedTextField?>
 <?import bayern.steinbrecher.woodpacker.elements.PlankField?>
 <?import bayern.steinbrecher.woodpacker.elements.ScaledCanvas?>
@@ -13,7 +14,6 @@ since: 0.1
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import bayern.steinbrecher.checkedElements.CheckedComboBox?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreenController"
@@ -22,8 +22,11 @@ since: 0.1
     <BorderPane>
         <left>
             <VBox>
-                <ListView fx:id="predefinedBasePlanksView"
-                          VBox.vgrow="ALWAYS"/>
+                <ScrollPane fitToHeight="true"
+                            fitToWidth="true"
+                            VBox.vgrow="ALWAYS">
+                    <ListView fx:id="predefinedBasePlanksView"/>
+                </ScrollPane>
                 <PlankField fx:id="newBasePlankField"/>
                 <HBox>
                     <CheckedComboBox fx:id="materialSelection"/>
@@ -38,7 +41,7 @@ since: 0.1
             <VBox>
                 <ScaledCanvas fx:id="basePlankPreview"
                               VBox.vgrow="ALWAYS"/>
-                <Button fx:id="selectBasePlank"
+                <Button fx:id="selectBasePlankButton"
                         text="%selectBasePlank"
                         onAction="#confirmBasePlank"
                         disable="${!controller.basePlankSelected}"/>

@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.ScreenController;
+import bayern.steinbrecher.woodpacker.DrawActionGenerator;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
@@ -49,6 +50,8 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void initialize() {
+        // FIXME Dynamically calculate max width and height
+        visualPlankCuttingPlan.setMaxHeight(800);
         visualPlankCuttingPlan.setMaxWidth(800);
         visualPlankCuttingPlan.sceneProperty()
                 .addListener((obs, previousScene, currentScene) -> {
@@ -92,17 +95,9 @@ public class PlankDemandScreenController extends ScreenController {
             visualPlankCuttingPlan.setTheoreticalWidth(newBasePlank.getWidth());
             visualPlankCuttingPlan.setTheoreticalHeight(newBasePlank.getHeight());
 
+            Consumer<GraphicsContext> basePlankActions = DrawActionGenerator.forBasePlank(newBasePlank);
             Consumer<GraphicsContext> drawingActions = gc -> {
-                // Draw background
-                gc.setFill(Color.BURLYWOOD);
-                gc.fillRect(0, 0, newBasePlank.getWidth(), newBasePlank.getHeight());
-                final double backgroundAngleBottom = Math.toRadians(45);
-                final double topBottomXDelta = newBasePlank.getHeight() / Math.tan(backgroundAngleBottom);
-                final int stepSize = 10;
-                gc.setStroke(Color.GRAY);
-                for (double x = -topBottomXDelta + stepSize; x < newBasePlank.getWidth(); x += stepSize) {
-                    gc.strokeLine(x, newBasePlank.getHeight(), x + topBottomXDelta, 0);
-                }
+                basePlankActions.accept(gc);
 
                 // Draw planks
                 List<PlankSolutionRow> placedPlankRows = proposedSolution.getKey();

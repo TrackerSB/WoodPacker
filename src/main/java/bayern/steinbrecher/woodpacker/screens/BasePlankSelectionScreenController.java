@@ -6,6 +6,7 @@ import bayern.steinbrecher.checkedElements.report.ReportType;
 import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
+import bayern.steinbrecher.woodpacker.DrawActionGenerator;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
@@ -14,6 +15,7 @@ import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
@@ -21,6 +23,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -61,7 +64,7 @@ public class BasePlankSelectionScreenController extends ScreenController {
     @FXML
     private CheckedTextField basePlankNameField;
     @FXML
-    private Button selectBasePlank;
+    private Button selectBasePlankButton;
     @FXML
     private CheckedComboBox<PlankMaterial> materialSelection;
 
@@ -116,30 +119,14 @@ public class BasePlankSelectionScreenController extends ScreenController {
         });
         predefinedBasePlanksView.getSelectionModel()
                 .setSelectionMode(SelectionMode.SINGLE);
-        basePlankSelected.bind(
-                Bindings.select(predefinedBasePlanksView, "selectionModel", "selectedItem")
-                        .isNotNull());
-        basePlankPreview.sceneProperty()
-                .addListener((obs, previousScene, currentScene) -> {
-                    if (currentScene != null) {
-                        basePlankPreview.maxHeightProperty()
-                                .bind(currentScene.heightProperty()
-                                        .subtract(selectBasePlank.heightProperty()));
-                    }
-                });
-        ChangeListener<Boolean> updateBasePlankPreview = (obs, wasSelected, isSelected) -> {
-            if (isSelected) {
-                basePlankPreview.theoreticalWidthProperty().unbind();
-                basePlankPreview.theoreticalHeightProperty().unbind();
-                Plank selectedBasePlank = predefinedBasePlanksView.getSelectionModel()
-                        .getSelectedItem();
-                basePlankPreview.setTheoreticalWidth(selectedBasePlank.getWidth());
-                basePlankPreview.setTheoreticalHeight(selectedBasePlank.getHeight());
-                basePlankPreview.setDrawingActions(gc -> {
-                    gc.setFill(Color.BURLYWOOD);
-                    gc.fillRect(0, 0, selectedBasePlank.getWidth(), selectedBasePlank.getHeight());
-                });
-            } else {
+        ObjectBinding<Plank> selectedBasePlankBinding
+                = Bindings.select(predefinedBasePlanksView, "selectionModel", "selectedItem");
+
+        // FIXME Specify max width and height of base plank preview dynamically
+        basePlankPreview.setMaxWidth(800);
+        basePlankPreview.setMaxHeight(800);
+        ChangeListener<Plank> updateBasePlankPreview = (obs, previousPlank, currentPlank) -> {
+            if (currentPlank == null) {
                 basePlankPreview.theoreticalWidthProperty()
                         .bind(basePlankPreview.widthProperty());
                 basePlankPreview.theoreticalHeightProperty()
@@ -155,10 +142,20 @@ public class BasePlankSelectionScreenController extends ScreenController {
                             basePlankPreview.getTheoreticalHeight() / 2,
                             basePlankPreview.getTheoreticalWidth());
                 });
+            } else {
+                basePlankPreview.theoreticalWidthProperty().unbind();
+                basePlankPreview.theoreticalHeightProperty().unbind();
+                Plank selectedBasePlank = predefinedBasePlanksView.getSelectionModel()
+                        .getSelectedItem();
+                basePlankPreview.setTheoreticalWidth(selectedBasePlank.getWidth());
+                basePlankPreview.setTheoreticalHeight(selectedBasePlank.getHeight());
+                basePlankPreview.setDrawingActions(DrawActionGenerator.forBasePlank(selectedBasePlank));
             }
         };
-        basePlankSelected.addListener(updateBasePlankPreview);
-        updateBasePlankPreview.changed(null, null, basePlankSelected.get()); // Ensure initial state
+        selectedBasePlankBinding.addListener(updateBasePlankPreview);
+        updateBasePlankPreview.changed(
+                null, null, predefinedBasePlanksView.getSelectionModel().getSelectedItem()); // Ensure initial state
+        basePlankSelected.bind(selectedBasePlankBinding.isNotNull());
 
         BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
         InvalidationListener updateBasePlankNameAlreadyExists =
