@@ -49,8 +49,6 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void initialize() {
-        visualPlankCuttingPlan.setMinWidth(300);
-        visualPlankCuttingPlan.setMinHeight(300);
         visualPlankCuttingPlan.setMaxWidth(800);
         visualPlankCuttingPlan.sceneProperty()
                 .addListener((obs, previousScene, currentScene) -> {

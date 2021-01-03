@@ -18,7 +18,7 @@ since: 0.1
             fx:controller="bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreenController"
             fitToHeight="true"
             fitToWidth="true">
-    <BorderPane>
+    <BorderPane fx:id="screenContent">
         <left>
             <VBox>
                 <ListView fx:id="predefinedBasePlanksView"
@@ -36,7 +36,8 @@ since: 0.1
             <VBox>
                 <ScaledCanvas fx:id="basePlankPreview"
                               VBox.vgrow="ALWAYS"/>
-                <Button text="%selectBasePlank"
+                <Button fx:id="selectBasePlank"
+                        text="%selectBasePlank"
                         onAction="#confirmBasePlank"
                         disable="${!controller.basePlankSelected}"/>
             </VBox>

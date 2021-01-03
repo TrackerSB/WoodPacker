@@ -49,6 +49,10 @@ public class ScaledCanvas extends Region {
         contentHolder.maxHeightProperty()
                 .bind(maxHeightProperty());
 
+        // TODO Determine why setting min width and height explicitly is required in order to make auto resize work
+        setMinWidth(300);
+        setMinHeight(300);
+
         NumberBinding theoreticalToActualDrawingAreaFactor = Bindings.min(
                 contentHolder.widthProperty().divide(theoreticalWidth),
                 contentHolder.heightProperty().divide(theoreticalHeight)
