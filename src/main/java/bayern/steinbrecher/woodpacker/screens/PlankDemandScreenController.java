@@ -18,7 +18,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
 import javafx.util.Pair;
 
@@ -102,6 +104,9 @@ public class PlankDemandScreenController extends ScreenController {
                 // Draw planks
                 List<PlankSolutionRow> placedPlankRows = proposedSolution.getKey();
                 if (placedPlankRows != null) {
+                    gc.setTextAlign(TextAlignment.CENTER);
+                    final double fontSize = newBasePlank.getHeight() / 20d;
+                    gc.setFont(Font.font(fontSize));
                     for (PlankSolutionRow row : placedPlankRows) {
                         double currentStartX = 0;
                         for (Plank plank : row.getPlanks()) {
@@ -114,8 +119,8 @@ public class PlankDemandScreenController extends ScreenController {
                             gc.setFill(Color.BLACK);
                             gc.fillText(
                                     plank.getId(),
-                                    currentStartX + plank.getWidth() / 2d,
-                                    row.getStartY() + plank.getHeight() / 2d
+                                    currentStartX + (plank.getWidth() / 2d),
+                                    row.getStartY() + (plank.getHeight() / 2d) + (fontSize / 2)
                             );
                             currentStartX += plank.getWidth();
                         }
