@@ -156,13 +156,12 @@ public class BasePlankSelectionScreenController extends ScreenController {
         updateBasePlankPreview.changed(null, null, basePlankSelected.get()); // Ensure initial state
 
         BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
-        InvalidationListener updateBasePlankNameAlreadyExists = obs -> {
-            basePlankNameAlreadyExists.set(
-                    predefinedBasePlanksView.getItems()
-                            .stream()
-                            .anyMatch(plank -> plank.getId().equals(basePlankNameField.getText()))
-            );
-        };
+        InvalidationListener updateBasePlankNameAlreadyExists =
+                obs -> basePlankNameAlreadyExists.set(
+                        predefinedBasePlanksView.getItems()
+                                .stream()
+                                .anyMatch(plank -> plank.getId().equals(basePlankNameField.getText()))
+                );
         basePlankNameField.textProperty()
                 .addListener(updateBasePlankNameAlreadyExists);
         predefinedBasePlanksView.itemsProperty()
