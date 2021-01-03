@@ -5,6 +5,7 @@ import bayern.steinbrecher.checkedElements.report.ReportType;
 import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
+import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.elements.PlankField;
 import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
@@ -144,9 +145,10 @@ public class BasePlankSelectionScreenController extends ScreenController {
                     gc.setFill(Color.WHITE);
                     gc.setFont(Font.font(basePlankPreview.getTheoreticalHeight() / 10));
                     gc.setTextAlign(TextAlignment.CENTER);
-                    gc.fillText("Nix ausgwäid",
+                    gc.fillText(WoodPacker.LANGUAGE_BUNDLE.getString("noBasePlankSelected"),
                             basePlankPreview.getTheoreticalWidth() / 2,
-                            basePlankPreview.getTheoreticalHeight() / 2); // FIXME Localize text
+                            basePlankPreview.getTheoreticalHeight() / 2,
+                            basePlankPreview.getTheoreticalWidth());
                 });
             }
         };
