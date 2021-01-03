@@ -69,7 +69,7 @@ public class PlankDemandScreenController extends ScreenController {
                     setText("");
                     setGraphic(null);
                 } else {
-                    setText(String.format("%d mm x %d mm", item.getWidth(), item.getHeight()));
+                    setText(item.toString());
                     ImageView grainDirectionIcon
                             = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
                     setGraphic(new HBox(createIdCircle(item.getId()), grainDirectionIcon));
@@ -142,7 +142,9 @@ public class PlankDemandScreenController extends ScreenController {
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void addPlank() {
         plankProblem.getRequiredPlanks()
-                .add(newPlankField.createPlank(String.valueOf(plankProblem.getRequiredPlanks().size() + 1)));
+                .add(newPlankField.createPlank(
+                        String.valueOf(plankProblem.getRequiredPlanks().size() + 1),
+                        plankProblem.getBasePlank().getMaterial()));
     }
 
     @FXML

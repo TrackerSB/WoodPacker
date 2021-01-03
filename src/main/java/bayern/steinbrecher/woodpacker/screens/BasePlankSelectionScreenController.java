@@ -1,5 +1,6 @@
 package bayern.steinbrecher.woodpacker.screens;
 
+import bayern.steinbrecher.checkedElements.CheckedComboBox;
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
 import bayern.steinbrecher.checkedElements.report.ReportType;
 import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
@@ -7,6 +8,7 @@ import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
+import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.elements.PlankField;
 import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
@@ -17,6 +19,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
@@ -59,6 +62,8 @@ public class BasePlankSelectionScreenController extends ScreenController {
     private CheckedTextField basePlankNameField;
     @FXML
     private Button selectBasePlank;
+    @FXML
+    private CheckedComboBox<PlankMaterial> materialSelection;
 
     private void readUserDefinedBasePlanks() {
         // FIXME Show graphical feedback to user in any case where a logger is used
@@ -102,7 +107,7 @@ public class BasePlankSelectionScreenController extends ScreenController {
                     setText("");
                     setGraphic(null);
                 } else {
-                    setText(String.format("\"%s\": %d mm x %d mm", item.getId(), item.getWidth(), item.getHeight()));
+                    setText(item.toString());
                     ImageView grainDirectionIcon
                             = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
                     setGraphic(grainDirectionIcon);
@@ -172,9 +177,14 @@ public class BasePlankSelectionScreenController extends ScreenController {
         basePlankNameField.addReport(
                 new ReportEntry("basePlankNameAlreadyExists", ReportType.ERROR, basePlankNameAlreadyExists));
 
+        materialSelection.setItems(FXCollections.observableArrayList(PlankMaterial.values()));
+        materialSelection.setEditable(false);
+        materialSelection.getSelectionModel().select(PlankMaterial.UNDEFINED); // Ensure initial state
+
         validNewBasePlank.bind(
                 newBasePlankField.validProperty()
-                        .and(basePlankNameField.validProperty()));
+                        .and(basePlankNameField.validProperty())
+                        .and(materialSelection.validProperty()));
 
         readUserDefinedBasePlanks();
     }
@@ -183,7 +193,8 @@ public class BasePlankSelectionScreenController extends ScreenController {
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void createBasePlank() {
         if (isValidNewBasePlank()) {
-            Plank newBasePlank = newBasePlankField.createPlank(basePlankNameField.getText());
+            Plank newBasePlank = newBasePlankField.createPlank(
+                    basePlankNameField.getText(), materialSelection.getValue());
             predefinedBasePlanksView.getItems()
                     .add(newBasePlank);
             ByteArrayOutputStream serializedBasePlank = new ByteArrayOutputStream();

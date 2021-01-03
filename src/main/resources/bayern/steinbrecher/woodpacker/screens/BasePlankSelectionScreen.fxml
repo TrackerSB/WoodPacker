@@ -13,6 +13,7 @@ since: 0.1
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import bayern.steinbrecher.checkedElements.CheckedComboBox?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreenController"
@@ -25,6 +26,7 @@ since: 0.1
                           VBox.vgrow="ALWAYS"/>
                 <PlankField fx:id="newBasePlankField"/>
                 <HBox>
+                    <CheckedComboBox fx:id="materialSelection"/>
                     <CheckedTextField fx:id="basePlankNameField"/>
                     <Button text="%createBasePlank"
                             onAction="#createBasePlank"

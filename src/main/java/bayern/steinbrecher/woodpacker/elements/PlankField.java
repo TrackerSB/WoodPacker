@@ -5,6 +5,7 @@ import bayern.steinbrecher.checkedElements.report.Reportable;
 import bayern.steinbrecher.checkedElements.report.ReportableBase;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
+import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -34,8 +35,8 @@ public class PlankField extends Control implements Reportable {
         return new PlankFieldSkin(this);
     }
 
-    public Plank createPlank(String id) {
-        return new Plank(id, getPlankWidth(), getPlankHeight(), getGrainDirection());
+    public Plank createPlank(String id, PlankMaterial material) {
+        return new Plank(id, getPlankWidth(), getPlankHeight(), getGrainDirection(), material);
     }
 
     // FIXME Only skins for PlankFields should be allowed to call this method
