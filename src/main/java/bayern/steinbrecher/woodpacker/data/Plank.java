@@ -1,5 +1,6 @@
 package bayern.steinbrecher.woodpacker.data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -8,6 +9,8 @@ import java.util.Objects;
  * @since 0.1
  */
 public class Plank implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final String id;
     private final int width; // in mm
     private final int height; // in mm
