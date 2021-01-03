@@ -22,7 +22,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -49,8 +48,6 @@ public class BasePlankSelectionScreenController extends ScreenController {
     // FIXME Move the next property to FXML
     private final ReadOnlyBooleanWrapper basePlankSelected = new ReadOnlyBooleanWrapper();
     private final ReadOnlyBooleanWrapper validNewBasePlank = new ReadOnlyBooleanWrapper();
-    @FXML
-    private BorderPane screenContent;
     @FXML
     private ListView<Plank> predefinedBasePlanksView;
     @FXML
