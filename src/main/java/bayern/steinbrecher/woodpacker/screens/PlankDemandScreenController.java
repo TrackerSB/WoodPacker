@@ -8,6 +8,7 @@ import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.PlankField;
 import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
+import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
@@ -25,6 +26,7 @@ import javafx.scene.text.TextBoundsType;
 import javafx.util.Pair;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -64,8 +66,17 @@ public class PlankDemandScreenController extends ScreenController {
                 });
 
         // Setup required planks list and its visualization
-        requiredPlanksList.itemsProperty()
-                .bind(plankProblem.requiredPlanksProperty());
+        plankProblem.requiredPlanksProperty()
+                .addListener((SetChangeListener<? super Plank>) change -> {
+                    if (change.wasAdded()) {
+                        requiredPlanksList.getItems()
+                                .add(change.getElementAdded());
+                    }
+                    if (change.wasRemoved()) {
+                        requiredPlanksList.getItems()
+                                .remove(change.getElementRemoved());
+                    }
+                });
         requiredPlanksList.setCellFactory(list -> new ListCell<>() {
             @Override
             protected void updateItem(Plank item, boolean empty) {
@@ -84,15 +95,18 @@ public class PlankDemandScreenController extends ScreenController {
 
         // Trigger updates of visual cutting plank
         plankProblem.basePlankProperty()
-                .addListener((obs, oldBasePlank, newBasePlank)
-                        -> updateVisualPlankCuttingPlan(newBasePlank, plankProblem.getProposedSolution()));
+                .addListener((obs, oldBasePlank, newBasePlank) -> {
+                    Pair<List<PlankSolutionRow>, Set<Plank>> proposedSolution = plankProblem.getProposedSolution();
+                    updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey(), proposedSolution.getValue());
+                });
         plankProblem.proposedSolutionProperty()
                 .addListener((obs, oldSolution, newSolution)
-                        -> updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution));
+                        -> updateVisualPlankCuttingPlan(
+                        plankProblem.getBasePlank(), newSolution.getKey(), newSolution.getValue()));
     }
 
     private void updateVisualPlankCuttingPlan(
-            Plank newBasePlank, Pair<List<PlankSolutionRow>, List<Plank>> proposedSolution) {
+            Plank newBasePlank, Iterable<PlankSolutionRow> placedPlankRows, Iterable<Plank> ignoredPlanks) {
         if (newBasePlank != null) {
             visualPlankCuttingPlan.setTheoreticalWidth(newBasePlank.getWidth());
             visualPlankCuttingPlan.setTheoreticalHeight(newBasePlank.getHeight());
@@ -102,7 +116,6 @@ public class PlankDemandScreenController extends ScreenController {
                 basePlankActions.accept(gc);
 
                 // Draw planks
-                List<PlankSolutionRow> placedPlankRows = proposedSolution.getKey();
                 if (placedPlankRows != null) {
                     gc.setTextAlign(TextAlignment.CENTER);
                     final double fontSize = newBasePlank.getHeight() / 20d;

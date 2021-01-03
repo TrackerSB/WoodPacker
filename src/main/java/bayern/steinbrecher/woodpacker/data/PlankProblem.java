@@ -1,18 +1,23 @@
 package bayern.steinbrecher.woodpacker.data;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -20,9 +25,10 @@ import java.util.stream.Collectors;
  * @since 0.1
  */
 public class PlankProblem {
-    private final ListProperty<Plank> requiredPlanks = new SimpleListProperty<>(null);
+    private static final Logger LOGGER = Logger.getLogger(PlankProblem.class.getName());
+    private final SetProperty<Plank> requiredPlanks = new SimpleSetProperty<>(null);
     private final ObjectProperty<Plank> basePlank = new SimpleObjectProperty<>(null);
-    private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, List<Plank>>> proposedSolution
+    private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<Plank>>> proposedSolution
             = new ReadOnlyObjectWrapper<>(null);
 
     public PlankProblem() {
@@ -35,26 +41,25 @@ public class PlankProblem {
                         });
                     }
                 });
-        setRequiredPlanks(FXCollections.observableArrayList()); // Ensure initial state
+        setRequiredPlanks(FXCollections.observableSet()); // Ensure initial state
         basePlankProperty()
-                .addListener((obs, previousBasePlank, currentBasePlank) -> {
-                    proposedSolution.set(determineSolution(currentBasePlank, getRequiredPlanks()));
-                });
+                .addListener((obs, previousBasePlank, currentBasePlank)
+                        -> proposedSolution.set(determineSolution(currentBasePlank, getRequiredPlanks())));
     }
 
     /**
      * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
      * not fit onto the base plank (besides the already added ones).
      */
-    private static Pair<List<PlankSolutionRow>, List<Plank>> determineSolution(
-            Plank basePlank, List<Plank> requiredPlanks) {
+    private static Pair<List<PlankSolutionRow>, Set<Plank>> determineSolution(
+            Plank basePlank, Set<Plank> requiredPlanks) {
         List<PlankSolutionRow> placedPlanks = new ArrayList<>();
-        List<Plank> ignoredPlanks;
+        Set<Plank> ignoredPlanks;
         if (basePlank == null) {
             ignoredPlanks = requiredPlanks;
         } else {
-            ignoredPlanks = new ArrayList<>();
-            List<Plank> planksToPlace = requiredPlanks.stream()
+            ignoredPlanks = new HashSet<>();
+            Collection<Plank> planksToPlace = requiredPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .sorted((p1, p2) -> p2.getHeight() - p1.getHeight())
                     .collect(Collectors.toList());
@@ -76,7 +81,13 @@ public class PlankProblem {
                         placedPlanks.add(newRow);
                         heightOfAddedRows = expectedEndY;
                     } else {
-                        ignoredPlanks.add(plank);
+                        boolean added = ignoredPlanks.add(plank);
+                        if (!added) {
+                            LOGGER.log(Level.WARNING,
+                                    String.format(
+                                            "Adding plank '%s' to the ignored planks failed since its already there",
+                                            plank.getId()));
+                        }
                     }
                 }
             }
@@ -84,15 +95,15 @@ public class PlankProblem {
         return new Pair<>(placedPlanks, ignoredPlanks);
     }
 
-    public ListProperty<Plank> requiredPlanksProperty() {
+    public SetProperty<Plank> requiredPlanksProperty() {
         return requiredPlanks;
     }
 
-    public ObservableList<Plank> getRequiredPlanks() {
+    public ObservableSet<Plank> getRequiredPlanks() {
         return requiredPlanksProperty().get();
     }
 
-    public void setRequiredPlanks(ObservableList<Plank> requiredPlanks) {
+    public void setRequiredPlanks(ObservableSet<Plank> requiredPlanks) {
         requiredPlanksProperty().set(requiredPlanks);
     }
 
@@ -108,11 +119,11 @@ public class PlankProblem {
         basePlankProperty().set(basePlank);
     }
 
-    public ReadOnlyObjectProperty<Pair<List<PlankSolutionRow>, List<Plank>>> proposedSolutionProperty() {
+    public ReadOnlyObjectProperty<Pair<List<PlankSolutionRow>, Set<Plank>>> proposedSolutionProperty() {
         return proposedSolution.getReadOnlyProperty();
     }
 
-    public Pair<List<PlankSolutionRow>, List<Plank>> getProposedSolution() {
+    public Pair<List<PlankSolutionRow>, Set<Plank>> getProposedSolution() {
         return proposedSolutionProperty().get();
     }
 }

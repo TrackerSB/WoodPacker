@@ -1,8 +1,8 @@
 package bayern.steinbrecher.woodpacker.data;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Stefan Huber
@@ -13,7 +13,7 @@ public class PlankSolutionRow {
     private final double height;
     private final double maxWidth;
     private final PlankGrainDirection grainDirection;
-    private final List<Plank> planks = new ArrayList<>();
+    private final Set<Plank> planks = new HashSet<>();
     private double currentWidth = 0;
 
     public PlankSolutionRow(double startY, double height, double maxWidth, PlankGrainDirection grainDirection) {
@@ -39,8 +39,8 @@ public class PlankSolutionRow {
         return grainDirection;
     }
 
-    public List<Plank> getPlanks() {
-        return Collections.unmodifiableList(planks);
+    public Set<Plank> getPlanks() {
+        return Collections.unmodifiableSet(planks);
     }
 
     public boolean addPlank(Plank plank) {
