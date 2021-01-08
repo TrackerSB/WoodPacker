@@ -3,6 +3,7 @@ package bayern.steinbrecher.woodpacker.data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Stefan Huber
@@ -69,6 +70,32 @@ public class Plank implements Serializable {
             case IRRELEVANT -> PlankGrainDirection.IRRELEVANT;
         };
         return new Plank(id, getHeight(), getWidth(), rotatedGrainDirection, material);
+    }
+
+    public Optional<Plank> heightDecreased(int decreaseBy) {
+        if (decreaseBy > getHeight()) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Cannot decrease planks height by %d since its height is %d", decreaseBy, getHeight()));
+        }
+        if (decreaseBy == getHeight()) {
+            return Optional.empty();
+        }
+        return Optional.of(
+                new Plank(getId(), getWidth(), getHeight() - decreaseBy, getGrainDirection(), getMaterial()));
+    }
+
+    public Optional<Plank> widthDecreased(int decreaseBy) {
+        if (decreaseBy > getWidth()) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Cannot decrease planks width by %d since its height is %d", decreaseBy, getHeight()));
+        }
+        if (decreaseBy == getWidth()) {
+            return Optional.empty();
+        }
+        return Optional.of(
+                new Plank(getId(), getWidth() - decreaseBy, getHeight(), getGrainDirection(), getMaterial()));
     }
 
     @Override

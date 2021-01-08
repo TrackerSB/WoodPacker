@@ -10,6 +10,7 @@ import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
@@ -121,10 +122,14 @@ public class PlankDemandScreenController extends ScreenController {
                     final double fontSize = newBasePlank.getHeight() / 20d;
                     gc.setFont(Font.font(fontSize));
                     for (PlankSolutionRow row : placedPlankRows) {
-                        double currentStartX = 0;
+                        Point2D rowToBasePlankOffset = row.getStartOffset();
+                        double plankToRowXOffset = 0;
+                        double plankToRowYOffset = 0;
                         for (Plank plank : row.getPlanks()) {
+                            double plankXPos = rowToBasePlankOffset.getX() + plankToRowXOffset;
+                            double plankYPos = rowToBasePlankOffset.getY() + plankToRowYOffset;
                             gc.beginPath();
-                            gc.rect(currentStartX, row.getStartY(), plank.getWidth(), plank.getHeight());
+                            gc.rect(plankXPos, plankYPos, plank.getWidth(), plank.getHeight());
                             gc.setStroke(Color.BLACK);
                             gc.stroke();
                             gc.setFill(Color.BURLYWOOD);
@@ -132,11 +137,19 @@ public class PlankDemandScreenController extends ScreenController {
                             gc.setFill(Color.BLACK);
                             gc.fillText(
                                     plank.getId(),
-                                    currentStartX + (plank.getWidth() / 2d),
-                                    row.getStartY() + (plank.getHeight() / 2d) + (fontSize / 2)
+                                    plankXPos + (plank.getWidth() / 2d),
+                                    plankYPos + (plank.getHeight() / 2d) + (fontSize / 2)
                             );
-                            currentStartX += plank.getWidth();
+                            if (row.addHorizontal()) {
+                                plankToRowXOffset += plank.getWidth();
+                            } else {
+                                plankToRowYOffset += plank.getHeight();
+                            }
                         }
+                        gc.setStroke(Color.RED);
+                        double rowWidth = row.addHorizontal() ? row.getCurrentLength() : row.getBreadth();
+                        double rowHeight = row.addHorizontal() ? row.getBreadth() : row.getCurrentLength();
+                        gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
                     }
                 }
             };

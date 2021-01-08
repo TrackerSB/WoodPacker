@@ -9,15 +9,17 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import javafx.geometry.Point2D;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -25,7 +27,16 @@ import java.util.stream.Collectors;
  * @since 0.1
  */
 public class PlankProblem {
-    private static final Logger LOGGER = Logger.getLogger(PlankProblem.class.getName());
+    /**
+     * A criterion is a pair of a function which calculates a value based on a given {@link Plank} and a weight. The
+     * higher the resulting value the better a given {@link Plank} suits the criterion.
+     */
+    private static final Collection<Pair<Function<PlankSolutionRow, Double>, Double>> CRITERIA = List.of(
+            // The less the breadths of the planks differs the better
+            new Pair<>(row -> 1d / row.getBreadths().size(), 1d),
+            // The less space a row wastes the better
+            new Pair<>(row -> ((double) row.getCurrentLength()) / row.getMaxLength(), 1d)
+    );
     private final SetProperty<Plank> requiredPlanks = new SimpleSetProperty<>(null);
     private final ObjectProperty<Plank> basePlank = new SimpleObjectProperty<>(null);
     private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<Plank>>> proposedSolution
@@ -47,6 +58,36 @@ public class PlankProblem {
                         -> proposedSolution.set(determineSolution(currentBasePlank, getRequiredPlanks())));
     }
 
+    private static PlankSolutionRow createCandidate(
+            boolean horizontal, Point2D basePlankOffset, Plank basePlank, List<Plank> sortedPlanks) {
+        assert !sortedPlanks.isEmpty() : "No planks left for creating a candidate";
+        // NOTE Assume planks are sorted by height if horizontal is true; sorted by width otherwise
+        int maxLength;
+        int breadth;
+        if (horizontal) {
+            maxLength = basePlank.getWidth();
+            breadth = sortedPlanks.get(0)
+                    .getHeight();
+        } else {
+            maxLength = basePlank.getHeight();
+            breadth = sortedPlanks.get(0)
+                    .getWidth();
+        }
+        PlankSolutionRow candidate = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, breadth);
+        Iterator<Plank> iterator = sortedPlanks.iterator();
+        //noinspection StatementWithEmptyBody
+        while (iterator.hasNext() && candidate.addPlank(iterator.next())) {
+            // NOTE Operation already done by addPlank
+        }
+        return candidate;
+    }
+
+    private static double determineCandidateQuality(PlankSolutionRow candidate) {
+        return CRITERIA.stream()
+                .mapToDouble(criterion -> criterion.getKey().apply(candidate) * criterion.getValue())
+                .sum();
+    }
+
     /**
      * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
      * not fit onto the base plank (besides the already added ones).
@@ -58,39 +99,51 @@ public class PlankProblem {
         if (basePlank == null) {
             ignoredPlanks = requiredPlanks;
         } else {
-            ignoredPlanks = new HashSet<>();
-            Collection<Plank> planksToPlace = requiredPlanks.stream()
+            Collection<Plank> rotatedPlanks = requiredPlanks.stream()
+                    .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
+                    .collect(Collectors.toList());
+            List<Plank> planksToPlaceByHeight = rotatedPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .sorted((p1, p2) -> p2.getHeight() - p1.getHeight())
                     .collect(Collectors.toList());
-            double heightOfAddedRows = 0;
-            for (Plank plank : planksToPlace) {
-                boolean placedInExistingRow = false;
-                for (PlankSolutionRow row : placedPlanks) {
-                    if (row.addPlank(plank)) {
-                        placedInExistingRow = true;
-                        break;
-                    }
-                }
-                if (!placedInExistingRow) {
-                    double expectedEndY = heightOfAddedRows + plank.getHeight();
-                    if (expectedEndY <= basePlank.getHeight()) {
-                        PlankSolutionRow newRow = new PlankSolutionRow(heightOfAddedRows, plank.getHeight(),
-                                basePlank.getWidth(), basePlank.getGrainDirection());
-                        newRow.addPlank(plank);
-                        placedPlanks.add(newRow);
-                        heightOfAddedRows = expectedEndY;
+            List<Plank> planksToPlaceByWidth = rotatedPlanks.stream()
+                    .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
+                    .sorted((p1, p2) -> p2.getWidth() - p1.getWidth())
+                    .collect(Collectors.toList());
+
+            Optional<Plank> remainingBasePlank = Optional.of(basePlank);
+            Point2D remainingBasePlankOffset = Point2D.ZERO;
+            while (remainingBasePlank.isPresent() && !planksToPlaceByHeight.isEmpty()) {
+                PlankSolutionRow horizontalCandidate = createCandidate(
+                        true, remainingBasePlankOffset, remainingBasePlank.get(), planksToPlaceByHeight);
+                PlankSolutionRow verticalCandidate = createCandidate(
+                        false, remainingBasePlankOffset, remainingBasePlank.get(), planksToPlaceByWidth);
+
+                if (horizontalCandidate.getPlanks().isEmpty()
+                        && verticalCandidate.getPlanks().isEmpty()) {
+                    remainingBasePlank = Optional.empty();
+                } else {
+                    double horizontalCandidateQuality = determineCandidateQuality(horizontalCandidate);
+                    double verticalCandidateQuality = determineCandidateQuality(verticalCandidate);
+                    PlankSolutionRow bestCandidate;
+                    if (horizontalCandidateQuality > verticalCandidateQuality) {
+                        bestCandidate = horizontalCandidate;
+                        remainingBasePlank = remainingBasePlank.get()
+                                .heightDecreased(bestCandidate.getBreadth());
+                        remainingBasePlankOffset = remainingBasePlankOffset.add(0, bestCandidate.getBreadth());
                     } else {
-                        boolean added = ignoredPlanks.add(plank);
-                        if (!added) {
-                            LOGGER.log(Level.WARNING,
-                                    String.format(
-                                            "Adding plank '%s' to the ignored planks failed since its already there",
-                                            plank.getId()));
-                        }
+                        bestCandidate = verticalCandidate;
+                        remainingBasePlank = remainingBasePlank.get()
+                                .widthDecreased(bestCandidate.getBreadth());
+                        remainingBasePlankOffset = remainingBasePlankOffset.add(bestCandidate.getBreadth(), 0);
                     }
+                    placedPlanks.add(bestCandidate);
+                    planksToPlaceByHeight.removeAll(bestCandidate.getPlanks());
+                    planksToPlaceByWidth.removeAll(bestCandidate.getPlanks());
                 }
             }
+            // NOTE Ignored planks may not have same rotation as initially given
+            ignoredPlanks = new HashSet<>(planksToPlaceByWidth);
         }
         return new Pair<>(placedPlanks, ignoredPlanks);
     }
