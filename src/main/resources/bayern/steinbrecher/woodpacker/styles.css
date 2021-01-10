@@ -1,6 +1,6 @@
-/*noinspection CssInvalidPseudoSelector*/
-*:invalid {
+/* noinspection CssInvalidPseudoSelector */
+:invalid {
     -fx-border-color: red;
-    -fx-highlight-fill: red;
     -fx-focus-color: red;
+    -fx-highlight-fill: red;
 }
