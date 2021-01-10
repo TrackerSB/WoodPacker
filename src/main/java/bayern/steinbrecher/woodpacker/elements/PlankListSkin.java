@@ -17,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -125,10 +126,7 @@ public class PlankListSkin extends SkinBase<PlankList> {
         );
     }
 
-    protected PlankListSkin(PlankList control) {
-        super(control);
-
-        Node plankView = createPlankView(control);
+    private PlankField createNewPlankField(PlankList control) {
         PlankField newPlankField = new PlankField();
 
         // Add report checking whether a new base plank can be added with the currently specified data
@@ -145,8 +143,19 @@ public class PlankListSkin extends SkinBase<PlankList> {
         onItemsPropertyUpdate.changed(null, null, control.getPlanks()); // Ensure initial state
         newPlankField.addReport(
                 new ReportEntry("basePlankNameAlreadyExists", ReportType.ERROR, basePlankNameAlreadyExists));
+        return newPlankField;
+    }
 
-        Button addPlankButton = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("add"));
+    protected PlankListSkin(PlankList control) {
+        super(control);
+
+        Node plankView = createPlankView(control);
+        PlankField newPlankField = createNewPlankField(control);
+
+        ImageView addPlankGraphic = new ImageView(getClass().getResource("add.png").toExternalForm());
+        addPlankGraphic.setFitHeight(20);
+        addPlankGraphic.setPreserveRatio(true);
+        Button addPlankButton = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("add"), addPlankGraphic);
         newPlankField.validProperty()
                 .addListener((obs, wasValid, isValid) -> addPlankButton.setDisable(!isValid));
         addPlankButton.setOnAction(aevt -> {
@@ -156,9 +165,23 @@ public class PlankListSkin extends SkinBase<PlankList> {
                 newPlankField.setPlankId("");
             }
         });
+        ButtonBar.setButtonData(addPlankButton, ButtonData.APPLY);
+
+        ImageView clearAllPlanksGraphic = new ImageView(getClass().getResource("clearedClipboard.png").toExternalForm());
+        clearAllPlanksGraphic.setFitHeight(20);
+        clearAllPlanksGraphic.setPreserveRatio(true);
+        Button clearAllPlanksButton
+                = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("clearAll"), clearAllPlanksGraphic);
+        control.planksProperty()
+                .emptyProperty()
+                .addListener((obs, wasEmpty, isEmpty) -> clearAllPlanksButton.setDisable(isEmpty));
+        clearAllPlanksButton.setDisable(control.getPlanks().isEmpty()); // Ensure initial state
+        clearAllPlanksButton.setOnAction(aevt -> control.getPlanks().clear());
+        ButtonBar.setButtonData(clearAllPlanksButton, ButtonData.CANCEL_CLOSE);
+
         ButtonBar actionsBar = new ButtonBar();
         actionsBar.getButtons()
-                .addAll(addPlankButton);
+                .addAll(addPlankButton, clearAllPlanksButton);
 
         VBox content = new VBox(plankView, newPlankField, actionsBar);
         content.setSpacing(5);
