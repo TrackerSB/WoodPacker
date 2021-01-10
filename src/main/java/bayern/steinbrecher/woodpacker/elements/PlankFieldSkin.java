@@ -10,9 +10,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -85,6 +87,25 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
         return content;
     }
 
+    private Node createCommentField(PlankField control) {
+        TextField commentField = new TextField();
+        commentField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("description"));
+        control.commentProperty()
+                .bindBidirectional(commentField.textProperty());
+
+        String externalIconPath = getClass()
+                .getResource("notepad.png")
+                .toExternalForm();
+        ImageView commentIcon = new ImageView(externalIconPath);
+        commentIcon.setPreserveRatio(true);
+        commentIcon.fitHeightProperty()
+                .bind(commentField.heightProperty());
+        HBox content = new HBox(commentIcon, commentField);
+        content.setAlignment(Pos.CENTER_LEFT);
+        content.setSpacing(5);
+        return content;
+    }
+
     protected PlankFieldSkin(PlankField control) {
         super(control);
 
@@ -111,12 +132,22 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
                     autoUpdateIndicator.accept(control.getPlankWidth(), newHeight.intValue());
                 });
 
+        Node commentField = createCommentField(control);
+
         Node indicatorNode = createGrainIndicator(control);
 
-        HBox contentRow = new HBox(widthField, separator, heightField, indicatorNode);
-        contentRow.setAlignment(Pos.CENTER_LEFT);
-        contentRow.setSpacing(5);
+        HBox sizeRow = new HBox(widthField, separator, heightField);
+        sizeRow.setAlignment(Pos.CENTER_LEFT);
+
+        HBox propertyRow = new HBox(commentField, indicatorNode);
+        propertyRow.setAlignment(Pos.CENTER_LEFT);
+        propertyRow.setSpacing(5);
+
+        VBox content = new VBox(sizeRow, propertyRow);
+        content.setAlignment(Pos.TOP_LEFT);
+        content.setSpacing(5);
+
         getChildren()
-                .add(contentRow);
+                .add(content);
     }
 }

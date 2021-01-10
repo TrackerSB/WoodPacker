@@ -13,6 +13,8 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -27,6 +29,7 @@ public class PlankField extends Control implements Reportable {
     private final IntegerProperty plankWidth = new SimpleIntegerProperty();
     private final IntegerProperty plankHeight = new SimpleIntegerProperty();
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
+    private final StringProperty comment = new SimpleStringProperty("");
     private final BooleanProperty skinElementsValid = new SimpleBooleanProperty(true);
     private final ReportableBase<PlankField> rBase = new ReportableBase<>(this);
 
@@ -36,7 +39,7 @@ public class PlankField extends Control implements Reportable {
     }
 
     public Plank createPlank(String id, PlankMaterial material) {
-        return new Plank(id, getPlankWidth(), getPlankHeight(), getGrainDirection(), material);
+        return new Plank(id, getPlankWidth(), getPlankHeight(), getGrainDirection(), material, getComment());
     }
 
     // FIXME Only skins for PlankFields should be allowed to call this method
@@ -78,6 +81,18 @@ public class PlankField extends Control implements Reportable {
 
     public void setGrainDirection(PlankGrainDirection direction) {
         grainDirectionProperty().set(direction);
+    }
+
+    public StringProperty commentProperty() {
+        return comment;
+    }
+
+    public String getComment() {
+        return commentProperty().get();
+    }
+
+    public void setComment(String comment) {
+        commentProperty().set(comment);
     }
 
     @Override

@@ -17,8 +17,14 @@ public class Plank implements Serializable {
     private final int height; // in mm
     private final PlankGrainDirection grainDirection;
     private final PlankMaterial material;
+    private final String comment;
 
     public Plank(String id, int width, int height, PlankGrainDirection grainDirection, PlankMaterial material) {
+        this(id, width, height, grainDirection, material, "");
+    }
+
+    public Plank(String id, int width, int height, PlankGrainDirection grainDirection, PlankMaterial material,
+                 String comment) {
         this.id = id;
         if (width <= 0) {
             throw new IllegalArgumentException("Width has to be positive");
@@ -30,6 +36,7 @@ public class Plank implements Serializable {
         this.height = height;
         this.grainDirection = grainDirection;
         this.material = material;
+        this.comment = comment;
     }
 
     public String getId() {
@@ -52,6 +59,10 @@ public class Plank implements Serializable {
         return material;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
     /**
      * @param direction The direction of the plank this plank might be cut out of.
      * @return {@code true} iff this planks grain direction is compatible with direction of a plank from which this
@@ -69,7 +80,7 @@ public class Plank implements Serializable {
             case VERTICAL -> PlankGrainDirection.HORIZONTAL;
             case IRRELEVANT -> PlankGrainDirection.IRRELEVANT;
         };
-        return new Plank(id, getHeight(), getWidth(), rotatedGrainDirection, material);
+        return new Plank(id, getHeight(), getWidth(), rotatedGrainDirection, getMaterial(), getComment());
     }
 
     public Optional<Plank> heightDecreased(int decreaseBy) {
@@ -82,7 +93,8 @@ public class Plank implements Serializable {
             return Optional.empty();
         }
         return Optional.of(
-                new Plank(getId(), getWidth(), getHeight() - decreaseBy, getGrainDirection(), getMaterial()));
+                new Plank(getId(), getWidth(), getHeight() - decreaseBy, getGrainDirection(), getMaterial(),
+                        getComment()));
     }
 
     public Optional<Plank> widthDecreased(int decreaseBy) {
@@ -95,12 +107,18 @@ public class Plank implements Serializable {
             return Optional.empty();
         }
         return Optional.of(
-                new Plank(getId(), getWidth() - decreaseBy, getHeight(), getGrainDirection(), getMaterial()));
+                new Plank(getId(), getWidth() - decreaseBy, getHeight(), getGrainDirection(), getMaterial(),
+                        getComment()));
     }
 
     @Override
     public String toString() {
-        return String.format("\"%s\": %d [mm] x %d [mm] (%s)", getId(), getWidth(), getHeight(), getMaterial());
+        if (getComment() == null || getComment().isBlank()) {
+            return String.format("\"%s\": %d [mm] x %d [mm] (%s)", getId(), getWidth(), getHeight(), getMaterial());
+        } else {
+            return String.format("\"%s\": %d [mm] x %d [mm] (%s) - %s",
+                    getId(), getWidth(), getHeight(), getMaterial(), getComment());
+        }
     }
 
     @Override
