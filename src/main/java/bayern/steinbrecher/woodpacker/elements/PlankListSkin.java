@@ -25,11 +25,39 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 public class PlankListSkin extends SkinBase<PlankList> {
+    private static final double ID_BADGE_MIN_WIDTH = 50;
+    private static final double ID_BADGE_PADDING = 5;
+    private static final Font ID_BADGE_FONT = Font.font(15);
+
     private final BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
+
+    private Node generateItemGraphic(Plank item) {
+        Text idText = new Text(item.getId());
+        idText.setFill(Color.WHITE);
+        idText.setFont(ID_BADGE_FONT);
+        double backgroundWidth = Math.max(idText.getBoundsInLocal().getWidth(), ID_BADGE_MIN_WIDTH)
+                + (2 * ID_BADGE_PADDING);
+        Rectangle idBackground = new Rectangle(backgroundWidth, 2 * ID_BADGE_FONT.getSize(), Color.BLACK);
+        idBackground.setArcWidth(idBackground.getHeight() / 2);
+        idBackground.setArcHeight(idBackground.getHeight() / 2);
+        StackPane idBadge = new StackPane(idBackground, idText);
+        ImageView grainDirectionIcon
+                = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
+        HBox content = new HBox(idBadge, grainDirectionIcon);
+        content.setAlignment(Pos.CENTER_LEFT);
+        content.setSpacing(10);
+        return content;
+    }
 
     private Node createPlankView(PlankList control) {
         ListView<Plank> planksView = new ListView<>();
@@ -63,10 +91,7 @@ public class PlankListSkin extends SkinBase<PlankList> {
                     setContextMenu(null);
                 } else {
                     setText(item.toString());
-                    ImageView grainDirectionIcon
-                            = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
-                    // FIXME Generate graphic showing grain direction and ID
-                    // setGraphic(new HBox(createIdCircle(item.getId()), grainDirectionIcon));
+                    setGraphic(generateItemGraphic(item));
                     ImageView deletePlankItemGraphic
                             = new ImageView(getClass().getResource("trash.png").toExternalForm());
                     deletePlankItemGraphic.setFitHeight(20);
