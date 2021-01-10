@@ -26,6 +26,7 @@ import javafx.scene.control.Skin;
  * @since 0.1
  */
 public class PlankField extends Control implements Reportable {
+    private final StringProperty plankId = new SimpleStringProperty("");
     private final IntegerProperty plankWidth = new SimpleIntegerProperty();
     private final IntegerProperty plankHeight = new SimpleIntegerProperty();
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
@@ -38,13 +39,25 @@ public class PlankField extends Control implements Reportable {
         return new PlankFieldSkin(this);
     }
 
-    public Plank createPlank(String id, PlankMaterial material) {
-        return new Plank(id, getPlankWidth(), getPlankHeight(), getGrainDirection(), material, getComment());
+    public Plank createPlank(PlankMaterial material) {
+        return new Plank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(), material, getComment());
     }
 
     // FIXME Only skins for PlankFields should be allowed to call this method
     void bindSkinElementsValidProperty(ObservableValue<Boolean> validity) {
         skinElementsValid.bind(validity);
+    }
+
+    public StringProperty plankIdProperty() {
+        return plankId;
+    }
+
+    public String getPlankId() {
+        return plankIdProperty().get();
+    }
+
+    public void setPlankId(String plankId) {
+        plankIdProperty().set(plankId);
     }
 
     public IntegerProperty plankWidthProperty() {

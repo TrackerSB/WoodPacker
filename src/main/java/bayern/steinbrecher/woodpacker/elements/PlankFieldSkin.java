@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
+import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import javafx.beans.property.BooleanProperty;
@@ -27,6 +28,23 @@ import java.util.function.BiConsumer;
  */
 public class PlankFieldSkin extends SkinBase<PlankField> {
     private final BooleanProperty indicatorChangedByUser = new SimpleBooleanProperty(false);
+
+    private Node createPlankIdField(PlankField control) {
+        CheckedTextField plankIdField = new CheckedTextField();
+        plankIdField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("identifier"));
+        plankIdField.textProperty()
+                .bindBidirectional(control.plankIdProperty());
+        control.addValidityConstraint(plankIdField.validProperty());
+
+        String externalIconPath = getClass()
+                .getResource("bookmark.png")
+                .toExternalForm();
+        ImageView idIcon = new ImageView(externalIconPath);
+        idIcon.setPreserveRatio(true);
+        idIcon.fitHeightProperty()
+                .bind(plankIdField.heightProperty());
+        return new HBox(idIcon, plankIdField);
+    }
 
     private Node createGrainIndicator(PlankField control) {
         PlankGrainDirectionIndicator indicator = new PlankGrainDirectionIndicator();
@@ -109,6 +127,8 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
     protected PlankFieldSkin(PlankField control) {
         super(control);
 
+        Node plankIdField = createPlankIdField(control);
+
         BiConsumer<Integer, Integer> autoUpdateIndicator = (plankWidth, plankHeight) -> {
             if (!indicatorChangedByUser.get()) {
                 control.setGrainDirection(
@@ -132,18 +152,16 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
                     autoUpdateIndicator.accept(control.getPlankWidth(), newHeight.intValue());
                 });
 
-        Node commentField = createCommentField(control);
-
-        Node indicatorNode = createGrainIndicator(control);
-
         HBox sizeRow = new HBox(widthField, separator, heightField);
         sizeRow.setAlignment(Pos.CENTER_LEFT);
 
+        Node commentField = createCommentField(control);
+        Node indicatorNode = createGrainIndicator(control);
         HBox propertyRow = new HBox(commentField, indicatorNode);
         propertyRow.setAlignment(Pos.CENTER_LEFT);
         propertyRow.setSpacing(5);
 
-        VBox content = new VBox(sizeRow, propertyRow);
+        VBox content = new VBox(plankIdField, sizeRow, propertyRow);
         content.setAlignment(Pos.TOP_LEFT);
         content.setSpacing(5);
 

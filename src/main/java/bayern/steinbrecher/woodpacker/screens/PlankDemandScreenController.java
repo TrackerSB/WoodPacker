@@ -1,32 +1,19 @@
 package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.ScreenController;
-import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
-import bayern.steinbrecher.woodpacker.elements.PlankField;
-import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
+import bayern.steinbrecher.woodpacker.elements.PlankList;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextBoundsType;
 import javafx.util.Pair;
 
 import java.util.List;
@@ -39,22 +26,11 @@ import java.util.function.Consumer;
  */
 public class PlankDemandScreenController extends ScreenController {
     @FXML
-    private ListView<Plank> requiredPlanksList;
+    private PlankList requiredPlanksView;
     @FXML
     private ScaledCanvas visualPlankCuttingPlan;
-    @FXML
-    private PlankField newPlankField;
     private final PlankProblem plankProblem = new PlankProblem();
     private int lastRequiredPlankId = 1;
-
-    // NOTE Can this method be reused for showing the same ID circles on the visual plank cutting plan?
-    private Node createIdCircle(String id) {
-        Circle idContainer = new Circle(10, Color.BLACK);
-        Text idText = new Text(id);
-        idText.setFill(Color.WHITE);
-        idText.setBoundsType(TextBoundsType.LOGICAL_VERTICAL_CENTER);
-        return new StackPane(idContainer, idText);
-    }
 
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
@@ -70,42 +46,18 @@ public class PlankDemandScreenController extends ScreenController {
                     }
                 });
 
-        // Setup required planks list and its visualization
-        plankProblem.requiredPlanksProperty()
+        // Sync requiredPlanksView --> plankProblem
+        requiredPlanksView.planksProperty()
                 .addListener((SetChangeListener<? super Plank>) change -> {
                     if (change.wasAdded()) {
-                        requiredPlanksList.getItems()
+                        plankProblem.getRequiredPlanks()
                                 .add(change.getElementAdded());
                     }
                     if (change.wasRemoved()) {
-                        requiredPlanksList.getItems()
+                        plankProblem.getRequiredPlanks()
                                 .remove(change.getElementRemoved());
                     }
                 });
-        requiredPlanksList.setCellFactory(list -> new ListCell<>() {
-            @Override
-            protected void updateItem(Plank item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText("");
-                    setGraphic(null);
-                    setContextMenu(null);
-                } else {
-                    setText(item.toString());
-                    ImageView grainDirectionIcon
-                            = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
-                    setGraphic(new HBox(createIdCircle(item.getId()), grainDirectionIcon));
-                    ImageView deletePlankItemGraphic
-                            = new ImageView(getClass().getResource("trash.png").toExternalForm());
-                    deletePlankItemGraphic.setFitHeight(20);
-                    deletePlankItemGraphic.setPreserveRatio(true);
-                    MenuItem deletePlankItem
-                            = new MenuItem(WoodPacker.LANGUAGE_BUNDLE.getString("delete"), deletePlankItemGraphic);
-                    deletePlankItem.setOnAction(evt -> plankProblem.getRequiredPlanks().remove(item));
-                    setContextMenu(new ContextMenu(deletePlankItem));
-                }
-            }
-        });
 
         // Trigger updates of visual cutting plank
         plankProblem.basePlankProperty()
@@ -175,22 +127,5 @@ public class PlankDemandScreenController extends ScreenController {
      */
     void setBasePlank(Plank basePlank) {
         plankProblem.setBasePlank(basePlank);
-    }
-
-    @FXML
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private void addPlank() {
-        plankProblem.getRequiredPlanks()
-                .add(newPlankField.createPlank(
-                        String.valueOf(lastRequiredPlankId),
-                        plankProblem.getBasePlank().getMaterial()));
-        lastRequiredPlankId++;
-    }
-
-    @FXML
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private void clearAllPlanks() {
-        plankProblem.requiredPlanksProperty()
-                .clear();
     }
 }

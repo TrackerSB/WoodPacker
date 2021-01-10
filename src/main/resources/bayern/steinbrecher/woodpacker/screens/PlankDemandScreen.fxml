@@ -4,14 +4,12 @@ author: Stefan Huber
 since: 0.1
 -->
 
-<?import bayern.steinbrecher.woodpacker.elements.PlankField?>
+<?import bayern.steinbrecher.woodpacker.elements.PlankList?>
 <?import bayern.steinbrecher.woodpacker.elements.ScaledCanvas?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -20,23 +18,9 @@ since: 0.1
     <BorderPane>
         <left>
             <VBox>
-                <ScrollPane fitToHeight="true"
-                            fitToWidth="true"
-                            VBox.vgrow="ALWAYS">
-                    <ListView fx:id="requiredPlanksList"/>
-                </ScrollPane>
-                <PlankField fx:id="newPlankField"/>
-                <ButtonBar>
-                    <buttons>
-                        <Button text="%add"
-                                onAction="#addPlank"/>
-                        <Button text="%clearAll"
-                                onAction="#clearAllPlanks"/>
-                        <Button text="%backToBasePlankScreen"
-                                onAction="#switchToPreviousScreen"
-                                ButtonBar.buttonData="BACK_PREVIOUS"/>
-                    </buttons>
-                </ButtonBar>
+                <PlankList fx:id="requiredPlanksView"/>
+                <Button text="%backToBasePlankScreen"
+                        onAction="#switchToPreviousScreen"/>
             </VBox>
         </left>
         <center>
