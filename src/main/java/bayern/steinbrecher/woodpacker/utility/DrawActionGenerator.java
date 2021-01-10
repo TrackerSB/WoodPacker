@@ -1,4 +1,4 @@
-package bayern.steinbrecher.woodpacker;
+package bayern.steinbrecher.woodpacker.utility;
 
 import bayern.steinbrecher.javaUtility.CompareUtility;
 import bayern.steinbrecher.woodpacker.data.Plank;

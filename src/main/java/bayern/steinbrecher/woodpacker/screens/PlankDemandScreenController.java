@@ -1,7 +1,6 @@
 package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.ScreenController;
-import bayern.steinbrecher.woodpacker.DrawActionGenerator;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
@@ -9,6 +8,7 @@ import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.PlankField;
 import bayern.steinbrecher.woodpacker.elements.PlankGrainDirectionIndicatorSkin;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
+import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
