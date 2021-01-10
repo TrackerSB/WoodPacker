@@ -106,7 +106,6 @@ public class PlankListSkin extends SkinBase<PlankList> {
         Node plankView = createPlankView(control);
         PlankField newPlankField = new PlankField();
 
-        // FIXME Re-enable
         // Add report checking whether a new base plank can be added with the currently specified data
         newPlankField.plankIdProperty()
                 .addListener(
