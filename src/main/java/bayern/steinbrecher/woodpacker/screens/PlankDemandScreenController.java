@@ -2,6 +2,7 @@ package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.DrawActionGenerator;
+import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
@@ -13,8 +14,10 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -42,6 +45,7 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private PlankField newPlankField;
     private final PlankProblem plankProblem = new PlankProblem();
+    private int lastRequiredPlankId = 1;
 
     // NOTE Can this method be reused for showing the same ID circles on the visual plank cutting plan?
     private Node createIdCircle(String id) {
@@ -85,11 +89,20 @@ public class PlankDemandScreenController extends ScreenController {
                 if (item == null || empty) {
                     setText("");
                     setGraphic(null);
+                    setContextMenu(null);
                 } else {
                     setText(item.toString());
                     ImageView grainDirectionIcon
                             = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
                     setGraphic(new HBox(createIdCircle(item.getId()), grainDirectionIcon));
+                    ImageView deletePlankItemGraphic
+                            = new ImageView(getClass().getResource("trash.png").toExternalForm());
+                    deletePlankItemGraphic.setFitHeight(20);
+                    deletePlankItemGraphic.setPreserveRatio(true);
+                    MenuItem deletePlankItem
+                            = new MenuItem(WoodPacker.LANGUAGE_BUNDLE.getString("delete"), deletePlankItemGraphic);
+                    deletePlankItem.setOnAction(evt -> plankProblem.getRequiredPlanks().remove(item));
+                    setContextMenu(new ContextMenu(deletePlankItem));
                 }
             }
         });
@@ -169,8 +182,9 @@ public class PlankDemandScreenController extends ScreenController {
     private void addPlank() {
         plankProblem.getRequiredPlanks()
                 .add(newPlankField.createPlank(
-                        String.valueOf(plankProblem.getRequiredPlanks().size() + 1),
+                        String.valueOf(lastRequiredPlankId),
                         plankProblem.getBasePlank().getMaterial()));
+        lastRequiredPlankId++;
     }
 
     @FXML
