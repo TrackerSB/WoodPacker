@@ -35,6 +35,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Optional;
+
 public class PlankListSkin extends SkinBase<PlankList> {
     private static final double ID_BADGE_MIN_WIDTH = 50;
     private static final double ID_BADGE_PADDING = 5;
@@ -106,9 +108,32 @@ public class PlankListSkin extends SkinBase<PlankList> {
         });
         planksView.getSelectionModel()
                 .setSelectionMode(SelectionMode.SINGLE);
+
+        // Sync visually selected plank <--> selected plank in model
         planksView.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, previousItem, currentItem) -> control.setSelectedPlank(currentItem));
+        ChangeListener<Optional<Plank>> onModelSelectedPlankChanged = (obs, previouslySelected, currentlySelected) -> {
+            /* NOTE 2021-01-15: The underlying ListView does not guarantee the uniqueness of planks. If there is
+             * some bug which results in having multiple identical planks in the ListView then trying to select
+             * the "selected plank" in the model in the ListView may change the "selected plank" in the model
+             * once more due to its ambiguity. In this case an infinite recursion in the sync could be the
+             * result.
+             */
+            if (currentlySelected.isPresent()) {
+                if (!currentlySelected.get().equals(planksView.getSelectionModel().getSelectedItem())) {
+                    planksView.getSelectionModel()
+                            .select(currentlySelected.get());
+                }
+            } else {
+                planksView.getSelectionModel()
+                        .clearSelection();
+            }
+        };
+        control.selectedPlankProperty()
+                .addListener(onModelSelectedPlankChanged);
+        // Ensure initial state
+        onModelSelectedPlankChanged.changed(null, null, control.getSelectedPlank());
 
         ScrollPane scrollablePlanksView = new ScrollPane(planksView);
         scrollablePlanksView.setFitToWidth(true);

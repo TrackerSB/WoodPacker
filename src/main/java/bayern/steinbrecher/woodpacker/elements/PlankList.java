@@ -48,8 +48,7 @@ public class PlankList extends Control {
         return selectedPlankProperty().get();
     }
 
-    // NOTE Only Skins should be allowed to call this method
-    void setSelectedPlank(Plank selectedPlank) {
+    public void setSelectedPlank(Plank selectedPlank) {
         this.selectedPlank.set(Optional.ofNullable(selectedPlank));
     }
 

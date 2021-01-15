@@ -103,9 +103,13 @@ public class PlankDemandScreenController extends ScreenController {
                     }
                     // FIXME Treat change.wasUpdated()?
                 });
+        // Sync selected base plank <--> plank problem base plank
         basePlankList.selectedPlankProperty()
                 .addListener((obs, previousBasePlank, currentBasePlank)
                         -> plankProblem.setBasePlank(currentBasePlank.orElse(null)));
+        plankProblem.basePlankProperty()
+                .addListener((obs, previousBasePlank, currentBasePlank)
+                        -> basePlankList.setSelectedPlank(currentBasePlank));
 
         materialSelection.setItems(FXCollections.observableArrayList(PlankMaterial.values()));
         materialSelection.setEditable(false);
@@ -122,7 +126,7 @@ public class PlankDemandScreenController extends ScreenController {
                     }
                 });
 
-        // Sync requiredPlanksView --> plankProblem
+        // Sync requiredPlanksView <--> plankProblem
         requiredPlanksView.planksProperty()
                 .addListener((SetChangeListener<? super Plank>) change -> {
                     if (change.wasAdded()) {
@@ -131,6 +135,17 @@ public class PlankDemandScreenController extends ScreenController {
                     }
                     if (change.wasRemoved()) {
                         plankProblem.getRequiredPlanks()
+                                .remove(change.getElementRemoved());
+                    }
+                });
+        plankProblem.requiredPlanksProperty()
+                .addListener((SetChangeListener<? super Plank>) change -> {
+                    if (change.wasAdded()) {
+                        requiredPlanksView.getPlanks()
+                                .add(change.getElementAdded());
+                    }
+                    if (change.wasRemoved()) {
+                        requiredPlanksView.getPlanks()
                                 .remove(change.getElementRemoved());
                     }
                 });
@@ -150,6 +165,7 @@ public class PlankDemandScreenController extends ScreenController {
         updateVisualPlankCuttingPlan(
                 plankProblem.getBasePlank(), proposedSolution.getKey(), proposedSolution.getValue());
 
+        // Creating binding signaling when a cutting plan should be drawn
         plankProblemValid.bind(
                 plankProblem.basePlankProperty().isNotNull()
                         .and(plankProblem.requiredPlanksProperty().emptyProperty().not()));
