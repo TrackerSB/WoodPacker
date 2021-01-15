@@ -9,6 +9,7 @@ import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
+import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
@@ -17,11 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,18 +52,10 @@ public class BasePlankSelectionScreenController extends ScreenController {
                     LOGGER.log(Level.WARNING,
                             String.format("The serialized data for '%s' is not available", basePlankName));
                 } else {
-                    try (ObjectInputStream deserializer
-                            = new ObjectInputStream(new ByteArrayInputStream(serializedBasePlank))) {
-                        Object deserializedObject = deserializer.readObject();
-                        if (deserializedObject instanceof Plank) {
-                            Plank basePlank = (Plank) deserializedObject;
-                            basePlankList.getPlanks()
-                                    .add(basePlank);
-                        } else {
-                            LOGGER.log(Level.WARNING,
-                                    String.format("The serialized object for '%s' is no '%s'",
-                                            basePlankName, Plank.class.getCanonicalName()));
-                        }
+                    try {
+                        Plank basePlank = SerializationUtility.deserialize(serializedBasePlank);
+                        basePlankList.getPlanks()
+                                .add(basePlank);
                     } catch (IOException | ClassNotFoundException ex) {
                         LOGGER.log(Level.WARNING, String.format("Failed to deserialize '%s'", basePlankName), ex);
                     }
@@ -118,11 +107,10 @@ public class BasePlankSelectionScreenController extends ScreenController {
         basePlankList.planksProperty()
                 .addListener((SetChangeListener<? super Plank>) change -> {
                     if (change.wasAdded()) {
-                        ByteArrayOutputStream serializedBasePlank = new ByteArrayOutputStream();
-                        try (ObjectOutputStream serializer = new ObjectOutputStream(serializedBasePlank)) {
-                            serializer.writeObject(change.getElementAdded());
-                            USER_DEFINED_BASE_PLANKS.putByteArray(change.getElementAdded().getId(),
-                                    serializedBasePlank.toByteArray());
+                        try {
+                            USER_DEFINED_BASE_PLANKS.putByteArray(
+                                    change.getElementAdded().getId(),
+                                    SerializationUtility.serialize(change.getElementAdded()));
                         } catch (IOException ex) {
                             LOGGER.log(Level.WARNING, "Could not persistently store new base plank", ex);
                             // FIXME Show stacktrace alert to user
