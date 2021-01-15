@@ -33,7 +33,7 @@ since: 0.1
                         <Button text="%exportPlanks"
                                 onAction="#askUserExportPlankProblem"
                                 disable="${!controller.plankProblemValid}"/>
-                        <Button text="%backToBasePlankScreen"
+                        <Button text="%backToMainMenu"
                                 onAction="#switchToPreviousScreen"/>
                     </buttons>
                 </ButtonBar>
