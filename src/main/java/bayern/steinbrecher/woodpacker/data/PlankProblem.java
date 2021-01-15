@@ -43,7 +43,7 @@ public class PlankProblem {
     private final SetProperty<Plank> requiredPlanks = new SimpleSetProperty<>(null);
     private final ObjectProperty<Plank> basePlank = new SimpleObjectProperty<>(null);
     private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<Plank>>> proposedSolution
-            = new ReadOnlyObjectWrapper<>(null);
+            = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
 
     public PlankProblem() {
         requiredPlanksProperty()

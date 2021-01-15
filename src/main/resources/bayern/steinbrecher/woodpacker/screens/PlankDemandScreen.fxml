@@ -11,6 +11,8 @@ since: 0.1
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import bayern.steinbrecher.checkedElements.CheckedComboBox?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -18,18 +20,24 @@ since: 0.1
             fitToHeight="true">
     <BorderPane>
         <left>
-            <VBox>
-                <PlankList fx:id="requiredPlanksView"/>
-                <ButtonBar>
-                    <buttons>
-                        <Button text="%exportPlanks"
-                                onAction="#askUserExportPlankProblem"
-                                disable="${!controller.plankProblemValid}"/>
-                        <Button text="%backToBasePlankScreen"
-                                onAction="#switchToPreviousScreen"/>
-                    </buttons>
-                </ButtonBar>
-            </VBox>
+            <HBox>
+                <VBox>
+                    <PlankList fx:id="basePlankList"/>
+                    <CheckedComboBox fx:id="materialSelection"/>
+                </VBox>
+                <VBox>
+                    <PlankList fx:id="requiredPlanksView"/>
+                    <ButtonBar>
+                        <buttons>
+                            <Button text="%exportPlanks"
+                                    onAction="#askUserExportPlankProblem"
+                                    disable="${!controller.plankProblemValid}"/>
+                            <Button text="%backToBasePlankScreen"
+                                    onAction="#switchToPreviousScreen"/>
+                        </buttons>
+                    </ButtonBar>
+                </VBox>
+            </HBox>
         </left>
         <center>
             <ScaledCanvas fx:id="visualPlankCuttingPlan"/>

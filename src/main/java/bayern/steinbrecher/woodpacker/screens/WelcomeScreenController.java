@@ -26,18 +26,18 @@ public class WelcomeScreenController extends ScreenController {
     @FXML
     private void switchToBasePlankSelection() throws ScreenSwitchFailedException {
         getScreenManager()
-                .switchTo(new BasePlankSelectionScreen());
+                .switchTo(new PlankDemandScreen());
     }
 
     @FXML
     private void askUserImportPlankProblem() throws IOException, ClassNotFoundException, ScreenSwitchFailedException {
-        Optional<File> openPath = FileSystemUtility.askForOpenPath(null);// FIXME Specify owner
-        if(openPath.isPresent()){
-            byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
-            PlankProblem.Snapshot snapshot = SerializationUtility.deserialize(deserializedSnapshot);
-            getScreenManager()
-                    .switchTo(new PlankDemandScreen(snapshot.basePlank));
-            // FIXME Load required planks
-        }
+        // Optional<File> openPath = FileSystemUtility.askForOpenPath(null);// FIXME Specify owner
+        // if(openPath.isPresent()){
+        //     byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
+        //     PlankProblem.Snapshot snapshot = SerializationUtility.deserialize(deserializedSnapshot);
+        //     getScreenManager()
+        //             .switchTo(new PlankDemandScreen(snapshot.basePlank));
+        //     // FIXME Load required planks
+        // }
     }
 }
