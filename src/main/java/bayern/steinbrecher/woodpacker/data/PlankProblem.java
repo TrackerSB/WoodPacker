@@ -12,8 +12,11 @@ import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.util.Pair;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -178,5 +181,28 @@ public class PlankProblem {
 
     public Pair<List<PlankSolutionRow>, Set<Plank>> getProposedSolution() {
         return proposedSolutionProperty().get();
+    }
+
+    public Snapshot createSnapshot() {
+        HashSet<Plank> serializableSet = new HashSet<>(getRequiredPlanks());
+        return new Snapshot(serializableSet, getBasePlank());
+    }
+
+    public void loadSnapshot(Snapshot snapshot) {
+        requiredPlanksProperty().clear();
+        requiredPlanksProperty().addAll(snapshot.requiredPlanks);
+        setBasePlank(snapshot.basePlank);
+    }
+
+    public static class Snapshot implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+        public final Set<Plank> requiredPlanks;
+        public final Plank basePlank;
+
+        private <T extends Set<Plank> & Serializable> Snapshot(T requiredPlanks, Plank basePlank) {
+            this.requiredPlanks = Collections.unmodifiableSet(requiredPlanks);
+            this.basePlank = basePlank;
+        }
     }
 }

@@ -6,10 +6,11 @@ since: 0.1
 
 <?import bayern.steinbrecher.woodpacker.elements.PlankList?>
 <?import bayern.steinbrecher.woodpacker.elements.ScaledCanvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -19,8 +20,15 @@ since: 0.1
         <left>
             <VBox>
                 <PlankList fx:id="requiredPlanksView"/>
-                <Button text="%backToBasePlankScreen"
-                        onAction="#switchToPreviousScreen"/>
+                <ButtonBar>
+                    <buttons>
+                        <Button text="%exportPlanks"
+                                onAction="#askUserExportPlankProblem"
+                                disable="${!controller.plankProblemValid}"/>
+                        <Button text="%backToBasePlankScreen"
+                                onAction="#switchToPreviousScreen"/>
+                    </buttons>
+                </ButtonBar>
             </VBox>
         </left>
         <center>

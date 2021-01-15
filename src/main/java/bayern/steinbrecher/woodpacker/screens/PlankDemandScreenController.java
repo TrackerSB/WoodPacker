@@ -7,6 +7,9 @@ import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
+import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -14,8 +17,15 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -25,12 +35,22 @@ import java.util.function.Consumer;
  * @since 0.1
  */
 public class PlankDemandScreenController extends ScreenController {
+    private static final FileChooser plankListFileChooser = new FileChooser();
+
+    static {
+        plankListFileChooser.getExtensionFilters()
+                .addAll(
+                        new ExtensionFilter("WoodPacker", "*.wp")
+                );
+        plankListFileChooser.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
+    }
+
     @FXML
     private PlankList requiredPlanksView;
     @FXML
     private ScaledCanvas visualPlankCuttingPlan;
     private final PlankProblem plankProblem = new PlankProblem();
-    private int lastRequiredPlankId = 1;
+    private final ReadOnlyBooleanWrapper plankProblemValid = new ReadOnlyBooleanWrapper();
 
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
@@ -69,6 +89,10 @@ public class PlankDemandScreenController extends ScreenController {
                 .addListener((obs, oldSolution, newSolution)
                         -> updateVisualPlankCuttingPlan(
                         plankProblem.getBasePlank(), newSolution.getKey(), newSolution.getValue()));
+
+        plankProblemValid.bind(
+                plankProblem.basePlankProperty().isNotNull()
+                        .and(plankProblem.requiredPlanksProperty().emptyProperty().not()));
     }
 
     private void updateVisualPlankCuttingPlan(
@@ -127,5 +151,25 @@ public class PlankDemandScreenController extends ScreenController {
      */
     void setBasePlank(Plank basePlank) {
         plankProblem.setBasePlank(basePlank);
+    }
+
+    @SuppressWarnings("unused")
+    @FXML
+    private void askUserExportPlankProblem() throws IOException {
+        File exportFile = plankListFileChooser.showSaveDialog(requiredPlanksView.getScene().getWindow());
+        if (exportFile != null) {
+            byte[] serializedPlankProblem = SerializationUtility.serialize(plankProblem.createSnapshot());
+            try (FileWriter writer = new FileWriter(exportFile)) {
+                writer.write(Arrays.toString(serializedPlankProblem));
+            }
+        }
+    }
+
+    public ReadOnlyBooleanProperty plankProblemValidProperty() {
+        return plankProblemValid.getReadOnlyProperty();
+    }
+
+    public boolean isPlankProblemValid() {
+        return plankProblemValidProperty().get();
     }
 }
