@@ -1,10 +1,8 @@
 package bayern.steinbrecher.woodpacker.screens;
 
-import bayern.steinbrecher.checkedElements.CheckedComboBox;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
-import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
@@ -14,7 +12,6 @@ import bayern.steinbrecher.woodpacker.utility.FileSystemUtility;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -49,8 +46,6 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private PlankList basePlankList;
 
-    @FXML
-    private CheckedComboBox<PlankMaterial> materialSelection;
     @FXML
     private PlankList requiredPlanksView;
     @FXML
@@ -110,10 +105,6 @@ public class PlankDemandScreenController extends ScreenController {
         plankProblem.basePlankProperty()
                 .addListener((obs, previousBasePlank, currentBasePlank)
                         -> basePlankList.setSelectedPlank(currentBasePlank));
-
-        materialSelection.setItems(FXCollections.observableArrayList(PlankMaterial.values()));
-        materialSelection.setEditable(false);
-        materialSelection.getSelectionModel().select(PlankMaterial.UNDEFINED); // Ensure initial state
 
         // FIXME Dynamically calculate max width and height
         visualPlankCuttingPlan.setMaxHeight(800);

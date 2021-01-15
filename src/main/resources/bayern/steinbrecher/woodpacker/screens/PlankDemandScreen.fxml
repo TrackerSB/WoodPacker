@@ -4,7 +4,6 @@ author: Stefan Huber
 since: 0.1
 -->
 
-<?import bayern.steinbrecher.checkedElements.CheckedComboBox?>
 <?import bayern.steinbrecher.woodpacker.elements.PlankList?>
 <?import bayern.steinbrecher.woodpacker.elements.ScaledCanvas?>
 <?import javafx.scene.control.Button?>
@@ -20,26 +19,25 @@ since: 0.1
             fitToHeight="true">
     <BorderPane>
         <left>
-            <HBox>
-                <VBox>
+            <VBox>
+                <HBox>
                     <PlankList fx:id="basePlankList"
+                               materialAllowed="true"
                                VBox.vgrow="ALWAYS"/>
-                    <CheckedComboBox fx:id="materialSelection"/>
-                </VBox>
-                <VBox>
                     <PlankList fx:id="requiredPlanksView"
+                               materialAllowed="false"
                                VBox.vgrow="ALWAYS"/>
-                    <ButtonBar>
-                        <buttons>
-                            <Button text="%exportPlanks"
-                                    onAction="#askUserExportPlankProblem"
-                                    disable="${!controller.plankProblemValid}"/>
-                            <Button text="%backToBasePlankScreen"
-                                    onAction="#switchToPreviousScreen"/>
-                        </buttons>
-                    </ButtonBar>
-                </VBox>
-            </HBox>
+                </HBox>
+                <ButtonBar>
+                    <buttons>
+                        <Button text="%exportPlanks"
+                                onAction="#askUserExportPlankProblem"
+                                disable="${!controller.plankProblemValid}"/>
+                        <Button text="%backToBasePlankScreen"
+                                onAction="#switchToPreviousScreen"/>
+                    </buttons>
+                </ButtonBar>
+            </VBox>
         </left>
         <center>
             <ScaledCanvas fx:id="visualPlankCuttingPlan"/>

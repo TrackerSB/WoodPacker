@@ -10,11 +10,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -30,17 +33,35 @@ public class PlankField extends Control implements Reportable {
     private final IntegerProperty plankWidth = new SimpleIntegerProperty();
     private final IntegerProperty plankHeight = new SimpleIntegerProperty();
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
+    private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
+    private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
+    private final BooleanProperty materialAllowed = new SimpleBooleanProperty(true);
     private final StringProperty comment = new SimpleStringProperty("");
     private final BooleanProperty skinElementsValid = new SimpleBooleanProperty(true);
     private final ReportableBase<PlankField> rBase = new ReportableBase<>(this);
+
+    public PlankField() {
+        ChangeListener<Boolean> onMaterialAllowedChanged = (obs, materialWasAllowed, materialIsAllowed) -> {
+            if (materialIsAllowed) {
+                material.bind(selectedMaterialProperty());
+            } else {
+                material.unbind();
+                material.set(PlankMaterial.UNDEFINED);
+            }
+        };
+        materialAllowedProperty()
+                .addListener(onMaterialAllowedChanged);
+        onMaterialAllowedChanged.changed(null, null, isMaterialAllowed()); // Ensure initial state
+    }
 
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PlankFieldSkin(this);
     }
 
-    public Plank createPlank(PlankMaterial material) {
-        return new Plank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(), material, getComment());
+    public Plank createPlank() {
+        return new Plank(
+                getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(), getMaterial(), getComment());
     }
 
     // FIXME Only skins for PlankFields should be allowed to call this method
@@ -94,6 +115,38 @@ public class PlankField extends Control implements Reportable {
 
     public void setGrainDirection(PlankGrainDirection direction) {
         grainDirectionProperty().set(direction);
+    }
+
+    public ReadOnlyObjectProperty<PlankMaterial> materialProperty() {
+        return material.getReadOnlyProperty();
+    }
+
+    public PlankMaterial getMaterial() {
+        return materialProperty().get();
+    }
+
+    public ObjectProperty<PlankMaterial> selectedMaterialProperty() {
+        return selectedMaterial;
+    }
+
+    public PlankMaterial getSelectedMaterial() {
+        return selectedMaterialProperty().get();
+    }
+
+    public void setSelectedMaterial(PlankMaterial material) {
+        selectedMaterialProperty().set(material);
+    }
+
+    public BooleanProperty materialAllowedProperty() {
+        return materialAllowed;
+    }
+
+    public boolean isMaterialAllowed() {
+        return materialAllowedProperty().get();
+    }
+
+    public void setMaterialAllowed(boolean materialAllowed) {
+        materialAllowedProperty().set(materialAllowed);
     }
 
     public StringProperty commentProperty() {

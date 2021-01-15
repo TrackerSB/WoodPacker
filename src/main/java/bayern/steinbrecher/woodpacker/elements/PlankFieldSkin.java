@@ -1,12 +1,15 @@
 package bayern.steinbrecher.woodpacker.elements;
 
+import bayern.steinbrecher.checkedElements.CheckedComboBox;
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
+import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -122,6 +125,23 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
         return content;
     }
 
+    private Node createMaterialSelection(PlankField control) {
+        CheckedComboBox<PlankMaterial> materialSelection
+                = new CheckedComboBox<>(FXCollections.observableArrayList(PlankMaterial.values()));
+        materialSelection.setEditable(false);
+        materialSelection.getSelectionModel().select(PlankMaterial.UNDEFINED); // Ensure initial state
+        materialSelection.disableProperty()
+                .bind(control.materialAllowedProperty().not());
+        materialSelection.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, previouslySelected, currentlySelected)
+                        -> control.setSelectedMaterial(currentlySelected));
+        control.selectedMaterialProperty()
+                .addListener((obs, previouslySelected, currentlySelected)
+                        -> materialSelection.getSelectionModel().select(currentlySelected));
+        return materialSelection;
+    }
+
     protected PlankFieldSkin(PlankField control) {
         super(control);
 
@@ -153,7 +173,8 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
 
         Node commentField = createCommentField(control);
         Node indicatorNode = createGrainIndicator(control);
-        HBox propertyRow = new HBox(commentField, indicatorNode);
+        Node materialSelection = createMaterialSelection(control);
+        HBox propertyRow = new HBox(commentField, indicatorNode, materialSelection);
         propertyRow.setAlignment(Pos.CENTER_LEFT);
         propertyRow.setSpacing(5);
 

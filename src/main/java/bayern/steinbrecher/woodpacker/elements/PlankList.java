@@ -1,11 +1,13 @@
 package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.woodpacker.data.Plank;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SetProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
@@ -18,6 +20,7 @@ public class PlankList extends Control {
     private final SetProperty<Plank> planks = new SimpleSetProperty<>(FXCollections.observableSet());
     private final ReadOnlyObjectWrapper<Optional<Plank>> selectedPlank = new ReadOnlyObjectWrapper<>(Optional.empty());
     private final ReadOnlyBooleanWrapper plankSelected = new ReadOnlyBooleanWrapper(false);
+    private final BooleanProperty materialAllowed = new SimpleBooleanProperty(true);
 
     public PlankList() {
         selectedPlank.addListener((obs, previousPlank, currentPlank) -> plankSelected.set(currentPlank.isPresent()));
@@ -58,5 +61,17 @@ public class PlankList extends Control {
 
     public boolean isPlankSelected() {
         return plankSelectedProperty().get();
+    }
+
+    public BooleanProperty materialAllowedProperty() {
+        return materialAllowed;
+    }
+
+    public boolean isMaterialAllowed() {
+        return materialAllowedProperty().get();
+    }
+
+    public void setMaterialAllowed(boolean materialAllowed) {
+        materialAllowedProperty().set(materialAllowed);
     }
 }

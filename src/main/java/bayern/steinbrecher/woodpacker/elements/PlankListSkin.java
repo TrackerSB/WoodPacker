@@ -188,10 +188,12 @@ public class PlankListSkin extends SkinBase<PlankList> {
         Button addPlankButton = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("add"), addPlankGraphic);
         newPlankField.validProperty()
                 .addListener((obs, wasValid, isValid) -> addPlankButton.setDisable(!isValid));
+        newPlankField.materialAllowedProperty()
+                .bind(control.materialAllowedProperty());
         addPlankButton.setOnAction(aevt -> {
             if (newPlankField.isValid()) {
                 control.getPlanks()
-                        .add(newPlankField.createPlank(PlankMaterial.UNDEFINED)); // FIXME Specify correct material
+                        .add(newPlankField.createPlank());
                 newPlankField.setPlankId("");
             }
         });
