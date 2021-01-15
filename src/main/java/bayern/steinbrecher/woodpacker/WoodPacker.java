@@ -2,7 +2,7 @@ package bayern.steinbrecher.woodpacker;
 
 import bayern.steinbrecher.screenSwitcher.ScreenManager;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
-import bayern.steinbrecher.woodpacker.screens.BasePlankSelectionScreen;
+import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -13,7 +13,8 @@ import java.util.ResourceBundle;
  * @since 0.1
  */
 public class WoodPacker extends Application {
-    public static final ResourceBundle LANGUAGE_BUNDLE = ResourceBundle.getBundle("bayern.steinbrecher.woodPacker.language");
+    public static final ResourceBundle LANGUAGE_BUNDLE = ResourceBundle
+            .getBundle("bayern.steinbrecher.woodPacker.language");
 
     @Override
     public void start(Stage primaryStage) throws ScreenSwitchFailedException {
@@ -21,7 +22,7 @@ public class WoodPacker extends Application {
         primaryStage.getScene()
                 .getStylesheets()
                 .add(getClass().getResource("styles.css").toExternalForm());
-        screenManager.switchTo(new BasePlankSelectionScreen());
+        screenManager.switchTo(new WelcomeScreen());
         primaryStage.setFullScreen(true);
         primaryStage.show();
     }

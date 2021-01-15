@@ -194,6 +194,10 @@ public class PlankProblem {
         setBasePlank(snapshot.basePlank);
     }
 
+    /**
+     * @author Stefan Huber
+     * @since 0.1
+     */
     public static class Snapshot implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;

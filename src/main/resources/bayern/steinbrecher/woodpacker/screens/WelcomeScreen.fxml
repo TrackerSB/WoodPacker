@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+author: Stefan Huber
+since: 0.1
+-->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.GridPane?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="bayern.steinbrecher.woodpacker.screens.WelcomeScreenController">
+    <Button text="%createCuttingPlan"
+            onAction="#switchToBasePlankSelection"
+            GridPane.rowIndex="0"
+            GridPane.columnIndex="0"/>
+    <Button text="%importPlanks"
+            onAction="#askUserImportPlankProblem"
+            GridPane.rowIndex="0"
+            GridPane.columnIndex="1"/>
+</GridPane>
