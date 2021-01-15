@@ -227,6 +227,10 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
+    public void loadPlankProblem(PlankProblem.Snapshot snapshot) {
+        plankProblem.loadSnapshot(snapshot);
+    }
+
     @SuppressWarnings("unused")
     @FXML
     private void askUserExportPlankProblem() throws IOException {
