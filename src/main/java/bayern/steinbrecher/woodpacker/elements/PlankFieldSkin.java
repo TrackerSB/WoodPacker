@@ -86,10 +86,8 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
         lengthField.setEditable(true);
         IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
         lengthProperty.bind(lengthField.valueProperty());
-        lengthProperty.addListener((ob, oldLength, newLength) -> {
-            lengthField.getEditor()
-                    .setText(String.valueOf(newLength));
-        });
+        lengthProperty.addListener((ob, oldLength, newLength)
+                -> lengthField.getEditor().setText(String.valueOf(newLength)));
         control.addValidityConstraint(lengthField.validProperty());
 
         String externalIconPath = getClass()
@@ -140,17 +138,15 @@ public class PlankFieldSkin extends SkinBase<PlankField> {
 
         Node widthField = createLengthField(control, true);
         control.plankWidthProperty()
-                .addListener((ob, oldWidth, newWidth) -> {
-                    autoUpdateIndicator.accept(newWidth.intValue(), control.getPlankHeight());
-                });
+                .addListener((ob, oldWidth, newWidth)
+                        -> autoUpdateIndicator.accept(newWidth.intValue(), control.getPlankHeight()));
 
         Label separator = new Label("\u2a09");
 
         Node heightField = createLengthField(control, false);
         control.plankHeightProperty()
-                .addListener((ob, oldHeight, newHeight) -> {
-                    autoUpdateIndicator.accept(control.getPlankWidth(), newHeight.intValue());
-                });
+                .addListener((ob, oldHeight, newHeight)
+                        -> autoUpdateIndicator.accept(control.getPlankWidth(), newHeight.intValue()));
 
         HBox sizeRow = new HBox(widthField, separator, heightField);
         sizeRow.setAlignment(Pos.CENTER_LEFT);
