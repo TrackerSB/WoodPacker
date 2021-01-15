@@ -4,15 +4,15 @@ author: Stefan Huber
 since: 0.1
 -->
 
+<?import bayern.steinbrecher.checkedElements.CheckedComboBox?>
 <?import bayern.steinbrecher.woodpacker.elements.PlankList?>
 <?import bayern.steinbrecher.woodpacker.elements.ScaledCanvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
-<?import bayern.steinbrecher.checkedElements.CheckedComboBox?>
+<?import javafx.scene.layout.VBox?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -22,11 +22,13 @@ since: 0.1
         <left>
             <HBox>
                 <VBox>
-                    <PlankList fx:id="basePlankList"/>
+                    <PlankList fx:id="basePlankList"
+                               VBox.vgrow="ALWAYS"/>
                     <CheckedComboBox fx:id="materialSelection"/>
                 </VBox>
                 <VBox>
-                    <PlankList fx:id="requiredPlanksView"/>
+                    <PlankList fx:id="requiredPlanksView"
+                               VBox.vgrow="ALWAYS"/>
                     <ButtonBar>
                         <buttons>
                             <Button text="%exportPlanks"
