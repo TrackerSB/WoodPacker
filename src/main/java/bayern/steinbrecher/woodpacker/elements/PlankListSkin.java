@@ -167,17 +167,21 @@ public class PlankListSkin extends SkinBase<PlankList> {
         });
         ButtonBar.setButtonData(addPlankButton, ButtonData.APPLY);
 
-        ImageView clearAllPlanksGraphic = new ImageView(getClass().getResource("clearedClipboard.png").toExternalForm());
+        ImageView clearAllPlanksGraphic = new ImageView(getClass().getResource("clearedClipboard.png")
+                .toExternalForm());
         clearAllPlanksGraphic.setFitHeight(20);
         clearAllPlanksGraphic.setPreserveRatio(true);
         Button clearAllPlanksButton
                 = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("clearAll"), clearAllPlanksGraphic);
+        clearAllPlanksButton.setOnAction(aevt -> control.getPlanks().clear());
+
+        ChangeListener<Boolean> onPlankListEmptyChanged = (obs, wasEmpty, isEmpty) -> {
+            clearAllPlanksButton.setDisable(isEmpty);
+        };
         control.planksProperty()
                 .emptyProperty()
-                .addListener((obs, wasEmpty, isEmpty) -> clearAllPlanksButton.setDisable(isEmpty));
-        clearAllPlanksButton.setDisable(control.getPlanks().isEmpty()); // Ensure initial state
-        clearAllPlanksButton.setOnAction(aevt -> control.getPlanks().clear());
-        ButtonBar.setButtonData(clearAllPlanksButton, ButtonData.CANCEL_CLOSE);
+                .addListener(onPlankListEmptyChanged);
+        onPlankListEmptyChanged.changed(null, null, control.getPlanks().isEmpty());
 
         ButtonBar actionsBar = new ButtonBar();
         actionsBar.getButtons()
