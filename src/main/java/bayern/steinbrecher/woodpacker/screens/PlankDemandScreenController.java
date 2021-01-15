@@ -103,8 +103,11 @@ public class PlankDemandScreenController extends ScreenController {
                 .addListener((obs, previousBasePlank, currentBasePlank)
                         -> plankProblem.setBasePlank(currentBasePlank.orElse(null)));
         plankProblem.basePlankProperty()
-                .addListener((obs, previousBasePlank, currentBasePlank)
-                        -> basePlankList.setSelectedPlank(currentBasePlank));
+                .addListener((obs, previousBasePlank, currentBasePlank) -> {
+                    basePlankList.getPlanks()
+                            .add(currentBasePlank); // Ensure the base plank to select exists
+                    basePlankList.setSelectedPlank(currentBasePlank);
+                });
 
         // FIXME Dynamically calculate max width and height
         visualPlankCuttingPlan.setMaxHeight(800);
