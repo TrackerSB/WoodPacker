@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
  * @since 0.1
  */
 public class WoodPacker extends Application {
-    public static final ResourceBundle LANGUAGE_BUNDLE = ResourceBundle
-            .getBundle("bayern.steinbrecher.woodPacker.language");
+    public static final ResourceBundle LANGUAGE_BUNDLE
+            = ResourceBundle.getBundle("bayern.steinbrecher.woodpacker.language");
 
     @Override
     public void start(Stage primaryStage) throws ScreenSwitchFailedException {
