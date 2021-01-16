@@ -93,12 +93,15 @@ public class PlankListSkin extends SkinBase<PlankList> {
                     setGraphic(null);
                     setContextMenu(null);
                 } else {
+                    String firstRow;
                     if (item.getMaterial() == PlankMaterial.UNDEFINED) {
-                        setText(String.format("%d [mm] x %d [mm]", item.getWidth(), item.getHeight()));
+                        firstRow = String.format("%d [mm] x %d [mm]", item.getWidth(), item.getHeight());
                     } else {
-                        setText(String.format("%d [mm] x %d [mm] (%s)", item.getWidth(), item.getHeight(),
-                                WoodPacker.LANGUAGE_BUNDLE.getString(item.getMaterial().getResourceKey())));
+                        firstRow = String.format("%d [mm] x %d [mm] (%s)", item.getWidth(), item.getHeight(),
+                                WoodPacker.LANGUAGE_BUNDLE.getString(item.getMaterial().getResourceKey()));
                     }
+                    String secondRow = item.getComment().isBlank() ? "" : String.format("\"%s\"", item.getComment());
+                    setText(firstRow + "\n" + secondRow);
                     setGraphic(generateItemGraphic(item));
                     ImageView deletePlankItemGraphic
                             = new ImageView(getClass().getResource("trash.png").toExternalForm());
