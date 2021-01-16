@@ -198,6 +198,7 @@ public class PlankListSkin extends SkinBase<PlankList> {
                 control.getPlanks()
                         .add(newPlankField.createPlank());
                 newPlankField.setPlankId("");
+                newPlankField.setComment("");
             }
         });
         ButtonBar.setButtonData(addPlankButton, ButtonData.APPLY);
