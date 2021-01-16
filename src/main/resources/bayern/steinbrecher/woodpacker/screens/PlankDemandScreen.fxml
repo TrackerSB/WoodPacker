@@ -20,13 +20,11 @@ since: 0.1
     <BorderPane>
         <left>
             <VBox>
-                <HBox>
+                <HBox VBox.vgrow="ALWAYS">
                     <PlankList fx:id="basePlankList"
-                               materialAllowed="true"
-                               VBox.vgrow="ALWAYS"/>
+                               materialAllowed="true"/>
                     <PlankList fx:id="requiredPlanksView"
-                               materialAllowed="false"
-                               VBox.vgrow="ALWAYS"/>
+                               materialAllowed="false"/>
                 </HBox>
                 <ButtonBar>
                     <buttons>
