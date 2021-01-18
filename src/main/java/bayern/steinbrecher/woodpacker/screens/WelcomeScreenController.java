@@ -32,7 +32,6 @@ public class WelcomeScreenController extends ScreenController {
             PlankProblem.Snapshot snapshot = SerializationUtility.deserialize(deserializedSnapshot);
             getScreenManager()
                     .switchTo(new PlankDemandScreen(snapshot));
-            // FIXME Load required planks
         }
     }
 
