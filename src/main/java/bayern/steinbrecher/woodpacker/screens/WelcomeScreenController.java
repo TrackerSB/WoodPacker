@@ -35,4 +35,10 @@ public class WelcomeScreenController extends ScreenController {
             // FIXME Load required planks
         }
     }
+
+    @FXML
+    private void switchToAbout() throws ScreenSwitchFailedException {
+        getScreenManager()
+                .switchTo(new AboutScreen());
+    }
 }

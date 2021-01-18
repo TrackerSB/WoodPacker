@@ -1,7 +1,9 @@
 plugins {
     id 'application'
-    id 'com.github.gmazzo.buildconfig' version "2.0.2"
+    id 'distribution'
     id 'java'
+
+    id 'com.github.gmazzo.buildconfig' version "2.0.2"
     id 'org.openjfx.javafxplugin' version '0.0.8' // NOTE 0.0.9 may not work with the current Gradle version
 }
 
@@ -22,16 +24,24 @@ dependencies {
     implementation 'org.jetbrains:annotations:20.1.0'
 }
 
+run {
+    main = "$moduleName/bayern.steinbrecher.woodpacker.WoodPacker"
+}
+
+distributions {
+    main {
+        contents {
+            from("${projectDir}/licenses") {into "bin/licenses"}
+        }
+    }
+}
+
 buildConfig {
     buildConfigField("String", "APP_NAME", "\"${project.name}\"")
     buildConfigField("String", "APP_VERSION", "\"${project.version}\"")
     buildConfigField("String", "APP_VERSION_NICKNAME", "\"Das Alpha-Tier\"")
     buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
     packageName("bayern.steinbrecher.woodpacker")
-}
-
-run {
-    main = "$moduleName/bayern.steinbrecher.woodpacker.WoodPacker"
 }
 
 javafx {
