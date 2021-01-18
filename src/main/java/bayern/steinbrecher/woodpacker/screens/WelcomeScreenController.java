@@ -5,6 +5,7 @@ import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.utility.FileSystemUtility;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 
 import java.io.File;
@@ -39,5 +40,10 @@ public class WelcomeScreenController extends ScreenController {
     private void switchToAbout() throws ScreenSwitchFailedException {
         getScreenManager()
                 .switchTo(new AboutScreen());
+    }
+
+    @FXML
+    private void exitApp() {
+        Platform.exit();
     }
 }

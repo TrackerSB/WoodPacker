@@ -9,7 +9,6 @@ since: 0.1
 <TilePane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="bayern.steinbrecher.woodpacker.screens.WelcomeScreenController"
-          prefColumns="2"
           alignment="CENTER"
           hgap="5"
           vgap="5">
@@ -19,4 +18,6 @@ since: 0.1
             onAction="#askUserImportPlankProblem"/>
     <Button text="%about"
             onAction="#switchToAbout"/>
+    <Button text="%exit"
+            onAction="#exitApp"/>
 </TilePane>
