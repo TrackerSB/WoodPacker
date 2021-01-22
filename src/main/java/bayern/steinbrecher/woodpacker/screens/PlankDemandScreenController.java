@@ -45,7 +45,6 @@ public class PlankDemandScreenController extends ScreenController {
 
     @FXML
     private PlankList basePlankList;
-
     @FXML
     private PlankList requiredPlanksView;
     @FXML
@@ -107,17 +106,6 @@ public class PlankDemandScreenController extends ScreenController {
                     basePlankList.getPlanks()
                             .add(currentBasePlank); // Ensure the base plank to select exists
                     basePlankList.setSelectedPlank(currentBasePlank);
-                });
-
-        // FIXME Dynamically calculate max width and height
-        visualPlankCuttingPlan.setMaxHeight(800);
-        visualPlankCuttingPlan.setMaxWidth(800);
-        visualPlankCuttingPlan.sceneProperty()
-                .addListener((obs, previousScene, currentScene) -> {
-                    if (currentScene != null) {
-                        visualPlankCuttingPlan.maxHeightProperty()
-                                .bind(currentScene.heightProperty());
-                    }
                 });
 
         // Sync requiredPlanksView <--> plankProblem
