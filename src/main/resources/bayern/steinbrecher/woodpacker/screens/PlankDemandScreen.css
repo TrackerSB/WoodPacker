@@ -11,6 +11,10 @@ since: 0.1
     -fx-graphic: url("woods.png");
 }
 
+#exportPlanksButton {
+   -fx-graphic: url("export.png");
+}
+
 #requiredPlanksListLabel {
     -fx-graphic: url("rulers.png");
 }

@@ -40,7 +40,8 @@ since: 0.1
                 </HBox>
                 <ButtonBar>
                     <buttons>
-                        <Button text="%exportPlanks"
+                        <Button id="exportPlanksButton"
+                                text="%exportPlanks"
                                 onAction="#askUserExportPlankProblem"
                                 disable="${!controller.plankProblemValid}"/>
                         <Button text="%backToMainMenu"
