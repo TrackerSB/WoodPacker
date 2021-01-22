@@ -7,56 +7,34 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="bayern.steinbrecher.woodpacker.screens.AboutScreenController"
-      maxWidth="500"
-      alignment="CENTER">
-    <HBox alignment="CENTER"
-          spacing="10">
+      stylesheets="@AboutScreen.css"
+      id="root">
+    <HBox id="title">
         <ImageView>
             <Image url="@../logo.png"
                    preserveRatio="true"
                    requestedWidth="200"/>
         </ImageView>
-        <VBox alignment="CENTER">
-            <Text text="${controller.appName}">
-                <font>
-                    <Font size="50"/>
-                </font>
-            </Text>
+        <VBox>
+            <Text id="appName"
+                  text="${controller.appName}"/>
             <Text fx:id="version"/>
         </VBox>
     </HBox>
-    <TitledPane collapsible="false"
+    <TitledPane id="authorInfoPane"
                 text="%authorInfo">
-        <graphic>
-            <ImageView>
-                <Image url="@idCard.png"/>
-            </ImageView>
-        </graphic>
-        <GridPane fx:id="authorInfo"
-                  hgap="10"/>
+        <GridPane fx:id="authorInfo"/>
     </TitledPane>
-    <TitledPane collapsible="false"
+    <TitledPane id="buildInfoPane"
                 text="%buildInfo">
-        <graphic>
-            <ImageView>
-                <Image url="@cpu.png"/>
-            </ImageView>
-        </graphic>
-        <GridPane fx:id="buildInfo"
-                  hgap="10"/>
+        <GridPane fx:id="buildInfo"/>
     </TitledPane>
-    <TitledPane collapsible="false"
+    <TitledPane id="licenseInfoPane"
                 text="%licensesInfo">
-        <graphic>
-            <ImageView>
-                <Image url="@license.png"/>
-            </ImageView>
-        </graphic>
         <VBox fx:id="licensesInfo"/>
     </TitledPane>
     <Button text="%backToMainMenu"

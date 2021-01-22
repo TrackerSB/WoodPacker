@@ -1,0 +1,33 @@
+GridPane {
+    -fx-hgap: 10;
+}
+
+.titled-pane {
+    -fx-collapsible: false;
+}
+
+#appName {
+    -fx-font-size: 50;
+}
+
+#authorInfoPane {
+    -fx-graphic: url("idCard.png");
+}
+
+#buildInfoPane {
+    -fx-graphic: url("cpu.png");
+}
+
+#licenseInfoPane {
+    -fx-graphic: url("license.png");
+}
+
+#root {
+    -fx-alignment: CENTER;
+    -fx-max-width: 500;
+}
+
+#title HBox, #title VBox, #title .text {
+    -fx-alignment: CENTER;
+    -fx-spacing: 10;
+}
