@@ -2,7 +2,6 @@ package bayern.steinbrecher.woodpacker.elements;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -10,7 +9,13 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 public class ImageButtonSkin extends SkinBase<ImageButton> {
 
@@ -21,6 +26,17 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
         Bindings.max(control.widthProperty(), control.heightProperty())
                 .addListener((obs, previousSize, currentSize)
                         -> contentHolder.setPrefSize(currentSize.doubleValue(), currentSize.doubleValue()));
+        contentHolder.onMouseClickedProperty()
+                .bind(control.onActionProperty());
+
+        Region imageBackground = new Region();
+        ChangeListener<Paint> onFillColorChanged = (obs, previousFillColor, currentFillColor)
+                -> imageBackground.setBackground(new Background(new BackgroundFill(currentFillColor, null, null)));
+        control.fillColorProperty()
+                .addListener(onFillColorChanged);
+        onFillColorChanged.changed(null, null, control.getFillColor()); // Ensure initial state
+        contentHolder.getChildren()
+                .add(imageBackground);
 
         ImageView backgroundImage = new ImageView();
         backgroundImage.setPreserveRatio(true);
@@ -32,22 +48,17 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
         contentHolder.getChildren()
                 .add(backgroundImage);
 
-        Region imageOverlay = new Region();
-        ChangeListener<Paint> onFillColorChanged = (obs, previousFillColor, currentFillColor)
-                -> imageOverlay.setBackground(new Background(new BackgroundFill(currentFillColor, null, null)));
-        control.fillColorProperty()
-                .addListener(onFillColorChanged);
-        onFillColorChanged.changed(null, null, control.getFillColor()); // Ensure initial state
-        imageOverlay.onMouseClickedProperty()
-                .bind(control.onActionProperty());
-        contentHolder.getChildren()
-                .add(imageOverlay);
-
-        Label buttonLabel = new Label();
-        buttonLabel.textProperty()
+        Text buttonText = new Text();
+        buttonText.textProperty()
                 .bind(control.textProperty());
+        buttonText.wrappingWidthProperty()
+                .bind(contentHolder.widthProperty());
+        buttonText.setTextAlignment(TextAlignment.CENTER);
+        buttonText.setStroke(Color.WHITE);
+        buttonText.setFill(Color.BLACK);
+        buttonText.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 26));
         contentHolder.getChildren()
-                .add(buttonLabel);
+                .add(buttonText);
 
         getChildren()
                 .add(contentHolder);
