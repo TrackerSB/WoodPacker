@@ -32,16 +32,31 @@
     </HBox>
     <TitledPane collapsible="false"
                 text="%authorInfo">
+        <graphic>
+            <ImageView>
+                <Image url="@idCard.png"/>
+            </ImageView>
+        </graphic>
         <GridPane fx:id="authorInfo"
                   hgap="10"/>
     </TitledPane>
     <TitledPane collapsible="false"
                 text="%buildInfo">
+        <graphic>
+            <ImageView>
+                <Image url="@cpu.png"/>
+            </ImageView>
+        </graphic>
         <GridPane fx:id="buildInfo"
                   hgap="10"/>
     </TitledPane>
     <TitledPane collapsible="false"
                 text="%licensesInfo">
+        <graphic>
+            <ImageView>
+                <Image url="@license.png"/>
+            </ImageView>
+        </graphic>
         <VBox fx:id="licensesInfo"/>
     </TitledPane>
     <Button text="%backToMainMenu"

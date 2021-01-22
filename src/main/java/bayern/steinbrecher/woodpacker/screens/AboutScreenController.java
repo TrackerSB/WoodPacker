@@ -49,10 +49,12 @@ public class AboutScreenController extends ScreenController {
     // Map license names to license paths
     private static final Map<String, Path> LICENSES = Map.of(
             "Flaticon", LICENSES_ROOT_DIR.resolve("flaticon.pdf"),
-            "Essential collection", LICENSES_ROOT_DIR.resolve("148705-essential-collection.pdf"),
+            "Essential Collection", LICENSES_ROOT_DIR.resolve("148705-essential-collection.pdf"),
             "Clipboard", LICENSES_ROOT_DIR.resolve("340058-clipboard.pdf"),
-            "Edit tools", LICENSES_ROOT_DIR.resolve("764586-edit-tools.pdf"),
-            "Carpenter", LICENSES_ROOT_DIR.resolve("2933545-carpenter.pdf")
+            "Edit Tools", LICENSES_ROOT_DIR.resolve("764586-edit-tools.pdf"),
+            "Carpenter", LICENSES_ROOT_DIR.resolve("2933545-carpenter.pdf"),
+            "Computer", LICENSES_ROOT_DIR.resolve("3076315-computer.pdf"),
+            "Business and Management", LICENSES_ROOT_DIR.resolve("292082-business-and-management.pdf")
     );
     private final ReadOnlyStringWrapper appName = new ReadOnlyStringWrapper(BuildConfig.APP_NAME);
     @FXML
