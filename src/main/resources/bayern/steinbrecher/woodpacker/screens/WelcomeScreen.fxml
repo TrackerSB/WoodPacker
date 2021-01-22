@@ -4,7 +4,7 @@ author: Stefan Huber
 since: 0.1
 -->
 
-<?import javafx.scene.control.Button?>
+<?import bayern.steinbrecher.woodpacker.elements.ImageButton?>
 <?import javafx.scene.layout.TilePane?>
 <TilePane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
@@ -12,12 +12,20 @@ since: 0.1
           alignment="CENTER"
           hgap="5"
           vgap="5">
-    <Button text="%createCuttingPlan"
-            onAction="#switchToBasePlankSelection"/>
-    <Button text="%importPlanks"
-            onAction="#askUserImportPlankProblem"/>
-    <Button text="%about"
-            onAction="#switchToAbout"/>
-    <Button text="%exit"
-            onAction="#exitApp"/>
+    <ImageButton text="%createCuttingPlan"
+                 fillColor="#00000055"
+                 imageUrl="@blueprint.png"
+                 onAction="#switchToBasePlankSelection"/>
+    <ImageButton text="%importPlanks"
+                 fillColor="#00000055"
+                 imageUrl="@import.png"
+                 onAction="#askUserImportPlankProblem"/>
+    <ImageButton text="%about"
+                 fillColor="#00000055"
+                 imageUrl="@team.png"
+                 onAction="#switchToAbout"/>
+    <ImageButton text="%exit"
+                 fillColor="#00000055"
+                 imageUrl="@power.png"
+                 onAction="#exitApp"/>
 </TilePane>
