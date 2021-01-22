@@ -4,6 +4,7 @@ import bayern.steinbrecher.screenSwitcher.ScreenManager;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.ResourceBundle;
@@ -24,6 +25,8 @@ public class WoodPacker extends Application {
                 .add(getClass().getResource("styles.css").toExternalForm());
         screenManager.switchTo(new WelcomeScreen());
         primaryStage.setFullScreen(true);
+        primaryStage.getIcons()
+                .add(new Image(getClass().getResource("logo.png").toExternalForm()));
         primaryStage.show();
     }
 }
