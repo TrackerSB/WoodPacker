@@ -1,0 +1,11 @@
+.label {
+    -fx-font-size: 30;
+}
+
+#basePlankListLabel {
+    -fx-graphic: url("woods.png");
+}
+
+#requiredPlanksListLabel {
+    -fx-graphic: url("rulers.png");
+}

@@ -17,19 +17,22 @@ since: 0.1
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
             fitToWidth="true"
-            fitToHeight="true">
+            fitToHeight="true"
+            stylesheets="@PlankDemandScreen.css">
     <BorderPane>
         <left>
             <VBox>
                 <HBox VBox.vgrow="ALWAYS">
                     <VBox>
-                        <Label text="%basePlankList"/>
+                        <Label id="basePlankListLabel"
+                               text="%basePlankList"/>
                         <PlankList fx:id="basePlankList"
                                    materialAllowed="true"
                                    VBox.vgrow="ALWAYS"/>
                     </VBox>
                     <VBox>
-                        <Label text="%demandList"/>
+                        <Label id="requiredPlanksListLabel"
+                               text="%demandList"/>
                         <PlankList fx:id="requiredPlanksView"
                                    materialAllowed="false"
                                    VBox.vgrow="ALWAYS"/>
