@@ -60,6 +60,23 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
         contentHolder.getChildren()
                 .add(buttonText);
 
+        Region hoverOverlay = new Region();
+        hoverOverlay.setBackground(new Background(
+                new BackgroundFill(Color.rgb(255, 255, 255, 0.3), null, null)));
+        hoverOverlay.visibleProperty()
+                .bind(contentHolder.hoverProperty()
+                        .and(contentHolder.pressedProperty().not()));
+        contentHolder.getChildren()
+                .add(hoverOverlay);
+
+        Region pressedOverlay = new Region();
+        pressedOverlay.setBackground(new Background(
+                new BackgroundFill(Color.rgb(0, 0, 0, 0.3), null, null)));
+        pressedOverlay.visibleProperty()
+                .bind(contentHolder.pressedProperty());
+        contentHolder.getChildren()
+                .add(pressedOverlay);
+
         getChildren()
                 .add(contentHolder);
     }
