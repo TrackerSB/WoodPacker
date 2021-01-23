@@ -203,8 +203,8 @@ public class PlankListSkin extends SkinBase<PlankList> {
         });
         ButtonBar.setButtonData(addPlankButton, ButtonData.APPLY);
 
-        ImageView clearAllPlanksGraphic = new ImageView(getClass().getResource("clearedClipboard.png")
-                .toExternalForm());
+        ImageView clearAllPlanksGraphic = new ImageView(
+                getClass().getResource("clearedClipboard.png").toExternalForm());
         clearAllPlanksGraphic.setFitHeight(20);
         clearAllPlanksGraphic.setPreserveRatio(true);
         Button clearAllPlanksButton
