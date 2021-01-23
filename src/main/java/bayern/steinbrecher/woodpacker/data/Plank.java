@@ -2,6 +2,7 @@ package bayern.steinbrecher.woodpacker.data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.text.Collator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -9,7 +10,7 @@ import java.util.Optional;
  * @author Stefan Huber
  * @since 0.1
  */
-public class Plank implements Serializable {
+public class Plank implements Comparable<Plank>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final String id;
@@ -136,5 +137,11 @@ public class Plank implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    @Override
+    public int compareTo(Plank other) {
+        return Collator.getInstance()
+                .compare(this.getId(), other.getId());
     }
 }

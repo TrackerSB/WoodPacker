@@ -12,6 +12,8 @@ import bayern.steinbrecher.woodpacker.utility.FileSystemUtility;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -24,9 +26,11 @@ import javafx.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,6 +82,14 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void initialize() {
+        // Ensure planks being sorted
+        ObservableSet<Plank> sortedBasePlanks
+                = FXCollections.observableSet(new TreeSet<>(basePlankList.getPlanks()));
+        basePlankList.setPlanks(sortedBasePlanks);
+        ObservableSet<Plank> sortedRequiredPlanks
+                = FXCollections.observableSet(new TreeSet<>(requiredPlanksView.getPlanks()));
+        requiredPlanksView.setPlanks(sortedRequiredPlanks);
+
         readUserDefinedBasePlanks();
 
         basePlankList.planksProperty()
