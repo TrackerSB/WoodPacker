@@ -197,8 +197,6 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         Button addPlankButton = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("add"), addPlankGraphic);
         newPlankField.validProperty()
                 .addListener((obs, wasValid, isValid) -> addPlankButton.setDisable(!isValid));
-        newPlankField.materialAllowedProperty()
-                .bind(control.materialAllowedProperty());
         addPlankButton.setOnAction(aevt -> {
             if (newPlankField.isValid()) {
                 control.getPlanks()

@@ -20,7 +20,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -38,7 +37,6 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
     private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
     private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
-    private final BooleanProperty materialAllowed = new SimpleBooleanProperty(true);
     private final StringProperty comment = new SimpleStringProperty("");
     private final BooleanProperty skinElementsValid = new SimpleBooleanProperty(true);
     private final ReportableBase<PlankField<T>> rBase = new ReportableBase<>(this);
@@ -46,17 +44,16 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     public PlankField(Class<T> genericRuntimeType) {
         this.genericRuntimeType = genericRuntimeType;
-        ChangeListener<Boolean> onMaterialAllowedChanged = (obs, materialWasAllowed, materialIsAllowed) -> {
-            if (materialIsAllowed) {
-                material.bind(selectedMaterialProperty());
-            } else {
-                material.unbind();
-                material.set(PlankMaterial.UNDEFINED);
-            }
-        };
-        materialAllowedProperty()
-                .addListener(onMaterialAllowedChanged);
-        onMaterialAllowedChanged.changed(null, null, isMaterialAllowed()); // Ensure initial state
+        if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
+            material.bind(selectedMaterialProperty());
+        } else if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
+            material.unbind();
+            material.set(PlankMaterial.UNDEFINED);
+        } else {
+            throw new UnsupportedOperationException(
+                    String.format("%s does not support %s as generic type", PlankField.class.getCanonicalName(),
+                            genericRuntimeType.getCanonicalName()));
+        }
     }
 
     /**
@@ -69,7 +66,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new PlankFieldSkin(this);
+        return new PlankFieldSkin<T>(this, genericRuntimeType);
     }
 
     public T createPlank() {
@@ -159,18 +156,6 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     public void setSelectedMaterial(PlankMaterial material) {
         selectedMaterialProperty().set(material);
-    }
-
-    public BooleanProperty materialAllowedProperty() {
-        return materialAllowed;
-    }
-
-    public boolean isMaterialAllowed() {
-        return materialAllowedProperty().get();
-    }
-
-    public void setMaterialAllowed(boolean materialAllowed) {
-        materialAllowedProperty().set(materialAllowed);
     }
 
     public StringProperty commentProperty() {

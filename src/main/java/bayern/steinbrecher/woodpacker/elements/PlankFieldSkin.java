@@ -4,6 +4,8 @@ import bayern.steinbrecher.checkedElements.CheckedComboBox;
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.woodpacker.WoodPacker;
+import bayern.steinbrecher.woodpacker.data.BasePlank;
+import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import javafx.beans.property.BooleanProperty;
@@ -29,10 +31,10 @@ import java.util.function.BiConsumer;
  * @author Stefan Huber
  * @since 0.1
  */
-public class PlankFieldSkin extends SkinBase<PlankField<?>> {
+public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
     private final BooleanProperty indicatorChangedByUser = new SimpleBooleanProperty(false);
 
-    private Node createPlankIdField(PlankField<?> control) {
+    private Node createPlankIdField(PlankField<T> control) {
         CheckedTextField plankIdField = new CheckedTextField();
         plankIdField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("identifier"));
         plankIdField.textProperty()
@@ -49,7 +51,7 @@ public class PlankFieldSkin extends SkinBase<PlankField<?>> {
         return new HBox(idIcon, plankIdField);
     }
 
-    private Node createGrainIndicator(PlankField<?> control) {
+    private Node createGrainIndicator(PlankField<T> control) {
         PlankGrainDirectionIndicator indicator = new PlankGrainDirectionIndicator();
         control.grainDirectionProperty()
                 .bindBidirectional(indicator.valueProperty());
@@ -79,7 +81,7 @@ public class PlankFieldSkin extends SkinBase<PlankField<?>> {
     /**
      * @param forWidth {@code true} for width field; {@code false} for height field
      */
-    private Node createLengthField(PlankField<?> control, boolean forWidth) {
+    private Node createLengthField(PlankField<T> control, boolean forWidth) {
         CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1000, 1);
         // @formatter: off
         // widthField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankWidth.png');"); // FIXME Icon not showing up
@@ -106,7 +108,7 @@ public class PlankFieldSkin extends SkinBase<PlankField<?>> {
         return content;
     }
 
-    private Node createCommentField(PlankField<?> control) {
+    private Node createCommentField(PlankField<T> control) {
         TextField commentField = new TextField();
         commentField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("description"));
         control.commentProperty()
@@ -125,13 +127,11 @@ public class PlankFieldSkin extends SkinBase<PlankField<?>> {
         return content;
     }
 
-    private Node createMaterialSelection(PlankField<?> control) {
+    private Node createMaterialSelection(PlankField<T> control) {
         CheckedComboBox<PlankMaterial> materialSelection
                 = new CheckedComboBox<>(FXCollections.observableArrayList(PlankMaterial.values()));
         materialSelection.setEditable(false);
         materialSelection.getSelectionModel().select(PlankMaterial.UNDEFINED); // Ensure initial state
-        materialSelection.disableProperty()
-                .bind(control.materialAllowedProperty().not());
         materialSelection.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, previouslySelected, currentlySelected)
@@ -142,7 +142,7 @@ public class PlankFieldSkin extends SkinBase<PlankField<?>> {
         return materialSelection;
     }
 
-    protected PlankFieldSkin(PlankField<?> control) {
+    protected PlankFieldSkin(PlankField<T> control, Class<T> genericRuntimeType) {
         super(control);
 
         Node plankIdField = createPlankIdField(control);
@@ -171,12 +171,20 @@ public class PlankFieldSkin extends SkinBase<PlankField<?>> {
         HBox sizeRow = new HBox(widthField, separator, heightField);
         sizeRow.setAlignment(Pos.CENTER_LEFT);
 
-        Node commentField = createCommentField(control);
-        Node indicatorNode = createGrainIndicator(control);
-        Node materialSelection = createMaterialSelection(control);
-        HBox propertyRow = new HBox(commentField, indicatorNode, materialSelection);
+        HBox propertyRow = new HBox();
         propertyRow.setAlignment(Pos.CENTER_LEFT);
         propertyRow.setSpacing(5);
+        Node commentField = createCommentField(control);
+        propertyRow.getChildren()
+                .add(commentField);
+        Node indicatorNode = createGrainIndicator(control);
+        propertyRow.getChildren()
+                .add(indicatorNode);
+        if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
+            Node materialSelection = createMaterialSelection(control);
+            propertyRow.getChildren()
+                    .add(materialSelection);
+        }
 
         VBox content = new VBox(plankIdField, sizeRow, propertyRow);
         content.setAlignment(Pos.TOP_LEFT);
