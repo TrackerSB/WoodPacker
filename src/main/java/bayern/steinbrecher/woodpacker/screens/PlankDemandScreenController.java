@@ -61,6 +61,7 @@ public class PlankDemandScreenController extends ScreenController {
     private ScaledCanvas visualPlankCuttingPlan;
     private final PlankProblem plankProblem = new PlankProblem();
     private final ReadOnlyBooleanWrapper plankProblemValid = new ReadOnlyBooleanWrapper();
+    private final ReadOnlyBooleanWrapper plankProblemSaved = new ReadOnlyBooleanWrapper();
 
     private void readUserDefinedBasePlanks() {
         // FIXME Show graphical feedback to user in any case where a logger is used
@@ -158,8 +159,10 @@ public class PlankDemandScreenController extends ScreenController {
                     updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey());
                 });
         plankProblem.proposedSolutionProperty()
-                .addListener((obs, oldSolution, newSolution)
-                        -> updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution.getKey()));
+                .addListener((obs, oldSolution, newSolution) -> {
+                    updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution.getKey());
+                    plankProblemSaved.set(false);
+                });
         // Ensure initial state
         Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
         updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), proposedSolution.getKey());
@@ -212,6 +215,7 @@ public class PlankDemandScreenController extends ScreenController {
     public void loadPlankProblem(PlankProblem setup) {
         plankProblem.setBasePlank(setup.getBasePlank());
         plankProblem.setRequiredPlanks(setup.getRequiredPlanks());
+        plankProblemSaved.set(true);
     }
 
     @SuppressWarnings("unused")
@@ -222,7 +226,27 @@ public class PlankDemandScreenController extends ScreenController {
         if (exportFile.isPresent()) {
             byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
             Files.write(exportFile.get().toPath(), serializedSnapshot);
+            plankProblemSaved.set(true);
         }
+    }
+
+    @SuppressWarnings("unused")
+    @FXML
+    private void trySwitchToPreviousScreen() throws IOException {
+        if (isPlankProblemValid() && !isPlankProblemSaved()) {
+            try {
+                Alert unsavedChangesAlert = DialogUtility.createInteractiveAlert(
+                        AlertType.CONFIRMATION, WoodPacker.LANGUAGE_BUNDLE.getString("unsavedChanges"),
+                        ButtonType.YES, ButtonType.NO);
+                Optional<ButtonType> userResponse = DialogUtility.showAndWait(unsavedChangesAlert);
+                if (userResponse.isPresent() && userResponse.get() == ButtonType.YES) {
+                    askUserExportPlankProblem();
+                }
+            } catch (DialogCreationException ex) {
+                LOGGER.log(Level.WARNING, "Could not ask user for saving unsaved changes");
+            }
+        }
+        switchToPreviousScreen();
     }
 
     public ReadOnlyBooleanProperty plankProblemValidProperty() {
@@ -231,5 +255,13 @@ public class PlankDemandScreenController extends ScreenController {
 
     public boolean isPlankProblemValid() {
         return plankProblemValidProperty().get();
+    }
+
+    public ReadOnlyBooleanProperty plankProblemSavedProperty() {
+        return plankProblemSaved;
+    }
+
+    public boolean isPlankProblemSaved() {
+        return plankProblemSavedProperty().get();
     }
 }
