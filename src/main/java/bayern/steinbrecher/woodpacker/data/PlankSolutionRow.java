@@ -19,7 +19,7 @@ public class PlankSolutionRow {
     private final boolean addHorizontal;
     private final int maxLength;
     private final int breadth;
-    private final SortedSet<Plank> planks;
+    private final SortedSet<RequiredPlank> planks;
     private int currentLength = 0;
 
     /**
@@ -63,7 +63,7 @@ public class PlankSolutionRow {
         return breadth;
     }
 
-    public Set<Plank> getPlanks() {
+    public Set<RequiredPlank> getPlanks() {
         return Collections.unmodifiableSet(planks);
     }
 
@@ -104,7 +104,7 @@ public class PlankSolutionRow {
                 && !getPlanks().contains(toBeAdded);
     }
 
-    public boolean addPlank(Plank plank) {
+    public boolean addPlank(RequiredPlank plank) {
         if (canContain(plank)) {
             boolean addedPlank = planks.add(plank);
             assert addedPlank : String.format(

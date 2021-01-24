@@ -2,9 +2,11 @@ package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.WoodPacker;
+import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
+import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
@@ -26,7 +28,6 @@ import javafx.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -48,9 +49,9 @@ public class PlankDemandScreenController extends ScreenController {
     private static final Preferences USER_DEFINED_BASE_PLANKS = USER_PREFERENCES_ROOT.node("baseplanks");
 
     @FXML
-    private PlankList basePlankList;
+    private PlankList<BasePlank> basePlankList;
     @FXML
-    private PlankList requiredPlanksView;
+    private PlankList<RequiredPlank> requiredPlanksView;
     @FXML
     private ScaledCanvas visualPlankCuttingPlan;
     private final PlankProblem plankProblem = new PlankProblem();
@@ -66,7 +67,7 @@ public class PlankDemandScreenController extends ScreenController {
                             String.format("The serialized data for '%s' is not available", basePlankName));
                 } else {
                     try {
-                        Plank basePlank = SerializationUtility.deserialize(serializedBasePlank);
+                        BasePlank basePlank = SerializationUtility.deserialize(serializedBasePlank);
                         basePlankList.getPlanks()
                                 .add(basePlank);
                     } catch (IOException | ClassNotFoundException ex) {
@@ -83,10 +84,10 @@ public class PlankDemandScreenController extends ScreenController {
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void initialize() {
         // Ensure planks being sorted
-        ObservableSet<Plank> sortedBasePlanks
+        ObservableSet<BasePlank> sortedBasePlanks
                 = FXCollections.observableSet(new TreeSet<>(basePlankList.getPlanks()));
         basePlankList.setPlanks(sortedBasePlanks);
-        ObservableSet<Plank> sortedRequiredPlanks
+        ObservableSet<RequiredPlank> sortedRequiredPlanks
                 = FXCollections.observableSet(new TreeSet<>(requiredPlanksView.getPlanks()));
         requiredPlanksView.setPlanks(sortedRequiredPlanks);
 
@@ -122,7 +123,7 @@ public class PlankDemandScreenController extends ScreenController {
 
         // Sync requiredPlanksView <--> plankProblem
         requiredPlanksView.planksProperty()
-                .addListener((SetChangeListener<? super Plank>) change -> {
+                .addListener((SetChangeListener<? super RequiredPlank>) change -> {
                     if (change.wasAdded()) {
                         plankProblem.getRequiredPlanks()
                                 .add(change.getElementAdded());
@@ -133,7 +134,7 @@ public class PlankDemandScreenController extends ScreenController {
                     }
                 });
         plankProblem.requiredPlanksProperty()
-                .addListener((SetChangeListener<? super Plank>) change -> {
+                .addListener((SetChangeListener<? super RequiredPlank>) change -> {
                     if (change.wasAdded()) {
                         requiredPlanksView.getPlanks()
                                 .add(change.getElementAdded());
@@ -147,7 +148,8 @@ public class PlankDemandScreenController extends ScreenController {
         // Trigger updates of visual cutting plank
         plankProblem.basePlankProperty()
                 .addListener((obs, oldBasePlank, newBasePlank) -> {
-                    Pair<List<PlankSolutionRow>, Set<Plank>> proposedSolution = plankProblem.getProposedSolution();
+                    Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem
+                            .getProposedSolution();
                     updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey(), proposedSolution.getValue());
                 });
         plankProblem.proposedSolutionProperty()
@@ -155,7 +157,7 @@ public class PlankDemandScreenController extends ScreenController {
                         -> updateVisualPlankCuttingPlan(
                         plankProblem.getBasePlank(), newSolution.getKey(), newSolution.getValue()));
         // Ensure initial state
-        Pair<List<PlankSolutionRow>, Set<Plank>> proposedSolution = plankProblem.getProposedSolution();
+        Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
         updateVisualPlankCuttingPlan(
                 plankProblem.getBasePlank(), proposedSolution.getKey(), proposedSolution.getValue());
 
@@ -166,7 +168,8 @@ public class PlankDemandScreenController extends ScreenController {
     }
 
     private void updateVisualPlankCuttingPlan(
-            Plank basePlank, Iterable<PlankSolutionRow> placedPlankRows, Iterable<Plank> ignoredPlanks) {
+            Plank basePlank, Iterable<PlankSolutionRow> placedPlankRows, Iterable<RequiredPlank> ignoredPlanks) {
+        // Update cutting plan preview
         if (basePlank == null) {
             visualPlankCuttingPlan.theoreticalWidthProperty()
                     .bind(visualPlankCuttingPlan.widthProperty());

@@ -4,28 +4,25 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.text.Collator;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Stefan Huber
  * @since 0.1
  */
-public class Plank implements Comparable<Plank>, Serializable {
+public abstract class Plank implements Comparable<Plank>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final String id;
     private final int width; // in mm
     private final int height; // in mm
     private final PlankGrainDirection grainDirection;
-    private final PlankMaterial material;
     private final String comment;
 
-    public Plank(String id, int width, int height, PlankGrainDirection grainDirection, PlankMaterial material) {
-        this(id, width, height, grainDirection, material, "");
+    public Plank(String id, int width, int height, PlankGrainDirection grainDirection) {
+        this(id, width, height, grainDirection, "");
     }
 
-    public Plank(String id, int width, int height, PlankGrainDirection grainDirection, PlankMaterial material,
-                 String comment) {
+    public Plank(String id, int width, int height, PlankGrainDirection grainDirection, String comment) {
         this.id = id;
         if (width <= 0) {
             throw new IllegalArgumentException("Width has to be positive");
@@ -36,7 +33,6 @@ public class Plank implements Comparable<Plank>, Serializable {
         }
         this.height = height;
         this.grainDirection = grainDirection;
-        this.material = material;
         this.comment = comment;
     }
 
@@ -56,10 +52,6 @@ public class Plank implements Comparable<Plank>, Serializable {
         return grainDirection;
     }
 
-    public PlankMaterial getMaterial() {
-        return material;
-    }
-
     public String getComment() {
         return comment;
     }
@@ -73,53 +65,6 @@ public class Plank implements Comparable<Plank>, Serializable {
         return direction == PlankGrainDirection.IRRELEVANT
                 || getGrainDirection() == PlankGrainDirection.IRRELEVANT
                 || getGrainDirection() == direction;
-    }
-
-    public Plank rotated() {
-        PlankGrainDirection rotatedGrainDirection = switch (getGrainDirection()) {
-            case HORIZONTAL -> PlankGrainDirection.VERTICAL;
-            case VERTICAL -> PlankGrainDirection.HORIZONTAL;
-            case IRRELEVANT -> PlankGrainDirection.IRRELEVANT;
-        };
-        return new Plank(id, getHeight(), getWidth(), rotatedGrainDirection, getMaterial(), getComment());
-    }
-
-    public Optional<Plank> heightDecreased(int decreaseBy) {
-        if (decreaseBy > getHeight()) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Cannot decrease planks height by %d since its height is %d", decreaseBy, getHeight()));
-        }
-        if (decreaseBy == getHeight()) {
-            return Optional.empty();
-        }
-        return Optional.of(
-                new Plank(getId(), getWidth(), getHeight() - decreaseBy, getGrainDirection(), getMaterial(),
-                        getComment()));
-    }
-
-    public Optional<Plank> widthDecreased(int decreaseBy) {
-        if (decreaseBy > getWidth()) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Cannot decrease planks width by %d since its height is %d", decreaseBy, getHeight()));
-        }
-        if (decreaseBy == getWidth()) {
-            return Optional.empty();
-        }
-        return Optional.of(
-                new Plank(getId(), getWidth() - decreaseBy, getHeight(), getGrainDirection(), getMaterial(),
-                        getComment()));
-    }
-
-    @Override
-    public String toString() {
-        if (getComment() == null || getComment().isBlank()) {
-            return String.format("\"%s\": %d [mm] x %d [mm] (%s)", getId(), getWidth(), getHeight(), getMaterial());
-        } else {
-            return String.format("\"%s\": %d [mm] x %d [mm] (%s) - %s",
-                    getId(), getWidth(), getHeight(), getMaterial(), getComment());
-        }
     }
 
     @Override

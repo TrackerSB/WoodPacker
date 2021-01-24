@@ -3,9 +3,12 @@ package bayern.steinbrecher.woodpacker.elements;
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
 import bayern.steinbrecher.checkedElements.report.Reportable;
 import bayern.steinbrecher.checkedElements.report.ReportableBase;
+import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
+import bayern.steinbrecher.woodpacker.data.RequiredPlank;
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -28,7 +31,7 @@ import javafx.scene.control.Skin;
  * @author Stefan Huber
  * @since 0.1
  */
-public class PlankField extends Control implements Reportable {
+public class PlankField<T extends Plank> extends Control implements Reportable {
     private final StringProperty plankId = new SimpleStringProperty("");
     private final IntegerProperty plankWidth = new SimpleIntegerProperty();
     private final IntegerProperty plankHeight = new SimpleIntegerProperty();
@@ -38,9 +41,11 @@ public class PlankField extends Control implements Reportable {
     private final BooleanProperty materialAllowed = new SimpleBooleanProperty(true);
     private final StringProperty comment = new SimpleStringProperty("");
     private final BooleanProperty skinElementsValid = new SimpleBooleanProperty(true);
-    private final ReportableBase<PlankField> rBase = new ReportableBase<>(this);
+    private final ReportableBase<PlankField<T>> rBase = new ReportableBase<>(this);
+    private final Class<T> genericRuntimeType;
 
-    public PlankField() {
+    public PlankField(Class<T> genericRuntimeType) {
+        this.genericRuntimeType = genericRuntimeType;
         ChangeListener<Boolean> onMaterialAllowedChanged = (obs, materialWasAllowed, materialIsAllowed) -> {
             if (materialIsAllowed) {
                 material.bind(selectedMaterialProperty());
@@ -54,14 +59,33 @@ public class PlankField extends Control implements Reportable {
         onMaterialAllowedChanged.changed(null, null, isMaterialAllowed()); // Ensure initial state
     }
 
+    /**
+     * Should be used in FXML only.
+     */
+    public PlankField(@NamedArg("genericRuntimeType") String genericRuntimeTypeName) throws ClassNotFoundException {
+        //noinspection unchecked
+        this((Class<T>) Class.forName(genericRuntimeTypeName));
+    }
+
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PlankFieldSkin(this);
     }
 
-    public Plank createPlank() {
-        return new Plank(
-                getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(), getMaterial(), getComment());
+    public T createPlank() {
+        if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
+            //noinspection unchecked
+            return (T) new RequiredPlank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(),
+                    getComment());
+        }
+        if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
+            //noinspection unchecked
+            return (T) new BasePlank(
+                    getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(), getMaterial(),
+                    getComment());
+        }
+        throw new UnsupportedOperationException(
+                String.format("Creating instances for %s is not supported", genericRuntimeType.getCanonicalName()));
     }
 
     // FIXME Only skins for PlankFields should be allowed to call this method

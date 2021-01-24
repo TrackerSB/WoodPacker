@@ -4,8 +4,9 @@ import bayern.steinbrecher.checkedElements.report.ReportEntry;
 import bayern.steinbrecher.checkedElements.report.ReportType;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
-import bayern.steinbrecher.woodpacker.data.PlankMaterial;
+import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -37,7 +38,7 @@ import javafx.scene.text.Text;
 
 import java.util.Optional;
 
-public class PlankListSkin extends SkinBase<PlankList> {
+public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
     private static final double ID_BADGE_MIN_WIDTH = 50;
     private static final double ID_BADGE_PADDING = 5;
     private static final Font ID_BADGE_FONT = Font.font(15);
@@ -62,14 +63,14 @@ public class PlankListSkin extends SkinBase<PlankList> {
         return content;
     }
 
-    private Node createPlankView(PlankList control) {
-        ListView<Plank> planksView = new ListView<>();
+    private Node createPlankView(PlankList<T> control) {
+        ListView<T> planksView = new ListView<>();
         // Sync control --> planksView
-        ChangeListener<ObservableSet<Plank>> onPlanksChanged = (obs, previousSet, currentSet) -> {
-            ObservableList<Plank> plankList = FXCollections.observableArrayList();
+        ChangeListener<ObservableSet<T>> onPlanksChanged = (obs, previousSet, currentSet) -> {
+            ObservableList<T> plankList = FXCollections.observableArrayList();
             plankList.addAll(currentSet);
             planksView.setItems(plankList);
-            currentSet.addListener((SetChangeListener<? super Plank>) change -> {
+            currentSet.addListener((SetChangeListener<T>) change -> {
                 if (change.wasAdded() && !planksView.getItems().contains(change.getElementAdded())) {
                     planksView.getItems()
                             .add(change.getElementAdded());
@@ -86,23 +87,28 @@ public class PlankListSkin extends SkinBase<PlankList> {
 
         planksView.setCellFactory(list -> new ListCell<>() {
             @Override
-            protected void updateItem(Plank item, boolean empty) {
+            protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
                     setText("");
                     setGraphic(null);
                     setContextMenu(null);
                 } else {
-                    String firstRow;
-                    if (item.getMaterial() == PlankMaterial.UNDEFINED) {
-                        firstRow = String.format("%d [mm] x %d [mm]", item.getWidth(), item.getHeight());
+                    setText(item.toString());
+                    if (item instanceof RequiredPlank) {
+                        RequiredPlank requiredPlank = (RequiredPlank) item;
+                        textFillProperty()
+                                .bind(new When(requiredPlank.placedInSolutionProperty())
+                                        .then(Color.BLACK)
+                                        .otherwise(Color.RED));
                     } else {
-                        firstRow = String.format("%d [mm] x %d [mm] (%s)", item.getWidth(), item.getHeight(),
-                                WoodPacker.LANGUAGE_BUNDLE.getString(item.getMaterial().getResourceKey()));
+                        textFillProperty()
+                                .unbind();
+                        setTextFill(Color.BLACK);
                     }
-                    String secondRow = item.getComment().isBlank() ? "" : String.format("\"%s\"", item.getComment());
-                    setText(firstRow + "\n" + secondRow);
+
                     setGraphic(generateItemGraphic(item));
+
                     ImageView deletePlankItemGraphic
                             = new ImageView(getClass().getResource("trash.png").toExternalForm());
                     deletePlankItemGraphic.setFitHeight(20);
@@ -121,7 +127,7 @@ public class PlankListSkin extends SkinBase<PlankList> {
         planksView.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, previousItem, currentItem) -> control.setSelectedPlank(currentItem));
-        ChangeListener<Optional<Plank>> onModelSelectedPlankChanged = (obs, previouslySelected, currentlySelected) -> {
+        ChangeListener<Optional<T>> onModelSelectedPlankChanged = (obs, previouslySelected, currentlySelected) -> {
             /* NOTE 2021-01-15: The underlying ListView does not guarantee the uniqueness of planks. If there is
              * some bug which results in having multiple identical planks in the ListView then trying to select
              * the "selected plank" in the model in the ListView may change the "selected plank" in the model
@@ -151,7 +157,7 @@ public class PlankListSkin extends SkinBase<PlankList> {
         return scrollablePlanksView;
     }
 
-    private void updateBasePlankNameAlreadyExists(PlankList control, String idForNewPlank) {
+    private void updateBasePlankNameAlreadyExists(PlankList<?> control, String idForNewPlank) {
         basePlankNameAlreadyExists.set(
                 control.getPlanks()
                         .stream()
@@ -159,14 +165,14 @@ public class PlankListSkin extends SkinBase<PlankList> {
         );
     }
 
-    private PlankField createNewPlankField(PlankList control) {
-        PlankField newPlankField = new PlankField();
+    private PlankField<T> createNewPlankField(PlankList<T> control, Class<T> genericRuntimeType) {
+        PlankField<T> newPlankField = new PlankField<>(genericRuntimeType);
 
         // Add report checking whether a new base plank can be added with the currently specified data
         newPlankField.plankIdProperty()
                 .addListener(
                         (observable, previousId, currentId) -> updateBasePlankNameAlreadyExists(control, currentId));
-        ChangeListener<ObservableSet<Plank>> onItemsPropertyUpdate = (obs, previousItemList, currentItemList) -> {
+        ChangeListener<ObservableSet<T>> onItemsPropertyUpdate = (obs, previousItemList, currentItemList) -> {
             updateBasePlankNameAlreadyExists(control, newPlankField.getPlankId());
             currentItemList.addListener((InvalidationListener) obss
                     -> updateBasePlankNameAlreadyExists(control, newPlankField.getPlankId()));
@@ -179,11 +185,11 @@ public class PlankListSkin extends SkinBase<PlankList> {
         return newPlankField;
     }
 
-    protected PlankListSkin(PlankList control) {
+    protected PlankListSkin(PlankList<T> control, Class<T> genericRuntimeType) {
         super(control);
 
         Node plankView = createPlankView(control);
-        PlankField newPlankField = createNewPlankField(control);
+        PlankField<T> newPlankField = createNewPlankField(control, genericRuntimeType);
 
         ImageView addPlankGraphic = new ImageView(getClass().getResource("add.png").toExternalForm());
         addPlankGraphic.setFitHeight(20);
@@ -211,9 +217,8 @@ public class PlankListSkin extends SkinBase<PlankList> {
                 = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("clearAll"), clearAllPlanksGraphic);
         clearAllPlanksButton.setOnAction(aevt -> control.getPlanks().clear());
 
-        ChangeListener<Boolean> onPlankListEmptyChanged = (obs, wasEmpty, isEmpty) -> {
-            clearAllPlanksButton.setDisable(isEmpty);
-        };
+        ChangeListener<Boolean> onPlankListEmptyChanged
+                = (obs, wasEmpty, isEmpty) -> clearAllPlanksButton.setDisable(isEmpty);
         control.planksProperty()
                 .emptyProperty()
                 .addListener(onPlankListEmptyChanged);

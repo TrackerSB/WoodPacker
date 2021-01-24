@@ -27,14 +27,14 @@ since: 0.1
                         <Label id="basePlankListLabel"
                                text="%basePlankList"/>
                         <PlankList fx:id="basePlankList"
-                                   materialAllowed="true"
+                                   genericRuntimeType="bayern.steinbrecher.woodpacker.data.BasePlank"
                                    VBox.vgrow="ALWAYS"/>
                     </VBox>
                     <VBox>
                         <Label id="requiredPlanksListLabel"
                                text="%demandList"/>
                         <PlankList fx:id="requiredPlanksView"
-                                   materialAllowed="false"
+                                   genericRuntimeType="bayern.steinbrecher.woodpacker.data.RequiredPlank"
                                    VBox.vgrow="ALWAYS"/>
                     </VBox>
                 </HBox>

@@ -40,9 +40,9 @@ public class PlankProblem {
             // The less space a row wastes the better
             new Pair<>(row -> ((double) row.getCurrentLength()) / row.getMaxLength(), 1d)
     );
-    private final SetProperty<Plank> requiredPlanks = new SimpleSetProperty<>(null);
-    private final ObjectProperty<Plank> basePlank = new SimpleObjectProperty<>(null);
-    private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<Plank>>> proposedSolution
+    private final SetProperty<RequiredPlank> requiredPlanks = new SimpleSetProperty<>(null);
+    private final ObjectProperty<BasePlank> basePlank = new SimpleObjectProperty<>(null);
+    private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>> proposedSolution
             = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
 
     public PlankProblem() {
@@ -62,7 +62,7 @@ public class PlankProblem {
     }
 
     private static PlankSolutionRow createCandidate(
-            boolean horizontal, Point2D basePlankOffset, Plank basePlank, List<Plank> sortedPlanks) {
+            boolean horizontal, Point2D basePlankOffset, Plank basePlank, List<RequiredPlank> sortedPlanks) {
         assert !sortedPlanks.isEmpty() : "No planks left for creating a candidate";
         // NOTE Assume planks are sorted by height if horizontal is true; sorted by width otherwise
         int maxLength;
@@ -77,7 +77,7 @@ public class PlankProblem {
                     .getWidth();
         }
         PlankSolutionRow candidate = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, breadth);
-        Iterator<Plank> iterator = sortedPlanks.iterator();
+        Iterator<RequiredPlank> iterator = sortedPlanks.iterator();
         //noinspection StatementWithEmptyBody
         while (iterator.hasNext() && candidate.addPlank(iterator.next())) {
             // NOTE Operation already done by addPlank
@@ -95,26 +95,26 @@ public class PlankProblem {
      * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
      * not fit onto the base plank (besides the already added ones).
      */
-    private static Pair<List<PlankSolutionRow>, Set<Plank>> determineSolution(
-            Plank basePlank, Set<Plank> requiredPlanks) {
+    private static Pair<List<PlankSolutionRow>, Set<RequiredPlank>> determineSolution(
+            BasePlank basePlank, Set<RequiredPlank> requiredPlanks) {
         List<PlankSolutionRow> placedPlanks = new ArrayList<>();
-        Set<Plank> ignoredPlanks;
+        Set<RequiredPlank> ignoredPlanks;
         if (basePlank == null) {
             ignoredPlanks = requiredPlanks;
         } else {
-            Collection<Plank> rotatedPlanks = requiredPlanks.stream()
+            Collection<RequiredPlank> rotatedPlanks = requiredPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .collect(Collectors.toList());
-            List<Plank> planksToPlaceByHeight = rotatedPlanks.stream()
+            List<RequiredPlank> planksToPlaceByHeight = rotatedPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .sorted((p1, p2) -> p2.getHeight() - p1.getHeight())
                     .collect(Collectors.toList());
-            List<Plank> planksToPlaceByWidth = rotatedPlanks.stream()
+            List<RequiredPlank> planksToPlaceByWidth = rotatedPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .sorted((p1, p2) -> p2.getWidth() - p1.getWidth())
                     .collect(Collectors.toList());
 
-            Optional<Plank> remainingBasePlank = Optional.of(basePlank);
+            Optional<BasePlank> remainingBasePlank = Optional.of(basePlank);
             Point2D remainingBasePlankOffset = Point2D.ZERO;
             while (remainingBasePlank.isPresent() && !planksToPlaceByHeight.isEmpty()) {
                 PlankSolutionRow horizontalCandidate = createCandidate(
@@ -141,50 +141,53 @@ public class PlankProblem {
                         remainingBasePlankOffset = remainingBasePlankOffset.add(bestCandidate.getBreadth(), 0);
                     }
                     placedPlanks.add(bestCandidate);
+                    bestCandidate.getPlanks()
+                            .forEach(p -> p.setPlacedInSolution(true));
                     planksToPlaceByHeight.removeAll(bestCandidate.getPlanks());
                     planksToPlaceByWidth.removeAll(bestCandidate.getPlanks());
                 }
             }
             // NOTE Ignored planks may not have same rotation as initially given
             ignoredPlanks = new HashSet<>(planksToPlaceByWidth);
+            ignoredPlanks.forEach(p -> p.setPlacedInSolution(false));
         }
         return new Pair<>(placedPlanks, ignoredPlanks);
     }
 
-    public SetProperty<Plank> requiredPlanksProperty() {
+    public SetProperty<RequiredPlank> requiredPlanksProperty() {
         return requiredPlanks;
     }
 
-    public ObservableSet<Plank> getRequiredPlanks() {
+    public ObservableSet<RequiredPlank> getRequiredPlanks() {
         return requiredPlanksProperty().get();
     }
 
-    public void setRequiredPlanks(ObservableSet<Plank> requiredPlanks) {
+    public void setRequiredPlanks(ObservableSet<RequiredPlank> requiredPlanks) {
         requiredPlanksProperty().set(requiredPlanks);
     }
 
-    public ObjectProperty<Plank> basePlankProperty() {
+    public ObjectProperty<BasePlank> basePlankProperty() {
         return basePlank;
     }
 
-    public Plank getBasePlank() {
+    public BasePlank getBasePlank() {
         return basePlankProperty().get();
     }
 
-    public void setBasePlank(Plank basePlank) {
+    public void setBasePlank(BasePlank basePlank) {
         basePlankProperty().set(basePlank);
     }
 
-    public ReadOnlyObjectProperty<Pair<List<PlankSolutionRow>, Set<Plank>>> proposedSolutionProperty() {
+    public ReadOnlyObjectProperty<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>> proposedSolutionProperty() {
         return proposedSolution.getReadOnlyProperty();
     }
 
-    public Pair<List<PlankSolutionRow>, Set<Plank>> getProposedSolution() {
+    public Pair<List<PlankSolutionRow>, Set<RequiredPlank>> getProposedSolution() {
         return proposedSolutionProperty().get();
     }
 
     public Snapshot createSnapshot() {
-        HashSet<Plank> serializableSet = new HashSet<>(getRequiredPlanks());
+        HashSet<RequiredPlank> serializableSet = new HashSet<>(getRequiredPlanks());
         return new Snapshot(serializableSet, getBasePlank());
     }
 
@@ -201,10 +204,10 @@ public class PlankProblem {
     public static class Snapshot implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
-        public final Set<Plank> requiredPlanks;
-        public final Plank basePlank;
+        public final Set<RequiredPlank> requiredPlanks;
+        public final BasePlank basePlank;
 
-        private <T extends Set<Plank> & Serializable> Snapshot(T requiredPlanks, Plank basePlank) {
+        private <T extends Set<RequiredPlank> & Serializable> Snapshot(T requiredPlanks, BasePlank basePlank) {
             this.requiredPlanks = Collections.unmodifiableSet(requiredPlanks);
             this.basePlank = basePlank;
         }

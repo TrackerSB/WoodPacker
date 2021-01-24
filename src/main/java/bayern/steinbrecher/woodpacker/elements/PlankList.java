@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.woodpacker.data.Plank;
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
@@ -16,42 +17,52 @@ import javafx.scene.control.Skin;
 
 import java.util.Optional;
 
-public class PlankList extends Control {
-    private final SetProperty<Plank> planks = new SimpleSetProperty<>(FXCollections.observableSet());
-    private final ReadOnlyObjectWrapper<Optional<Plank>> selectedPlank = new ReadOnlyObjectWrapper<>(Optional.empty());
+public class PlankList<T extends Plank> extends Control {
+    private final SetProperty<T> planks = new SimpleSetProperty<>(FXCollections.observableSet());
+    private final ReadOnlyObjectWrapper<Optional<T>> selectedPlank = new ReadOnlyObjectWrapper<>(Optional.empty());
     private final ReadOnlyBooleanWrapper plankSelected = new ReadOnlyBooleanWrapper(false);
     private final BooleanProperty materialAllowed = new SimpleBooleanProperty(true);
+    private final Class<T> genericRuntimeType;
 
-    public PlankList() {
+    public PlankList(Class<T> genericRuntimeType) {
+        this.genericRuntimeType = genericRuntimeType;
         selectedPlank.addListener((obs, previousPlank, currentPlank) -> plankSelected.set(currentPlank.isPresent()));
+    }
+
+    /**
+     * Should be used in FXML only.
+     */
+    public PlankList(@NamedArg("genericRuntimeType") String genericRuntimeTypeName) throws ClassNotFoundException {
+        //noinspection unchecked
+        this((Class<T>) Class.forName(genericRuntimeTypeName));
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new PlankListSkin(this);
+        return new PlankListSkin<>(this, genericRuntimeType);
     }
 
-    public SetProperty<Plank> planksProperty() {
+    public SetProperty<T> planksProperty() {
         return planks;
     }
 
-    public ObservableSet<Plank> getPlanks() {
+    public ObservableSet<T> getPlanks() {
         return planksProperty().get();
     }
 
-    public void setPlanks(ObservableSet<Plank> planks) {
+    public void setPlanks(ObservableSet<T> planks) {
         planksProperty().set(planks);
     }
 
-    public ReadOnlyObjectProperty<Optional<Plank>> selectedPlankProperty() {
+    public ReadOnlyObjectProperty<Optional<T>> selectedPlankProperty() {
         return selectedPlank.getReadOnlyProperty();
     }
 
-    public Optional<Plank> getSelectedPlank() {
+    public Optional<T> getSelectedPlank() {
         return selectedPlankProperty().get();
     }
 
-    public void setSelectedPlank(Plank selectedPlank) {
+    public void setSelectedPlank(T selectedPlank) {
         this.selectedPlank.set(Optional.ofNullable(selectedPlank));
     }
 
