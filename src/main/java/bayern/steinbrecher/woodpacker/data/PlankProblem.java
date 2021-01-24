@@ -12,11 +12,13 @@ import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.util.Pair;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +31,9 @@ import java.util.stream.Collectors;
  * @author Stefan Huber
  * @since 0.1
  */
-public class PlankProblem {
+public class PlankProblem implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     /**
      * A criterion is a pair of a function which calculates a value based on a given {@link Plank} and a weight. The
      * higher the resulting value the better a given {@link Plank} suits the criterion.
@@ -40,9 +44,9 @@ public class PlankProblem {
             // The less space a row wastes the better
             new Pair<>(row -> ((double) row.getCurrentLength()) / row.getMaxLength(), 1d)
     );
-    private final SetProperty<RequiredPlank> requiredPlanks = new SimpleSetProperty<>(null);
-    private final ObjectProperty<BasePlank> basePlank = new SimpleObjectProperty<>(null);
-    private final ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>> proposedSolution
+    private transient /*final*/ SetProperty<RequiredPlank> requiredPlanks = new SimpleSetProperty<>(null);
+    private transient /*final*/ ObjectProperty<BasePlank> basePlank = new SimpleObjectProperty<>(null);
+    private transient /*final*/ ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>> proposedSolution
             = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
 
     public PlankProblem() {
@@ -154,6 +158,22 @@ public class PlankProblem {
         return new Pair<>(placedPlanks, ignoredPlanks);
     }
 
+    @Serial
+    private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+        input.defaultReadObject();
+        requiredPlanks = new SimpleSetProperty<>(
+                FXCollections.observableSet((HashSet<RequiredPlank>) input.readObject()));
+        basePlank = new SimpleObjectProperty<>((BasePlank) input.readObject());
+        proposedSolution = new ReadOnlyObjectWrapper<>(determineSolution(getBasePlank(), getRequiredPlanks()));
+    }
+
+    @Serial
+    private void writeObject(ObjectOutputStream output) throws IOException {
+        output.defaultWriteObject();
+        output.writeObject(new HashSet<>(getRequiredPlanks()));
+        output.writeObject(getBasePlank());
+    }
+
     public SetProperty<RequiredPlank> requiredPlanksProperty() {
         return requiredPlanks;
     }
@@ -184,32 +204,5 @@ public class PlankProblem {
 
     public Pair<List<PlankSolutionRow>, Set<RequiredPlank>> getProposedSolution() {
         return proposedSolutionProperty().get();
-    }
-
-    public Snapshot createSnapshot() {
-        HashSet<RequiredPlank> serializableSet = new HashSet<>(getRequiredPlanks());
-        return new Snapshot(serializableSet, getBasePlank());
-    }
-
-    public void loadSnapshot(Snapshot snapshot) {
-        requiredPlanksProperty().clear();
-        requiredPlanksProperty().addAll(snapshot.requiredPlanks);
-        setBasePlank(snapshot.basePlank);
-    }
-
-    /**
-     * @author Stefan Huber
-     * @since 0.1
-     */
-    public static class Snapshot implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
-        public final Set<RequiredPlank> requiredPlanks;
-        public final BasePlank basePlank;
-
-        private <T extends Set<RequiredPlank> & Serializable> Snapshot(T requiredPlanks, BasePlank basePlank) {
-            this.requiredPlanks = Collections.unmodifiableSet(requiredPlanks);
-            this.basePlank = basePlank;
-        }
     }
 }

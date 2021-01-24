@@ -3,13 +3,18 @@ package bayern.steinbrecher.woodpacker.data;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
+
 /**
  * @author Stefan Huber
  * @since 0.1
  */
 public class RequiredPlank extends Plank {
     // FIXME Solely PlankProblem::determineSolution(...) should be allowed to change this member
-    private final BooleanProperty placedInSolution = new SimpleBooleanProperty(false);
+    private transient /*final*/ BooleanProperty placedInSolution = new SimpleBooleanProperty(false);
 
     public RequiredPlank(String id, int width, int height, PlankGrainDirection grainDirection) {
         super(id, width, height, grainDirection);
@@ -26,6 +31,18 @@ public class RequiredPlank extends Plank {
             case IRRELEVANT -> PlankGrainDirection.IRRELEVANT;
         };
         return new RequiredPlank(getId(), getHeight(), getWidth(), rotatedGrainDirection, getComment());
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+        input.defaultReadObject();
+        placedInSolution = new SimpleBooleanProperty(input.readBoolean());
+    }
+
+    @Serial
+    private void writeObject(ObjectOutputStream output) throws IOException, ClassNotFoundException {
+        output.defaultWriteObject();
+        output.writeBoolean(isPlacedInSolution());
     }
 
     @Override

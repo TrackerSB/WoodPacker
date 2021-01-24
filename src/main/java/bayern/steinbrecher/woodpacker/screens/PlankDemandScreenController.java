@@ -1,5 +1,7 @@
 package bayern.steinbrecher.woodpacker.screens;
 
+import bayern.steinbrecher.javaUtility.DialogCreationException;
+import bayern.steinbrecher.javaUtility.DialogUtility;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
@@ -20,6 +22,9 @@ import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -204,8 +209,9 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
-    public void loadPlankProblem(PlankProblem.Snapshot snapshot) {
-        plankProblem.loadSnapshot(snapshot);
+    public void loadPlankProblem(PlankProblem setup) {
+        plankProblem.setBasePlank(setup.getBasePlank());
+        plankProblem.setRequiredPlanks(setup.getRequiredPlanks());
     }
 
     @SuppressWarnings("unused")
@@ -213,7 +219,7 @@ public class PlankDemandScreenController extends ScreenController {
     private void askUserExportPlankProblem() throws IOException {
         Optional<File> exportFile = FileSystemUtility.askForSavePath(requiredPlanksView.getScene().getWindow());
         if (exportFile.isPresent()) {
-            byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem.createSnapshot());
+            byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
             Files.write(exportFile.get().toPath(), serializedSnapshot);
         }
     }

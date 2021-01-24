@@ -30,7 +30,7 @@ public class WelcomeScreenController extends ScreenController {
         Optional<File> openPath = FileSystemUtility.askForOpenPath(null);// FIXME Specify owner
         if (openPath.isPresent()) {
             byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
-            PlankProblem.Snapshot snapshot = SerializationUtility.deserialize(deserializedSnapshot);
+            PlankProblem snapshot = SerializationUtility.deserialize(deserializedSnapshot);
             getScreenManager()
                     .switchTo(new PlankDemandScreen(snapshot));
         }

@@ -10,22 +10,22 @@ import org.jetbrains.annotations.NotNull;
  * @since 0.1
  */
 public class PlankDemandScreen extends Screen<PlankDemandScreenController> {
-    private final PlankProblem.Snapshot initialSnapshot;
+    private final PlankProblem initialSetup;
 
     public PlankDemandScreen() {
         this(null);
     }
 
-    public PlankDemandScreen(PlankProblem.Snapshot initialSnapshot) {
+    public PlankDemandScreen(PlankProblem initialSetup) {
         super(PlankDemandScreen.class.getResource("PlankDemandScreen.fxml"), WoodPacker.LANGUAGE_BUNDLE);
-        this.initialSnapshot = initialSnapshot;
+        this.initialSetup = initialSetup;
     }
 
     @Override
     protected void afterControllerIsInitialized(@NotNull PlankDemandScreenController controller) {
         super.afterControllerIsInitialized(controller);
-        if (initialSnapshot != null) {
-            controller.loadPlankProblem(initialSnapshot);
+        if (initialSetup != null) {
+            controller.loadPlankProblem(initialSetup);
         }
     }
 }
