@@ -217,6 +217,7 @@ public class PlankDemandScreenController extends ScreenController {
     @SuppressWarnings("unused")
     @FXML
     private void askUserExportPlankProblem() throws IOException {
+        // FIXME Notify user about export failure
         Optional<File> exportFile = FileSystemUtility.askForSavePath(requiredPlanksView.getScene().getWindow());
         if (exportFile.isPresent()) {
             byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
