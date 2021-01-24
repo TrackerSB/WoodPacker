@@ -45,7 +45,8 @@ since: 0.1
                                 onAction="#askUserExportPlankProblem"
                                 disable="${!controller.plankProblemValid}"/>
                         <Button text="%backToMainMenu"
-                                onAction="#switchToPreviousScreen"/>
+                                onAction="#switchToPreviousScreen"
+                                styleClass="to-previous-screen"/>
                     </buttons>
                 </ButtonBar>
             </VBox>

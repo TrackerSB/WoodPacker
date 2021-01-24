@@ -4,3 +4,7 @@
     -fx-focus-color: red;
     -fx-highlight-fill: red;
 }
+
+.button.to-previous-screen {
+    -fx-graphic: url("return.png");
+}

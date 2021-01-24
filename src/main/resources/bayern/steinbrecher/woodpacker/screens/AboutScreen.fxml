@@ -38,5 +38,6 @@
         <VBox fx:id="licensesInfo"/>
     </TitledPane>
     <Button text="%backToMainMenu"
-            onAction="#switchToPreviousScreen"/>
+            onAction="#switchToPreviousScreen"
+            styleClass="to-previous-screen"/>
 </VBox>
