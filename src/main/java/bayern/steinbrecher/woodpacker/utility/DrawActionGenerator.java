@@ -3,10 +3,14 @@ package bayern.steinbrecher.woodpacker.utility;
 import bayern.steinbrecher.javaUtility.CompareUtility;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
+import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +32,11 @@ public final class DrawActionGenerator {
     }
 
     public static Consumer<GraphicsContext> forBasePlank(BasePlank basePlank) {
+        if (basePlank == null) {
+            return gc -> {
+            };
+        }
+
         List<Line> grainLines = switch (basePlank.getGrainDirection()) {
             case HORIZONTAL -> {
                 final int numSteps = CompareUtility.clamp(
@@ -72,6 +81,50 @@ public final class DrawActionGenerator {
             for (Line grainLine : grainLines) {
                 gc.strokeLine(grainLine.getStartX(), grainLine.getStartY(),
                         grainLine.getEndX(), grainLine.getEndY());
+            }
+        };
+    }
+
+    public static Consumer<GraphicsContext> forRequiredPlanks(
+            BasePlank basePlank, Iterable<PlankSolutionRow> placedPlankRows) {
+        if (placedPlankRows == null) {
+            return gc -> {
+            };
+        }
+
+        return gc -> {
+            gc.setTextAlign(TextAlignment.CENTER);
+            final double fontSize = basePlank.getHeight() / 20d;
+            gc.setFont(Font.font(fontSize));
+            for (PlankSolutionRow row : placedPlankRows) {
+                Point2D rowToBasePlankOffset = row.getStartOffset();
+                double plankToRowXOffset = 0;
+                double plankToRowYOffset = 0;
+                for (Plank plank : row.getPlanks()) {
+                    double plankXPos = rowToBasePlankOffset.getX() + plankToRowXOffset;
+                    double plankYPos = rowToBasePlankOffset.getY() + plankToRowYOffset;
+                    gc.beginPath();
+                    gc.rect(plankXPos, plankYPos, plank.getWidth(), plank.getHeight());
+                    gc.setStroke(Color.BLACK);
+                    gc.stroke();
+                    gc.setFill(Color.BURLYWOOD);
+                    gc.fill();
+                    gc.setFill(Color.BLACK);
+                    gc.fillText(
+                            plank.getId(),
+                            plankXPos + (plank.getWidth() / 2d),
+                            plankYPos + (plank.getHeight() / 2d) + (fontSize / 2)
+                    );
+                    if (row.addHorizontal()) {
+                        plankToRowXOffset += plank.getWidth();
+                    } else {
+                        plankToRowYOffset += plank.getHeight();
+                    }
+                }
+                gc.setStroke(Color.RED);
+                double rowWidth = row.addHorizontal() ? row.getCurrentLength() : row.getBreadth();
+                double rowHeight = row.addHorizontal() ? row.getBreadth() : row.getCurrentLength();
+                gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
             }
         };
     }
