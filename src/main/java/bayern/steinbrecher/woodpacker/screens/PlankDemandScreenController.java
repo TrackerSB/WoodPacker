@@ -18,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -178,6 +179,7 @@ public class PlankDemandScreenController extends ScreenController {
                 gc.setFill(Color.WHITE);
                 gc.setFont(Font.font(visualPlankCuttingPlan.getTheoreticalHeight() / 10));
                 gc.setTextAlign(TextAlignment.CENTER);
+                gc.setTextBaseline(VPos.CENTER);
                 gc.fillText(WoodPacker.LANGUAGE_BUNDLE.getString("noBasePlankSelected"),
                         visualPlankCuttingPlan.getTheoreticalWidth() / 2,
                         visualPlankCuttingPlan.getTheoreticalHeight() / 2,

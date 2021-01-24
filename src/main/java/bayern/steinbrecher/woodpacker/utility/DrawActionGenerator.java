@@ -6,6 +6,7 @@ import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import javafx.geometry.Point2D;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -115,11 +116,12 @@ public final class DrawActionGenerator {
                     gc.setFill(Color.BURLYWOOD);
                     gc.fill();
 
+                    gc.setTextBaseline(VPos.CENTER);
                     gc.setFill(Color.BLACK);
                     double fontSize = basePlank.getHeight() / 20d;
                     gc.setFont(Font.font(fontSize));
                     double textXOffset = plankXPos + (plank.getWidth() / 2d);
-                    double textYOffset = plankYPos + (plank.getHeight() / 2d) + (fontSize / 2);
+                    double textYOffset = plankYPos + (plank.getHeight() / 2d);
                     double maxTextLength = MAX_LABEL_WIDTH_FACTOR * Math.max(plank.getWidth(), plank.getHeight());
                     if (plank.getHeight() > plank.getWidth()) {
                         gc.translate(textXOffset, textYOffset);
