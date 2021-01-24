@@ -150,16 +150,14 @@ public class PlankDemandScreenController extends ScreenController {
                 .addListener((obs, oldBasePlank, newBasePlank) -> {
                     Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem
                             .getProposedSolution();
-                    updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey(), proposedSolution.getValue());
+                    updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey());
                 });
         plankProblem.proposedSolutionProperty()
                 .addListener((obs, oldSolution, newSolution)
-                        -> updateVisualPlankCuttingPlan(
-                        plankProblem.getBasePlank(), newSolution.getKey(), newSolution.getValue()));
+                        -> updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution.getKey()));
         // Ensure initial state
         Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
-        updateVisualPlankCuttingPlan(
-                plankProblem.getBasePlank(), proposedSolution.getKey(), proposedSolution.getValue());
+        updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), proposedSolution.getKey());
 
         // Creating binding signaling when a cutting plan should be drawn
         plankProblemValid.bind(
@@ -167,8 +165,7 @@ public class PlankDemandScreenController extends ScreenController {
                         .and(plankProblem.requiredPlanksProperty().emptyProperty().not()));
     }
 
-    private void updateVisualPlankCuttingPlan(
-            Plank basePlank, Iterable<PlankSolutionRow> placedPlankRows, Iterable<RequiredPlank> ignoredPlanks) {
+    private void updateVisualPlankCuttingPlan(BasePlank basePlank, Iterable<PlankSolutionRow> placedPlankRows) {
         // Update cutting plan preview
         if (basePlank == null) {
             visualPlankCuttingPlan.theoreticalWidthProperty()

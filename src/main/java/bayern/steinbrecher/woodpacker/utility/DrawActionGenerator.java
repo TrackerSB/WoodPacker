@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.utility;
 
 import bayern.steinbrecher.javaUtility.CompareUtility;
+import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -26,7 +27,7 @@ public final class DrawActionGenerator {
         throw new UnsupportedOperationException("Construction of instances is prohibited");
     }
 
-    public static Consumer<GraphicsContext> forBasePlank(Plank basePlank) {
+    public static Consumer<GraphicsContext> forBasePlank(BasePlank basePlank) {
         List<Line> grainLines = switch (basePlank.getGrainDirection()) {
             case HORIZONTAL -> {
                 final int numSteps = CompareUtility.clamp(
