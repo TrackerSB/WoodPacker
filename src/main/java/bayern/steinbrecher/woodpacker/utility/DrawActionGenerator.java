@@ -33,7 +33,7 @@ public final class DrawActionGenerator {
     /**
      * The percentage of the width which a label of a required plank is allowed to take.
      */
-    private static final double MAX_LABEL_WIDTH_FACTOR = 0.75;
+    private static final double MAX_LABEL_SIZE_FACTOR = 0.75;
 
     private DrawActionGenerator() {
         throw new UnsupportedOperationException("Construction of instances is prohibited");
@@ -107,6 +107,7 @@ public final class DrawActionGenerator {
                 double plankToRowXOffset = 0;
                 double plankToRowYOffset = 0;
                 for (Plank plank : row.getPlanks()) {
+                    // Draw plank shape
                     double plankXPos = rowToBasePlankOffset.getX() + plankToRowXOffset;
                     double plankYPos = rowToBasePlankOffset.getY() + plankToRowYOffset;
                     gc.beginPath();
@@ -116,29 +117,56 @@ public final class DrawActionGenerator {
                     gc.setFill(Color.BURLYWOOD);
                     gc.fill();
 
+                    boolean drawLabelVertical = plank.getHeight() > plank.getWidth();
+                    // Size in text direction
+                    double availableLength = drawLabelVertical ? plank.getHeight() : plank.getWidth();
+                    // Size orthogonal to text direction
+                    double availableHeight = drawLabelVertical ? plank.getWidth() : plank.getHeight();
+
+                    // Draw plank label
                     gc.setTextBaseline(VPos.CENTER);
                     gc.setFill(Color.BLACK);
-                    double fontSize = basePlank.getHeight() / 20d;
-                    gc.setFont(Font.font(fontSize));
-                    double textXOffset = plankXPos + (plank.getWidth() / 2d);
-                    double textYOffset = plankYPos + (plank.getHeight() / 2d);
-                    double maxTextLength = MAX_LABEL_WIDTH_FACTOR * Math.max(plank.getWidth(), plank.getHeight());
-                    if (plank.getHeight() > plank.getWidth()) {
-                        gc.translate(textXOffset, textYOffset);
+                    double maxLabelLength = MAX_LABEL_SIZE_FACTOR * availableLength;
+                    double maxLabelHeight = MAX_LABEL_SIZE_FACTOR * availableHeight;
+                    double labelFontSize = Math.min(basePlank.getHeight() / 20d, maxLabelHeight);
+                    gc.setFont(Font.font(labelFontSize));
+                    double labelXOffset = plankXPos + (plank.getWidth() / 2d);
+                    double labelYOffset = plankYPos + (plank.getHeight() / 2d);
+                    if (drawLabelVertical) {
+                        gc.translate(labelXOffset, labelYOffset);
                         gc.rotate(-90);
-                        gc.fillText(plank.getId(), 0, 0, maxTextLength);
+                        gc.fillText(plank.getId(), 0, 0, maxLabelLength);
                         gc.rotate(90);
-                        gc.translate(-textXOffset, -textYOffset);
+                        gc.translate(-labelXOffset, -labelYOffset);
                     } else {
-                        gc.fillText(plank.getId(), textXOffset, textYOffset, maxTextLength);
+                        gc.fillText(plank.getId(), labelXOffset, labelYOffset, maxLabelLength);
                     }
 
+                    // Draw dimensioning labels
+                    double dimensioningLabelFontSize
+                            = Math.min(availableLength - maxLabelLength, availableHeight - maxLabelHeight) / 2;
+                    gc.setFont(Font.font(dimensioningLabelFontSize));
+                    gc.setTextBaseline(VPos.TOP);
+                    gc.fillText(String.valueOf(plank.getWidth()),
+                            plankXPos + plank.getWidth() / 2d,
+                            plankYPos,
+                            plank.getWidth());
+                    gc.rotate(-90);
+                    //noinspection SuspiciousNameCombination
+                    gc.fillText(String.valueOf(plank.getHeight()),
+                            -plankYPos - plank.getHeight() / 2d,
+                            plankXPos,
+                            plank.getHeight());
+                    gc.rotate(90);
+
+                    // Move offset to next plank in solution row
                     if (row.addHorizontal()) {
                         plankToRowXOffset += plank.getWidth();
                     } else {
                         plankToRowYOffset += plank.getHeight();
                     }
                 }
+
                 gc.setStroke(Color.RED);
                 double rowWidth = row.addHorizontal() ? row.getCurrentLength() : row.getBreadth();
                 double rowHeight = row.addHorizontal() ? row.getBreadth() : row.getCurrentLength();
