@@ -233,20 +233,30 @@ public class PlankDemandScreenController extends ScreenController {
     @SuppressWarnings("unused")
     @FXML
     private void trySwitchToPreviousScreen() throws IOException {
-        if (isPlankProblemValid() && !isPlankProblemSaved()) {
+        if (isPlankProblemSaved() || !isPlankProblemValid()) {
+            switchToPreviousScreen();
+        } else {
             try {
                 Alert unsavedChangesAlert = DialogUtility.createInteractiveAlert(
                         AlertType.CONFIRMATION, WoodPacker.LANGUAGE_BUNDLE.getString("unsavedChanges"),
-                        ButtonType.YES, ButtonType.NO);
+                        ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
                 Optional<ButtonType> userResponse = DialogUtility.showAndWait(unsavedChangesAlert);
-                if (userResponse.isPresent() && userResponse.get() == ButtonType.YES) {
-                    askUserExportPlankProblem();
+                if (userResponse.isPresent()) {
+                    ButtonType buttonType = userResponse.get();
+                    if (buttonType == ButtonType.YES) {
+                        askUserExportPlankProblem();
+                        if (isPlankProblemSaved()) {
+                            switchToPreviousScreen();
+                        }
+                    } else if (buttonType == ButtonType.NO) {
+                        switchToPreviousScreen();
+                    }
                 }
             } catch (DialogCreationException ex) {
                 LOGGER.log(Level.WARNING, "Could not ask user for saving unsaved changes");
+                switchToPreviousScreen();
             }
         }
-        switchToPreviousScreen();
     }
 
     public ReadOnlyBooleanProperty plankProblemValidProperty() {
