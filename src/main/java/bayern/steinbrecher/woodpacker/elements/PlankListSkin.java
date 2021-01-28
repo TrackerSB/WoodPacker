@@ -11,9 +11,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -26,6 +26,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -36,6 +37,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
@@ -63,13 +65,26 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         return content;
     }
 
-    private Node createPlankView(PlankList<T> control) {
+    private Node createPlankView(PlankList<T> control, TextField searchField) {
         ListView<T> planksView = new ListView<>();
         // Sync control --> planksView
         ChangeListener<ObservableSet<T>> onPlanksChanged = (obs, previousSet, currentSet) -> {
-            ObservableList<T> plankList = FXCollections.observableArrayList();
-            plankList.addAll(currentSet);
-            planksView.setItems(plankList);
+            FilteredList<T> filterableItems = new FilteredList<>(FXCollections.observableArrayList(currentSet));
+            searchField.textProperty()
+                    .addListener((obss, previousSearchText, currentSearchText) -> {
+                        String lowerCaseSearchText = currentSearchText
+                                .toLowerCase(Locale.ROOT);
+                        filterableItems.setPredicate(
+                                plank -> {
+                                    String lowerCaseId = plank.getId()
+                                            .toLowerCase(Locale.ROOT);
+                                    String lowerCaseComment = plank.getComment()
+                                            .toLowerCase(Locale.ROOT);
+                                    return lowerCaseId.contains(lowerCaseSearchText)
+                                            || lowerCaseComment.contains(lowerCaseSearchText);
+                                });
+                    });
+            planksView.setItems(filterableItems);
             currentSet.addListener((SetChangeListener<T>) change -> {
                 if (change.wasAdded() && !planksView.getItems().contains(change.getElementAdded())) {
                     planksView.getItems()
@@ -188,7 +203,10 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
     protected PlankListSkin(PlankList<T> control, Class<T> genericRuntimeType) {
         super(control);
 
-        Node plankView = createPlankView(control);
+        TextField searchField = new TextField();
+        searchField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("searchFor"));
+
+        Node plankView = createPlankView(control, searchField);
         PlankField<T> newPlankField = createNewPlankField(control, genericRuntimeType);
 
         ImageView addPlankGraphic = new ImageView(getClass().getResource("add.png").toExternalForm());
@@ -226,7 +244,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         actionsBar.getButtons()
                 .addAll(addPlankButton, clearAllPlanksButton);
 
-        VBox content = new VBox(plankView, newPlankField, actionsBar);
+        VBox content = new VBox(searchField, plankView, newPlankField, actionsBar);
         content.setSpacing(5);
         content.setAlignment(Pos.TOP_LEFT);
         getChildren()
