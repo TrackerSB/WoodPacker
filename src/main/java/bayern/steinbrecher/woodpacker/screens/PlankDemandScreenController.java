@@ -7,6 +7,7 @@ import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
+import bayern.steinbrecher.woodpacker.data.PlankSolutionCriterion;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
@@ -17,6 +18,7 @@ import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
@@ -25,6 +27,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -59,6 +64,8 @@ public class PlankDemandScreenController extends ScreenController {
     private PlankList<RequiredPlank> requiredPlanksView;
     @FXML
     private ScaledCanvas visualPlankCuttingPlan;
+    @FXML
+    private VBox criteriaPane;
     private final PlankProblem plankProblem = new PlankProblem();
     private final ReadOnlyBooleanWrapper plankProblemValid = new ReadOnlyBooleanWrapper();
     private final ReadOnlyBooleanWrapper plankProblemSaved = new ReadOnlyBooleanWrapper();
@@ -86,16 +93,11 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
-    @FXML
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private void initialize() {
+    private void initializeBasePlankList() {
         // Ensure planks being sorted
         ObservableSet<BasePlank> sortedBasePlanks
                 = FXCollections.observableSet(new TreeSet<>(basePlankList.getPlanks()));
         basePlankList.setPlanks(sortedBasePlanks);
-        ObservableSet<RequiredPlank> sortedRequiredPlanks
-                = FXCollections.observableSet(new TreeSet<>(requiredPlanksView.getPlanks()));
-        requiredPlanksView.setPlanks(sortedRequiredPlanks);
 
         readUserDefinedBasePlanks();
 
@@ -116,6 +118,7 @@ public class PlankDemandScreenController extends ScreenController {
                     }
                     // FIXME Treat change.wasUpdated()?
                 });
+
         // Sync selected base plank <--> plank problem base plank
         basePlankList.selectedPlankProperty()
                 .addListener((obs, previousBasePlank, currentBasePlank)
@@ -126,8 +129,15 @@ public class PlankDemandScreenController extends ScreenController {
                             .add(currentBasePlank); // Ensure the base plank to select exists
                     basePlankList.setSelectedPlank(currentBasePlank);
                 });
+    }
 
-        // Sync requiredPlanksView <--> plankProblem
+    private void initializeRequiredPlanksList() {
+        // Ensure planks being sorted
+        ObservableSet<RequiredPlank> sortedRequiredPlanks
+                = FXCollections.observableSet(new TreeSet<>(requiredPlanksView.getPlanks()));
+        requiredPlanksView.setPlanks(sortedRequiredPlanks);
+
+        // Sync requiredPlanksView <--> plank problem
         requiredPlanksView.planksProperty()
                 .addListener((SetChangeListener<? super RequiredPlank>) change -> {
                     if (change.wasAdded()) {
@@ -150,27 +160,40 @@ public class PlankDemandScreenController extends ScreenController {
                                 .remove(change.getElementRemoved());
                     }
                 });
+    }
 
-        // Trigger updates of visual cutting plank
-        plankProblem.basePlankProperty()
-                .addListener((obs, oldBasePlank, newBasePlank) -> {
-                    Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem
-                            .getProposedSolution();
-                    updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey());
-                });
-        plankProblem.proposedSolutionProperty()
-                .addListener((obs, oldSolution, newSolution) -> {
-                    updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution.getKey());
-                    plankProblemSaved.set(false);
-                });
-        // Ensure initial state
-        Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
-        updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), proposedSolution.getKey());
+    private void initializeCriteriaPane() {
+        for (PlankSolutionCriterion criterion : PlankSolutionCriterion.values()) {
+            Slider weightControl = new Slider(0, 10, plankProblem.getCriterionWeight(criterion));
+            weightControl.setShowTickLabels(true);
+            weightControl.setShowTickMarks(true);
+            weightControl.setSnapToTicks(true);
+            weightControl.setMinorTickCount(4);
+            weightControl.setMajorTickUnit(5);
 
-        // Creating binding signaling when a cutting plan should be drawn
-        plankProblemValid.bind(
-                plankProblem.basePlankProperty().isNotNull()
-                        .and(plankProblem.requiredPlanksProperty().emptyProperty().not()));
+            // Sync slider <--> plank problem
+            weightControl.valueProperty()
+                    .addListener((obs, previousValue, currentValue)
+                            -> plankProblem.setCriterionWeight(criterion, currentValue.doubleValue()));
+            plankProblem.criterionWeightsProperty()
+                    .addListener((MapChangeListener<? super PlankSolutionCriterion, ? super Double>) change -> {
+                        if (change.getKey() == criterion) {
+                            double nextValue;
+                            if (change.wasAdded()) {
+                                nextValue = change.getValueAdded();
+                            } else if (change.wasRemoved()) {
+                                nextValue = change.getValueRemoved();
+                            } else {
+                                throw new IllegalStateException("A map change was neither an addition nor a removal");
+                            }
+                            weightControl.setValue(nextValue);
+                        }
+                    });
+
+            String criterionDescription = WoodPacker.LANGUAGE_BUNDLE.getString(criterion.getResourceKey());
+            criteriaPane.getChildren()
+                    .addAll(new Label(criterionDescription), weightControl);
+        }
     }
 
     private void updateVisualPlankCuttingPlan(BasePlank basePlank, Iterable<PlankSolutionRow> placedPlankRows) {
@@ -212,10 +235,45 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
+    private void setupCuttingPlanPreviewUpdates() {
+        // Trigger updates of visual cutting plank
+        plankProblem.basePlankProperty()
+                .addListener((obs, oldBasePlank, newBasePlank) -> {
+                    Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem
+                            .getProposedSolution();
+                    updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey());
+                });
+        plankProblem.proposedSolutionProperty()
+                .addListener((obs, oldSolution, newSolution) -> {
+                    updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution.getKey());
+                    plankProblemSaved.set(false);
+                });
+        // Ensure initial state
+        Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
+        updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), proposedSolution.getKey());
+
+        // Creating binding signaling whether a cutting plan should be drawn
+        plankProblemValid.bind(
+                plankProblem.basePlankProperty().isNotNull()
+                        .and(plankProblem.requiredPlanksProperty().emptyProperty().not()));
+    }
+
+    @FXML
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private void initialize() {
+        initializeBasePlankList();
+        initializeRequiredPlanksList();
+        initializeCriteriaPane();
+        setupCuttingPlanPreviewUpdates();
+    }
+
     public void loadPlankProblem(PlankProblem setup) {
         plankProblem.setBasePlank(setup.getBasePlank());
         plankProblem.setRequiredPlanks(setup.getRequiredPlanks());
+        plankProblem.criterionWeightsProperty()
+                .putAll(setup.criterionWeightsProperty());
         plankProblemSaved.set(true);
+        updateVisualPlankCuttingPlan(setup.getBasePlank(), setup.getProposedSolution().getKey());
     }
 
     @SuppressWarnings("unused")

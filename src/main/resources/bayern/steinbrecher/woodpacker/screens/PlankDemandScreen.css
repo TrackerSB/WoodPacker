@@ -3,7 +3,11 @@ author: Stefan Huber
 since: 0.1
  */
 
-.label {
+Slider {
+    -fx-min-width: 250;
+}
+
+.heading {
     -fx-font-size: 30;
 }
 

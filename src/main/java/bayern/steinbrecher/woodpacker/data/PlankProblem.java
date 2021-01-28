@@ -1,5 +1,6 @@
 package bayern.steinbrecher.woodpacker.data;
 
+import bayern.steinbrecher.javaUtility.SupplyingMap;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -8,6 +9,8 @@ import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.util.Pair;
@@ -19,12 +22,12 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -34,22 +37,15 @@ import java.util.stream.Collectors;
 public class PlankProblem implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    /**
-     * A criterion is a pair of a function which calculates a value based on a given {@link Plank} and a weight. The
-     * higher the resulting value the better a given {@link Plank} suits the criterion.
-     */
-    private static final Collection<Pair<Function<PlankSolutionRow, Double>, Double>> CRITERIA = List.of(
-            // The less the breadths of the planks differs the better
-            new Pair<>(row -> 1d / row.getBreadths().size(), 1d),
-            // The less space a row wastes the better
-            new Pair<>(row -> ((double) row.getCurrentLength()) / row.getMaxLength(), 1d)
-    );
-    private transient /*final*/ SetProperty<RequiredPlank> requiredPlanks = new SimpleSetProperty<>(null);
-    private transient /*final*/ ObjectProperty<BasePlank> basePlank = new SimpleObjectProperty<>(null);
-    private transient /*final*/ ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>> proposedSolution
-            = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
+    private transient /*final*/ ObservableMap<PlankSolutionCriterion, Double> criterionWeights;
+    private transient /*final*/ SetProperty<RequiredPlank> requiredPlanks;
+    private transient /*final*/ ObjectProperty<BasePlank> basePlank;
+    private transient /*final*/ ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>>
+            proposedSolution;
 
     public PlankProblem() {
+        initializeTransientMember();
+
         requiredPlanksProperty()
                 .addListener((obs, oldList, currentList) -> {
                     if (currentList != null) {
@@ -63,6 +59,16 @@ public class PlankProblem implements Serializable {
         basePlankProperty()
                 .addListener((obs, previousBasePlank, currentBasePlank)
                         -> proposedSolution.set(determineSolution(currentBasePlank, getRequiredPlanks())));
+        criterionWeightsProperty()
+                .addListener((MapChangeListener<? super PlankSolutionCriterion, ? super Double>) change
+                        -> proposedSolution.set(determineSolution(getBasePlank(), getRequiredPlanks())));
+    }
+
+    private void initializeTransientMember() {
+        criterionWeights = FXCollections.observableMap(new SupplyingMap<>(criterion -> 1d));
+        requiredPlanks = new SimpleSetProperty<>(FXCollections.observableSet());
+        basePlank = new SimpleObjectProperty<>(null);
+        proposedSolution = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
     }
 
     private static PlankSolutionRow createCandidate(
@@ -89,9 +95,10 @@ public class PlankProblem implements Serializable {
         return candidate;
     }
 
-    private static double determineCandidateQuality(PlankSolutionRow candidate) {
-        return CRITERIA.stream()
-                .mapToDouble(criterion -> criterion.getKey().apply(candidate) * criterion.getValue())
+    private double determineCandidateQuality(PlankSolutionRow candidate) {
+        return criterionWeights.entrySet()
+                .stream()
+                .mapToDouble(criterion -> criterion.getKey().getRating(candidate) * criterion.getValue())
                 .sum();
     }
 
@@ -99,7 +106,7 @@ public class PlankProblem implements Serializable {
      * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
      * not fit onto the base plank (besides the already added ones).
      */
-    private static Pair<List<PlankSolutionRow>, Set<RequiredPlank>> determineSolution(
+    private Pair<List<PlankSolutionRow>, Set<RequiredPlank>> determineSolution(
             BasePlank basePlank, Set<RequiredPlank> requiredPlanks) {
         List<PlankSolutionRow> placedPlanks = new ArrayList<>();
         Set<RequiredPlank> ignoredPlanks;
@@ -158,20 +165,39 @@ public class PlankProblem implements Serializable {
         return new Pair<>(placedPlanks, ignoredPlanks);
     }
 
+    @SuppressWarnings("unchecked")
     @Serial
     private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+        initializeTransientMember();
+
         input.defaultReadObject();
-        requiredPlanks = new SimpleSetProperty<>(
-                FXCollections.observableSet((HashSet<RequiredPlank>) input.readObject()));
-        basePlank = new SimpleObjectProperty<>((BasePlank) input.readObject());
-        proposedSolution = new ReadOnlyObjectWrapper<>(determineSolution(getBasePlank(), getRequiredPlanks()));
+        criterionWeightsProperty()
+                .putAll((HashMap<PlankSolutionCriterion, Double>) input.readObject());
+        requiredPlanksProperty()
+                .addAll((HashSet<RequiredPlank>) input.readObject());
+        setBasePlank((BasePlank) input.readObject());
+        proposedSolution.set(determineSolution(getBasePlank(), getRequiredPlanks()));
     }
 
     @Serial
     private void writeObject(ObjectOutputStream output) throws IOException {
         output.defaultWriteObject();
+        output.writeObject(new HashMap<>(criterionWeightsProperty()));
         output.writeObject(new HashSet<>(getRequiredPlanks()));
         output.writeObject(getBasePlank());
+    }
+
+    public ObservableMap<PlankSolutionCriterion, Double> criterionWeightsProperty() {
+        // FIXME How to avoid that null values are set as weight
+        return criterionWeights;
+    }
+
+    public double getCriterionWeight(PlankSolutionCriterion criterion) {
+        return criterionWeights.get(criterion);
+    }
+
+    public void setCriterionWeight(PlankSolutionCriterion criterion, double weight) {
+        criterionWeights.put(criterion, weight);
     }
 
     public SetProperty<RequiredPlank> requiredPlanksProperty() {

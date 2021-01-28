@@ -13,6 +13,7 @@ since: 0.1
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -25,14 +26,16 @@ since: 0.1
                 <HBox VBox.vgrow="ALWAYS">
                     <VBox>
                         <Label id="basePlankListLabel"
-                               text="%basePlankList"/>
+                               text="%basePlankList"
+                               styleClass="heading"/>
                         <PlankList fx:id="basePlankList"
                                    genericRuntimeType="bayern.steinbrecher.woodpacker.data.BasePlank"
                                    VBox.vgrow="ALWAYS"/>
                     </VBox>
                     <VBox>
                         <Label id="requiredPlanksListLabel"
-                               text="%demandList"/>
+                               text="%demandList"
+                               styleClass="heading"/>
                         <PlankList fx:id="requiredPlanksView"
                                    genericRuntimeType="bayern.steinbrecher.woodpacker.data.RequiredPlank"
                                    VBox.vgrow="ALWAYS"/>
@@ -54,5 +57,19 @@ since: 0.1
         <center>
             <ScaledCanvas fx:id="visualPlankCuttingPlan"/>
         </center>
+        <right>
+            <ScrollPane fitToWidth="true"
+                        fitToHeight="true"
+                        hbarPolicy="NEVER">
+                <VBox fx:id="criteriaPane"
+                      alignment="TOP_CENTER">
+                    <Text text="%optimizationCriteria"
+                          styleClass="heading"
+                          textAlignment="CENTER"/>
+                    <Text text="%optimizationCriteriaLegend"/>
+                    <Label/> <!-- FIXME Find proper way of adding a gap after the legend -->
+                </VBox>
+            </ScrollPane>
+        </right>
     </BorderPane>
 </ScrollPane>
