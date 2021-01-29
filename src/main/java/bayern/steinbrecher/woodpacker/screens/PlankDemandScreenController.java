@@ -47,6 +47,7 @@ import javax.imageio.ImageIO;
 import java.awt.Desktop;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
@@ -289,20 +290,31 @@ public class PlankDemandScreenController extends ScreenController {
 
     @SuppressWarnings("unused")
     @FXML
-    private void askUserExportPlankProblem() throws IOException {
-        // FIXME Notify user about export failure
+    private boolean askUserExportPlankProblem() throws DialogCreationException {
+        boolean exportSucceeded = false;
         Optional<File> exportFile = PredefinedFileChooser.PLANK_PROBLEM
                 .askForSavePath(requiredPlanksView.getScene().getWindow());
         if (exportFile.isPresent()) {
-            byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
-            Files.write(exportFile.get().toPath(), serializedSnapshot);
+            try {
+                byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
+                Files.write(exportFile.get().toPath(), serializedSnapshot);
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE,
+                        String.format("Could export plank problem to '%s'", exportFile.get().getAbsolutePath()));
+                Alert exportFailedAlert = WoodPacker.DIALOG_GENERATOR
+                        .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));
+                DialogGenerator.showAndWait(exportFailedAlert);
+            }
             plankProblemSaved.set(true);
+            exportSucceeded = true;
         }
+
+        return exportSucceeded;
     }
 
     @SuppressWarnings("unused")
     @FXML
-    private void trySwitchToPreviousScreen() throws IOException {
+    private void trySwitchToPreviousScreen() {
         if (isPlankProblemSaved() || !isPlankProblemValid()) {
             switchToPreviousScreen();
         } else {
@@ -332,7 +344,7 @@ public class PlankDemandScreenController extends ScreenController {
 
     @SuppressWarnings("unused")
     @FXML
-    private void printPreview() throws IOException {
+    private void printPreview() throws DialogCreationException {
         Optional<File> savePath = PredefinedFileChooser.CUTTING_PLAN
                 .askForSavePath(requiredPlanksView.getScene().getWindow());
         if (savePath.isPresent()) {
@@ -341,9 +353,25 @@ public class PlankDemandScreenController extends ScreenController {
                 ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
                 ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", snapshotByteStream);
                 document.add(new Image(ImageDataFactory.create(snapshotByteStream.toByteArray())));
+                try {
+                    Desktop.getDesktop()
+                            .open(savePath.get());
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "Could not open exported cutting plan to user", ex);
+                }
+            } catch (FileNotFoundException ex) {
+                LOGGER.log(Level.SEVERE,
+                        String.format("Could not open '%s' for writing", savePath.get().getAbsolutePath()), ex);
+                Alert writeAccessDeniedAlert = WoodPacker.DIALOG_GENERATOR
+                        .createErrorAlert(WoodPacker.getResource(
+                                "writeAccessDenied", savePath.get().getAbsolutePath()));
+                DialogGenerator.showAndWait(writeAccessDeniedAlert);
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, "Could not export cutting plan", ex);
+                Alert cuttingPlanExportFailed = WoodPacker.DIALOG_GENERATOR
+                        .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));
+                DialogGenerator.showAndWait(cuttingPlanExportFailed);
             }
-            Desktop.getDesktop()
-                    .open(savePath.get());
         }
     }
 

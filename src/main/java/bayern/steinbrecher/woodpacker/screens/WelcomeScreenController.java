@@ -1,23 +1,30 @@
 package bayern.steinbrecher.woodpacker.screens;
 
+import bayern.steinbrecher.javaUtility.DialogCreationException;
+import bayern.steinbrecher.javaUtility.DialogGenerator;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
+import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Stefan Huber
  * @since 0.1
  */
 public class WelcomeScreenController extends ScreenController {
+    private static final Logger LOGGER = Logger.getLogger(WelcomeScreenController.class.getName());
 
     @FXML
     private void switchToPlankDemandScreen() throws ScreenSwitchFailedException {
@@ -26,13 +33,20 @@ public class WelcomeScreenController extends ScreenController {
     }
 
     @FXML
-    private void askUserImportPlankProblem() throws IOException, ClassNotFoundException, ScreenSwitchFailedException {
-        Optional<File> openPath = PredefinedFileChooser.PLANK_PROBLEM.askForOpenPath(null);// FIXME Specify owner
+    private void askUserImportPlankProblem() throws ScreenSwitchFailedException, DialogCreationException {
+        Optional<File> openPath = PredefinedFileChooser.PLANK_PROBLEM.askForOpenPath(null); // FIXME Specify owner
         if (openPath.isPresent()) {
-            byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
-            PlankProblem snapshot = SerializationUtility.deserialize(deserializedSnapshot);
-            getScreenManager()
-                    .switchTo(new PlankDemandScreen(snapshot));
+            try {
+                byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
+                PlankProblem snapshot = SerializationUtility.deserialize(deserializedSnapshot);
+                getScreenManager()
+                        .switchTo(new PlankDemandScreen(snapshot));
+            } catch (IOException | ClassNotFoundException ex) {
+                LOGGER.log(Level.SEVERE, "Could not import plank problem", ex);
+                Alert importFailedAlert = WoodPacker.DIALOG_GENERATOR
+                        .createStacktraceAlert(ex, WoodPacker.getResource("importFailed"));
+                DialogGenerator.showAndWait(importFailedAlert);
+            }
         }
     }
 
