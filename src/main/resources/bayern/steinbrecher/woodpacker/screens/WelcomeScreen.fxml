@@ -13,7 +13,7 @@ since: 0.1
     <ImageButton text="%createCuttingPlan"
                  fillColor="gray"
                  imageUrl="@blueprint.png"
-                 onAction="#switchToBasePlankSelection"/>
+                 onAction="#switchToPlankDemandScreen"/>
     <ImageButton text="%importPlanks"
                  fillColor="gray"
                  imageUrl="@import.png"

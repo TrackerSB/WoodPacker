@@ -20,7 +20,7 @@ import java.util.Optional;
 public class WelcomeScreenController extends ScreenController {
 
     @FXML
-    private void switchToBasePlankSelection() throws ScreenSwitchFailedException {
+    private void switchToPlankDemandScreen() throws ScreenSwitchFailedException {
         getScreenManager()
                 .switchTo(new PlankDemandScreen());
     }
