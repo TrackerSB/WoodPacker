@@ -6,8 +6,10 @@ import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
 import javafx.application.Application;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
@@ -29,10 +31,13 @@ public class WoodPacker extends Application {
     private static final String DEFAULT_STYLESHEET_PATH = WoodPacker.class
             .getResource("styles.css")
             .toExternalForm();
-    public static final DialogGenerator DIALOG_GENERATOR = new DialogGenerator(DEFAULT_STYLESHEET_PATH);
+    public static /*final*/ DialogGenerator DIALOG_GENERATOR = null;
 
     @Override
     public void start(Stage primaryStage) throws ScreenSwitchFailedException {
+        DIALOG_GENERATOR = new DialogGenerator(
+                primaryStage, Modality.APPLICATION_MODAL, StageStyle.UTILITY, DEFAULT_STYLESHEET_PATH);
+
         ScreenManager screenManager = new ScreenManager(primaryStage);
         primaryStage.getScene()
                 .getStylesheets()

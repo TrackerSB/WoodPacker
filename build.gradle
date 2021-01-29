@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     implementation "bayern.steinbrecher:CheckedElements:0.12-rc.1-SNAPSHOT"
-    implementation "bayern.steinbrecher:JavaUtility:0.18-rc.3-SNAPSHOT"
+    implementation "bayern.steinbrecher:JavaUtility:0.18-rc.4-SNAPSHOT"
     implementation "bayern.steinbrecher:ScreenSwitcher:0.2.1-SNAPSHOT"
     implementation "com.itextpdf:kernel:7.1.14"
     implementation "com.itextpdf:io:7.1.14"
