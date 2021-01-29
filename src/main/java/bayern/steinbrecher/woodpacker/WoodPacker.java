@@ -1,5 +1,6 @@
 package bayern.steinbrecher.woodpacker;
 
+import bayern.steinbrecher.javaUtility.DialogGenerator;
 import bayern.steinbrecher.screenSwitcher.ScreenManager;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
@@ -25,13 +26,17 @@ public class WoodPacker extends Application {
     public static final ResourceBundle LANGUAGE_BUNDLE
             = ResourceBundle.getBundle("bayern.steinbrecher.woodpacker.language");
     private static final Logger LOGGER = Logger.getLogger(WoodPacker.class.getName());
+    private static final String DEFAULT_STYLESHEET_PATH = WoodPacker.class
+            .getResource("styles.css")
+            .toExternalForm();
+    public static final DialogGenerator DIALOG_GENERATOR = new DialogGenerator(DEFAULT_STYLESHEET_PATH);
 
     @Override
     public void start(Stage primaryStage) throws ScreenSwitchFailedException {
         ScreenManager screenManager = new ScreenManager(primaryStage);
         primaryStage.getScene()
                 .getStylesheets()
-                .add(getClass().getResource("styles.css").toExternalForm());
+                .add(DEFAULT_STYLESHEET_PATH);
         screenManager.switchTo(new WelcomeScreen());
         primaryStage.setFullScreen(true);
         primaryStage.getIcons()

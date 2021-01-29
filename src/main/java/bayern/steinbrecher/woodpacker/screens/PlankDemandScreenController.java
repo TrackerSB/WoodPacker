@@ -1,7 +1,7 @@
 package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.javaUtility.DialogCreationException;
-import bayern.steinbrecher.javaUtility.DialogUtility;
+import bayern.steinbrecher.javaUtility.DialogGenerator;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
@@ -307,10 +307,11 @@ public class PlankDemandScreenController extends ScreenController {
             switchToPreviousScreen();
         } else {
             try {
-                Alert unsavedChangesAlert = DialogUtility.createInteractiveAlert(
-                        AlertType.CONFIRMATION, WoodPacker.getResource("unsavedChanges"),
-                        ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-                Optional<ButtonType> userResponse = DialogUtility.showAndWait(unsavedChangesAlert);
+                Alert unsavedChangesAlert = WoodPacker.DIALOG_GENERATOR
+                        .createInteractiveAlert(
+                                AlertType.CONFIRMATION, WoodPacker.getResource("unsavedChanges"),
+                                ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+                Optional<ButtonType> userResponse = DialogGenerator.showAndWait(unsavedChangesAlert);
                 if (userResponse.isPresent()) {
                     ButtonType buttonType = userResponse.get();
                     if (buttonType == ButtonType.YES) {
