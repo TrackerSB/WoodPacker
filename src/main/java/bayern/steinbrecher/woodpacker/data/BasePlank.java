@@ -52,7 +52,7 @@ public class BasePlank extends Plank {
 
     @Override
     public String toString() {
-        String localizedMaterial = WoodPacker.LANGUAGE_BUNDLE.getString(getMaterial().getResourceKey());
+        String localizedMaterial = WoodPacker.getResource(getMaterial().getResourceKey());
         if (getComment() == null || getComment().isBlank()) {
             return String.format("\"%s\": %d [mm] x %d [mm] (%s)", getId(), getWidth(), getHeight(), localizedMaterial);
         } else {

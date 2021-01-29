@@ -129,7 +129,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                     deletePlankItemGraphic.setFitHeight(20);
                     deletePlankItemGraphic.setPreserveRatio(true);
                     MenuItem deletePlankItem
-                            = new MenuItem(WoodPacker.LANGUAGE_BUNDLE.getString("delete"), deletePlankItemGraphic);
+                            = new MenuItem(WoodPacker.getResource("delete"), deletePlankItemGraphic);
                     deletePlankItem.setOnAction(evt -> control.getPlanks().remove(item));
                     setContextMenu(new ContextMenu(deletePlankItem));
                 }
@@ -204,7 +204,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         super(control);
 
         TextField searchField = new TextField();
-        searchField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("searchFor"));
+        searchField.setPromptText(WoodPacker.getResource("searchFor"));
 
         Node plankView = createPlankView(control, searchField);
         PlankField<T> newPlankField = createNewPlankField(control, genericRuntimeType);
@@ -212,7 +212,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         ImageView addPlankGraphic = new ImageView(getClass().getResource("add.png").toExternalForm());
         addPlankGraphic.setFitHeight(20);
         addPlankGraphic.setPreserveRatio(true);
-        Button addPlankButton = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("add"), addPlankGraphic);
+        Button addPlankButton = new Button(WoodPacker.getResource("add"), addPlankGraphic);
         newPlankField.validProperty()
                 .addListener((obs, wasValid, isValid) -> addPlankButton.setDisable(!isValid));
         addPlankButton.setOnAction(aevt -> {
@@ -230,7 +230,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         clearAllPlanksGraphic.setFitHeight(20);
         clearAllPlanksGraphic.setPreserveRatio(true);
         Button clearAllPlanksButton
-                = new Button(WoodPacker.LANGUAGE_BUNDLE.getString("clearAll"), clearAllPlanksGraphic);
+                = new Button(WoodPacker.getResource("clearAll"), clearAllPlanksGraphic);
         clearAllPlanksButton.setOnAction(aevt -> control.getPlanks().clear());
 
         ChangeListener<Boolean> onPlankListEmptyChanged

@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 public enum PredefinedFileChooser {
     CUTTING_PLAN(
-            new ExtensionFilter(WoodPacker.LANGUAGE_BUNDLE.getString("cuttingPlan"), "*.pdf")
+            new ExtensionFilter(WoodPacker.getResource("cuttingPlan"), "*.pdf")
     ),
     PLANK_PROBLEM(
             new ExtensionFilter("WoodPacker", "*.wp")

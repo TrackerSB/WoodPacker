@@ -36,7 +36,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
 
     private Node createPlankIdField(PlankField<T> control) {
         CheckedTextField plankIdField = new CheckedTextField();
-        plankIdField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("identifier"));
+        plankIdField.setPromptText(WoodPacker.getResource("identifier"));
         plankIdField.textProperty()
                 .bindBidirectional(control.plankIdProperty());
         control.addValidityConstraint(plankIdField.validProperty());
@@ -87,7 +87,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         // widthField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankWidth.png');"); // FIXME Icon not showing up
         // heightField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankHeight.png');"); // FIXME Icon not showing up
         // @formatter: on
-        lengthField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString(forWidth ? "width" : "height"));
+        lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
         IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
         lengthProperty.bind(lengthField.valueProperty());
@@ -110,7 +110,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
 
     private Node createCommentField(PlankField<T> control) {
         TextField commentField = new TextField();
-        commentField.setPromptText(WoodPacker.LANGUAGE_BUNDLE.getString("description"));
+        commentField.setPromptText(WoodPacker.getResource("description"));
         control.commentProperty()
                 .bindBidirectional(commentField.textProperty());
 

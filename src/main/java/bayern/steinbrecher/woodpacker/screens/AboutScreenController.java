@@ -75,7 +75,7 @@ public class AboutScreenController extends ScreenController {
             authorInfo.add(new Text(entry.getKey()), 0, currentRow);
             String rolesList = entry.getValue()
                     .stream()
-                    .map(WoodPacker.LANGUAGE_BUNDLE::getString)
+                    .map(WoodPacker::getResource)
                     .collect(Collectors.joining(", "));
             authorInfo.add(new Text(rolesList), 1, currentRow);
             currentRow++;
@@ -83,7 +83,7 @@ public class AboutScreenController extends ScreenController {
 
         currentRow = 0;
         for (Pair<String, String> entry : BUILD_INFO_ENTRIES) {
-            buildInfo.add(new Text(WoodPacker.LANGUAGE_BUNDLE.getString(entry.getKey())), 0, currentRow);
+            buildInfo.add(new Text(WoodPacker.getResource(entry.getKey())), 0, currentRow);
             buildInfo.add(new Text(entry.getValue()), 1, currentRow);
             currentRow++;
         }

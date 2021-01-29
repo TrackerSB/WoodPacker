@@ -201,7 +201,7 @@ public class PlankDemandScreenController extends ScreenController {
                         }
                     });
 
-            String criterionDescription = WoodPacker.LANGUAGE_BUNDLE.getString(criterion.getResourceKey());
+            String criterionDescription = WoodPacker.getResource(criterion.getResourceKey());
             criteriaPane.getChildren()
                     .addAll(new Label(criterionDescription), weightControl);
         }
@@ -222,7 +222,7 @@ public class PlankDemandScreenController extends ScreenController {
                 gc.setFont(Font.font(visualPlankCuttingPlan.getTheoreticalHeight() / 10));
                 gc.setTextAlign(TextAlignment.CENTER);
                 gc.setTextBaseline(VPos.CENTER);
-                gc.fillText(WoodPacker.LANGUAGE_BUNDLE.getString("noBasePlankSelected"),
+                gc.fillText(WoodPacker.getResource("noBasePlankSelected"),
                         visualPlankCuttingPlan.getTheoreticalWidth() / 2,
                         visualPlankCuttingPlan.getTheoreticalHeight() / 2,
                         visualPlankCuttingPlan.getTheoreticalWidth());
@@ -308,7 +308,7 @@ public class PlankDemandScreenController extends ScreenController {
         } else {
             try {
                 Alert unsavedChangesAlert = DialogUtility.createInteractiveAlert(
-                        AlertType.CONFIRMATION, WoodPacker.LANGUAGE_BUNDLE.getString("unsavedChanges"),
+                        AlertType.CONFIRMATION, WoodPacker.getResource("unsavedChanges"),
                         ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
                 Optional<ButtonType> userResponse = DialogUtility.showAndWait(unsavedChangesAlert);
                 if (userResponse.isPresent()) {

@@ -24,6 +24,6 @@ public enum PlankMaterial {
 
     @Override
     public String toString() {
-        return WoodPacker.LANGUAGE_BUNDLE.getString(getResourceKey());
+        return WoodPacker.getResource(getResourceKey());
     }
 }
