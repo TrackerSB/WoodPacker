@@ -21,6 +21,9 @@ dependencies {
     implementation "bayern.steinbrecher:CheckedElements:0.12-rc.1-SNAPSHOT"
     implementation "bayern.steinbrecher:JavaUtility:0.17"
     implementation "bayern.steinbrecher:ScreenSwitcher:0.2.1-SNAPSHOT"
+    implementation "com.itextpdf:kernel:7.1.14"
+    implementation "com.itextpdf:io:7.1.14"
+    implementation "com.itextpdf:layout:7.1.14"
     implementation 'org.jetbrains:annotations:20.1.0'
 }
 
@@ -49,6 +52,7 @@ javafx {
     modules = [
             "javafx.controls",
             "javafx.fxml",
-            "javafx.graphics"
+            "javafx.graphics",
+            "javafx.swing"
     ]
 }

@@ -13,28 +13,39 @@ import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
-import bayern.steinbrecher.woodpacker.utility.FileSystemUtility;
+import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Image;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 
+import javax.imageio.ImageIO;
+import java.awt.Desktop;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -280,7 +291,8 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private void askUserExportPlankProblem() throws IOException {
         // FIXME Notify user about export failure
-        Optional<File> exportFile = FileSystemUtility.askForSavePath(requiredPlanksView.getScene().getWindow());
+        Optional<File> exportFile = PredefinedFileChooser.PLANK_PROBLEM
+                .askForSavePath(requiredPlanksView.getScene().getWindow());
         if (exportFile.isPresent()) {
             byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
             Files.write(exportFile.get().toPath(), serializedSnapshot);
@@ -314,6 +326,23 @@ public class PlankDemandScreenController extends ScreenController {
                 LOGGER.log(Level.WARNING, "Could not ask user for saving unsaved changes");
                 switchToPreviousScreen();
             }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @FXML
+    private void printPreview() throws IOException {
+        Optional<File> savePath = PredefinedFileChooser.CUTTING_PLAN
+                .askForSavePath(requiredPlanksView.getScene().getWindow());
+        if (savePath.isPresent()) {
+            try (Document document = new Document(new PdfDocument(new PdfWriter(savePath.get())))) {
+                WritableImage snapshot = visualPlankCuttingPlan.snapshot(new SnapshotParameters(), null);
+                ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
+                ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", snapshotByteStream);
+                document.add(new Image(ImageDataFactory.create(snapshotByteStream.toByteArray())));
+            }
+            Desktop.getDesktop()
+                    .open(savePath.get());
         }
     }
 

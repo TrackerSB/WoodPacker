@@ -55,7 +55,18 @@ since: 0.1
             </VBox>
         </left>
         <center>
-            <ScaledCanvas fx:id="visualPlankCuttingPlan"/>
+            <VBox>
+                <ScaledCanvas fx:id="visualPlankCuttingPlan"
+                              VBox.vgrow="ALWAYS"/>
+                <ButtonBar>
+                    <buttons>
+                        <Button id="printPreview"
+                                text="%print"
+                                onAction="#printPreview"
+                                disable="${!controller.plankProblemValid}"/>
+                    </buttons>
+                </ButtonBar>
+            </VBox>
         </center>
         <right>
             <ScrollPane fitToWidth="true"

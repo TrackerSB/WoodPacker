@@ -3,7 +3,7 @@ package bayern.steinbrecher.woodpacker.screens;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
-import bayern.steinbrecher.woodpacker.utility.FileSystemUtility;
+import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -27,7 +27,7 @@ public class WelcomeScreenController extends ScreenController {
 
     @FXML
     private void askUserImportPlankProblem() throws IOException, ClassNotFoundException, ScreenSwitchFailedException {
-        Optional<File> openPath = FileSystemUtility.askForOpenPath(null);// FIXME Specify owner
+        Optional<File> openPath = PredefinedFileChooser.PLANK_PROBLEM.askForOpenPath(null);// FIXME Specify owner
         if (openPath.isPresent()) {
             byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
             PlankProblem snapshot = SerializationUtility.deserialize(deserializedSnapshot);

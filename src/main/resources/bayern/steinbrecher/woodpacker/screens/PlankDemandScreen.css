@@ -19,6 +19,10 @@ Slider {
    -fx-graphic: url("export.png");
 }
 
+#printPreview {
+    -fx-graphic: url("printer.png");
+}
+
 #requiredPlanksListLabel {
     -fx-graphic: url("rulers.png");
 }

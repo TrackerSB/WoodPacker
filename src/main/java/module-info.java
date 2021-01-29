@@ -8,7 +8,13 @@ module bayern.steinbrecher.WoodPacker {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
+    requires javafx.swing;
     requires org.jetbrains.annotations;
+
+    // iText modules
+    requires kernel;
+    requires io;
+    requires layout;
 
     opens bayern.steinbrecher.woodpacker to javafx.graphics;
     opens bayern.steinbrecher.woodpacker.elements to javafx.fxml;
