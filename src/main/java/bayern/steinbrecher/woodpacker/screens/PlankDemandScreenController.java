@@ -45,6 +45,7 @@ import javafx.util.Pair;
 
 import javax.imageio.ImageIO;
 import java.awt.Desktop;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -350,8 +351,13 @@ public class PlankDemandScreenController extends ScreenController {
         if (savePath.isPresent()) {
             try (Document document = new Document(new PdfDocument(new PdfWriter(savePath.get())))) {
                 WritableImage snapshot = visualPlankCuttingPlan.snapshot(new SnapshotParameters(), null);
+                BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
+                BufferedImage monochromeSnapshot = new BufferedImage(
+                        bufferedSnapshot.getWidth(), bufferedSnapshot.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+                monochromeSnapshot.createGraphics()
+                        .drawImage(bufferedSnapshot, 0, 0, null);
                 ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
-                ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", snapshotByteStream);
+                ImageIO.write(monochromeSnapshot, "png", snapshotByteStream);
                 document.add(new Image(ImageDataFactory.create(snapshotByteStream.toByteArray())));
                 try {
                     Desktop.getDesktop()

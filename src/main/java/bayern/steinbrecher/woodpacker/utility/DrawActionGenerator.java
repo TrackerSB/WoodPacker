@@ -18,16 +18,18 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * A utility for generating drawing actions that can be used with {@link ScaledCanvas}.
+ * A utility for generating drawing actions that can be used with {@link ScaledCanvas}. The colors used by any draw
+ * action as well as the order of drawing components also consider which components of any drawing should be visible
+ * when converting the final image to black and white (e.g. for purpose of printing).
  *
  * @author Stefan Huber
  * @since 0.1
  */
 public final class DrawActionGenerator {
     // Base planks drawing action configuration
-    private static final int minNumGrainIndicationSteps = 5;
+    private static final int minNumGrainIndicationSteps = 10;
     private static final int maxNumGrainIndicationSteps = 50;
-    private static final int preferredGrainIndicationStepSize = 10;
+    private static final int preferredGrainIndicationStepSize = 30;
 
     // Required planks drawing action configuration
     /**
@@ -83,9 +85,14 @@ public final class DrawActionGenerator {
         };
 
         return gc -> {
+            gc.beginPath();
+            gc.rect(0, 0, basePlank.getWidth(), basePlank.getHeight());
             gc.setFill(Color.BURLYWOOD);
-            gc.fillRect(0, 0, basePlank.getWidth(), basePlank.getHeight());
-            gc.setStroke(Color.GRAY);
+            gc.fill();
+            gc.setStroke(Color.BLACK);
+            gc.stroke();
+            gc.closePath();
+
             for (Line grainLine : grainLines) {
                 gc.strokeLine(grainLine.getStartX(), grainLine.getStartY(),
                         grainLine.getEndX(), grainLine.getEndY());
@@ -110,12 +117,14 @@ public final class DrawActionGenerator {
                     // Draw plank shape
                     double plankXPos = rowToBasePlankOffset.getX() + plankToRowXOffset;
                     double plankYPos = rowToBasePlankOffset.getY() + plankToRowYOffset;
+
                     gc.beginPath();
                     gc.rect(plankXPos, plankYPos, plank.getWidth(), plank.getHeight());
-                    gc.setStroke(Color.BLACK);
-                    gc.stroke();
                     gc.setFill(Color.BURLYWOOD);
                     gc.fill();
+                    gc.setStroke(Color.BLACK);
+                    gc.stroke();
+                    gc.closePath();
 
                     boolean drawLabelVertical = plank.getHeight() > plank.getWidth();
                     // Size in text direction
