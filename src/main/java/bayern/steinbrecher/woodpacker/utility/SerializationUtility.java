@@ -24,8 +24,7 @@ public final class SerializationUtility {
     public static <T extends Serializable> T deserialize(final byte[] toDeserialize)
             throws IOException, ClassNotFoundException {
         try (ObjectInputStream deserializer = new ObjectInputStream(new ByteArrayInputStream(toDeserialize))) {
-            final Object deserializedObject = deserializer.readObject();
-            return (T) deserializedObject;
+            return (T) deserializer.readObject();
         }
     }
 }
