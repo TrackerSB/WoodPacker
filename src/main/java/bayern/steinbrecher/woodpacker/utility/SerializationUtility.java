@@ -14,7 +14,7 @@ public final class SerializationUtility {
 
     public static <T extends Serializable> byte[] serialize(final T toSerialize) throws IOException {
         final ByteArrayOutputStream serializedBasePlank = new ByteArrayOutputStream();
-        try (final ObjectOutputStream serializer = new ObjectOutputStream(serializedBasePlank)) {
+        try (ObjectOutputStream serializer = new ObjectOutputStream(serializedBasePlank)) {
             serializer.writeObject(toSerialize);
             return serializedBasePlank.toByteArray();
         }
@@ -23,8 +23,8 @@ public final class SerializationUtility {
     @SuppressWarnings("unchecked")
     public static <T extends Serializable> T deserialize(final byte[] toDeserialize)
             throws IOException, ClassNotFoundException {
-        try (final ObjectInputStream deserializer = new ObjectInputStream(new ByteArrayInputStream(toDeserialize))) {
-            Object deserializedObject = deserializer.readObject();
+        try (ObjectInputStream deserializer = new ObjectInputStream(new ByteArrayInputStream(toDeserialize))) {
+            final Object deserializedObject = deserializer.readObject();
             return (T) deserializedObject;
         }
     }
