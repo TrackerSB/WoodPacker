@@ -22,15 +22,15 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
     public ImageButtonSkin(final ImageButton control) {
         super(control);
 
-        StackPane contentHolder = new StackPane();
+        final StackPane contentHolder = new StackPane();
         Bindings.max(control.widthProperty(), control.heightProperty())
                 .addListener((obs, previousSize, currentSize)
                         -> contentHolder.setPrefSize(currentSize.doubleValue(), currentSize.doubleValue()));
         contentHolder.onMouseClickedProperty()
                 .bind(control.onActionProperty());
 
-        Region imageBackground = new Region();
-        ChangeListener<Paint> onFillColorChanged = (obs, previousFillColor, currentFillColor)
+        final Region imageBackground = new Region();
+        final ChangeListener<Paint> onFillColorChanged = (obs, previousFillColor, currentFillColor)
                 -> imageBackground.setBackground(new Background(new BackgroundFill(currentFillColor, null, null)));
         control.fillColorProperty()
                 .addListener(onFillColorChanged);
@@ -38,9 +38,9 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
         contentHolder.getChildren()
                 .add(imageBackground);
 
-        ImageView backgroundImage = new ImageView();
+        final ImageView backgroundImage = new ImageView();
         backgroundImage.setPreserveRatio(true);
-        ChangeListener<String> onImageUrlChanged = (obs, previousUrl, currentUrl)
+        final ChangeListener<String> onImageUrlChanged = (obs, previousUrl, currentUrl)
                 -> backgroundImage.setImage(new Image(currentUrl));
         control.imageUrlProperty()
                 .addListener(onImageUrlChanged);
@@ -48,7 +48,7 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
         contentHolder.getChildren()
                 .add(backgroundImage);
 
-        Text buttonText = new Text();
+        final Text buttonText = new Text();
         buttonText.textProperty()
                 .bind(control.textProperty());
         buttonText.wrappingWidthProperty()
@@ -60,7 +60,7 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
         contentHolder.getChildren()
                 .add(buttonText);
 
-        Region hoverOverlay = new Region();
+        final Region hoverOverlay = new Region();
         hoverOverlay.setBackground(new Background(
                 new BackgroundFill(Color.rgb(255, 255, 255, 0.3), null, null)));
         hoverOverlay.visibleProperty()
@@ -69,7 +69,7 @@ public class ImageButtonSkin extends SkinBase<ImageButton> {
         contentHolder.getChildren()
                 .add(hoverOverlay);
 
-        Region pressedOverlay = new Region();
+        final Region pressedOverlay = new Region();
         pressedOverlay.setBackground(new Background(
                 new BackgroundFill(Color.rgb(0, 0, 0, 0.3), null, null)));
         pressedOverlay.visibleProperty()

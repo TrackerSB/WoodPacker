@@ -25,6 +25,7 @@ public class PlankList<T extends Plank> extends Control {
     private final Class<T> genericRuntimeType;
 
     public PlankList(final Class<T> genericRuntimeType) {
+        super();
         this.genericRuntimeType = genericRuntimeType;
         selectedPlank.addListener((obs, previousPlank, currentPlank) -> plankSelected.set(currentPlank.isPresent()));
     }

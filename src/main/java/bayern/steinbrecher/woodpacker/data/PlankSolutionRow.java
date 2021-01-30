@@ -20,7 +20,7 @@ public class PlankSolutionRow {
     private final int maxLength;
     private final int breadth;
     private final SortedSet<RequiredPlank> planks;
-    private int currentLength = 0;
+    private int currentLength;
 
     /**
      * @param startOffset   The position in the base plank space of the left upper corner
@@ -37,9 +37,9 @@ public class PlankSolutionRow {
         this.breadth = breadth;
 
         // If horizontal row sort by height descending; otherwise sort by width descending
-        Function<Plank, Integer> compareMethod = addHorizontal() ? Plank::getHeight : Plank::getWidth;
-        Comparator<Plank> descendingBreadthComparator = (pA, pB) -> {
-            int diff = compareMethod.apply(pB) - compareMethod.apply(pA);
+        final Function<Plank, Integer> compareMethod = addHorizontal() ? Plank::getHeight : Plank::getWidth;
+        final Comparator<Plank> descendingBreadthComparator = (pA, pB) -> {
+            final int diff = compareMethod.apply(pB) - compareMethod.apply(pA);
             /* NOTE The IDs of the planks have to be considered since otherwise the sorted set of planks could not
              * contain planks of the same size.
              */
@@ -106,14 +106,13 @@ public class PlankSolutionRow {
     }
 
     public boolean addPlank(final RequiredPlank plank) {
-        if (canContain(plank)) {
-            boolean addedPlank = planks.add(plank);
+        final boolean containable = canContain(plank);
+        if (containable) {
+            final boolean addedPlank = planks.add(plank);
             assert addedPlank : String.format(
                     "Plank '%s' was not added even though the row could contain it", plank.getId());
             currentLength = getCurrentLength() + getPlankLength(plank);
-            return true;
-        } else {
-            return false;
         }
+        return containable;
     }
 }

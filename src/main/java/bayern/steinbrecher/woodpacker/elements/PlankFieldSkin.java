@@ -41,7 +41,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
                 .bindBidirectional(control.plankIdProperty());
         control.addValidityConstraint(plankIdField.validProperty());
 
-        String externalIconPath = getClass()
+        final String externalIconPath = getClass()
                 .getResource("bookmark.png")
                 .toExternalForm();
         final ImageView idIcon = new ImageView(externalIconPath);

@@ -196,7 +196,7 @@ public class PlankProblem implements Serializable {
         return criterionWeights.get(criterion);
     }
 
-    public void setCriterionWeight(final PlankSolutionCriterion criterion, double weight) {
+    public void setCriterionWeight(final PlankSolutionCriterion criterion, final double weight) {
         criterionWeights.put(criterion, weight);
     }
 

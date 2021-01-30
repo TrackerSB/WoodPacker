@@ -35,8 +35,10 @@ public class ScaledCanvas extends Region {
     private final Canvas drawingArea = new Canvas();
 
     public ScaledCanvas() {
+        super();
+
         // Fit content holder to expected user defined dimensions
-        StackPane contentHolder = new StackPane(drawingArea);
+        final StackPane contentHolder = new StackPane(drawingArea);
         contentHolder.minWidthProperty()
                 .bind(minWidthProperty());
         contentHolder.minHeightProperty()
@@ -54,7 +56,7 @@ public class ScaledCanvas extends Region {
         setMinWidth(300);
         setMinHeight(300);
 
-        NumberBinding theoreticalToActualDrawingAreaFactor = Bindings.min(
+        final NumberBinding theoreticalToActualDrawingAreaFactor = Bindings.min(
                 contentHolder.widthProperty().divide(theoreticalWidth),
                 contentHolder.heightProperty().divide(theoreticalHeight)
         );
@@ -69,7 +71,7 @@ public class ScaledCanvas extends Region {
                 .add(contentHolder);
 
         // Trigger redraw
-        Runnable redraw = () -> {
+        final Runnable redraw = () -> {
             GraphicsContext gc = drawingArea.getGraphicsContext2D();
             gc.save(); // Ensure that the set scales do not stack on each redraw
             gc.setFill(Color.WHITE);

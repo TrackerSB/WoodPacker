@@ -24,7 +24,7 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
     protected PlankGrainDirectionIndicatorSkin(final PlankGrainDirectionIndicator control) {
         super(control);
 
-        Button indicatorButton = new Button();
+        final Button indicatorButton = new Button();
         indicatorButton.setOnAction(aevt -> {
             control.setValue(
                     switch (control.getValue()) {
@@ -35,7 +35,7 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
             );
         });
 
-        Consumer<PlankGrainDirection> updateIndicatorGraphic = direction -> {
+        final Consumer<PlankGrainDirection> updateIndicatorGraphic = direction -> {
             indicatorButton.setGraphic(generateImageView(direction));
         };
         control.valueProperty()
@@ -49,8 +49,8 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
     }
 
     public static ImageView generateImageView(final PlankGrainDirection direction) {
-        String imageName = GRAIN_DIRECTION_SYMBOL_FILE_NAMES.get(direction);
-        URL symbolResource = PlankGrainDirectionIndicatorSkin.class
+        final String imageName = GRAIN_DIRECTION_SYMBOL_FILE_NAMES.get(direction);
+        final URL symbolResource = PlankGrainDirectionIndicatorSkin.class
                 .getResource(imageName);
         if (symbolResource == null) {
             throw new ExceptionInInitializerError(String.format("Cannot find symbol for '%s'", imageName));

@@ -66,14 +66,15 @@ public class AboutScreenController extends ScreenController {
     @FXML
     private VBox licensesInfo;
 
+    @SuppressWarnings("unused")
     @FXML
     private void initialize() {
         version.setText(String.format("%s (\"%s\")", BuildConfig.APP_VERSION, BuildConfig.APP_VERSION_NICKNAME));
 
         int currentRow = 0;
-        for (Pair<String, Collection<String>> entry : AUTHOR_INFO_ENTRIES) {
+        for (final Pair<String, Collection<String>> entry : AUTHOR_INFO_ENTRIES) {
             authorInfo.add(new Text(entry.getKey()), 0, currentRow);
-            String rolesList = entry.getValue()
+            final String rolesList = entry.getValue()
                     .stream()
                     .map(WoodPacker::getResource)
                     .collect(Collectors.joining(", "));
@@ -82,14 +83,14 @@ public class AboutScreenController extends ScreenController {
         }
 
         currentRow = 0;
-        for (Pair<String, String> entry : BUILD_INFO_ENTRIES) {
+        for (final Pair<String, String> entry : BUILD_INFO_ENTRIES) {
             buildInfo.add(new Text(WoodPacker.getResource(entry.getKey())), 0, currentRow);
             buildInfo.add(new Text(entry.getValue()), 1, currentRow);
             currentRow++;
         }
 
         LICENSES.forEach((name, path) -> {
-            Hyperlink licenseLink = new Hyperlink(name);
+            final Hyperlink licenseLink = new Hyperlink(name);
             licenseLink.setOnAction(aevt -> {
                 try {
                     Desktop.getDesktop().open(path.toFile());

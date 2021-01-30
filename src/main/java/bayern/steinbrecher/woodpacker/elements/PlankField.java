@@ -39,6 +39,8 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final Class<T> genericRuntimeType;
 
     public PlankField(final Class<T> genericRuntimeType) {
+        super();
+
         this.genericRuntimeType = genericRuntimeType;
         if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
             material.bind(selectedMaterialProperty());

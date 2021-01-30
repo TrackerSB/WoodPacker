@@ -26,36 +26,40 @@ import java.util.logging.Logger;
 public class WelcomeScreenController extends ScreenController {
     private static final Logger LOGGER = Logger.getLogger(WelcomeScreenController.class.getName());
 
+    @SuppressWarnings("unused")
     @FXML
     private void switchToPlankDemandScreen() throws ScreenSwitchFailedException {
         getScreenManager()
                 .switchTo(new PlankDemandScreen());
     }
 
+    @SuppressWarnings("unused")
     @FXML
     private void askUserImportPlankProblem() throws ScreenSwitchFailedException, DialogCreationException {
-        Optional<File> openPath = PredefinedFileChooser.PLANK_PROBLEM.askForOpenPath(null); // FIXME Specify owner
+        final Optional<File> openPath = PredefinedFileChooser.PLANK_PROBLEM.askForOpenPath(null); // FIXME Specify owner
         if (openPath.isPresent()) {
             try {
-                byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
-                PlankProblem snapshot = SerializationUtility.deserialize(deserializedSnapshot);
+                final byte[] deserializedSnapshot = Files.readAllBytes(openPath.get().toPath());
+                final PlankProblem snapshot = SerializationUtility.deserialize(deserializedSnapshot);
                 getScreenManager()
                         .switchTo(new PlankDemandScreen(snapshot));
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.log(Level.SEVERE, "Could not import plank problem", ex);
-                Alert importFailedAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert importFailedAlert = WoodPacker.DIALOG_GENERATOR
                         .createStacktraceAlert(ex, WoodPacker.getResource("importFailed"));
                 DialogGenerator.showAndWait(importFailedAlert);
             }
         }
     }
 
+    @SuppressWarnings("unused")
     @FXML
     private void switchToAbout() throws ScreenSwitchFailedException {
         getScreenManager()
                 .switchTo(new AboutScreen());
     }
 
+    @SuppressWarnings("unused")
     @FXML
     private void exitApp() {
         Platform.exit();

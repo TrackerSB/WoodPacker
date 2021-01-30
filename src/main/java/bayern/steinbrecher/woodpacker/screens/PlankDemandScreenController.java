@@ -255,7 +255,7 @@ public class PlankDemandScreenController extends ScreenController {
         // Trigger updates of visual cutting plank
         plankProblem.basePlankProperty()
                 .addListener((obs, oldBasePlank, newBasePlank) -> {
-                    Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem
+                    final Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem
                             .getProposedSolution();
                     updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey());
                 });
@@ -388,7 +388,7 @@ public class PlankDemandScreenController extends ScreenController {
                     documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
 
                     final Image cuttingPlan = generateCuttingPlan();
-                    float leftMargin = (document.getPdfDocument().getDefaultPageSize().getWidth()
+                    final float leftMargin = (document.getPdfDocument().getDefaultPageSize().getWidth()
                             - cuttingPlan.getImageWidth()) / 2;
                     cuttingPlan.setMarginLeft(leftMargin);
                     document.add(cuttingPlan);

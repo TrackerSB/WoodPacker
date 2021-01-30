@@ -31,14 +31,14 @@ public class WoodPacker extends Application {
     private static final String DEFAULT_STYLESHEET_PATH = WoodPacker.class
             .getResource("styles.css")
             .toExternalForm();
-    public static /*final*/ DialogGenerator DIALOG_GENERATOR = null;
+    public static /*final*/ DialogGenerator DIALOG_GENERATOR;
 
     @Override
     public void start(final Stage primaryStage) throws ScreenSwitchFailedException {
         DIALOG_GENERATOR = new DialogGenerator(
                 primaryStage, Modality.APPLICATION_MODAL, StageStyle.UTILITY, DEFAULT_STYLESHEET_PATH);
 
-        ScreenManager screenManager = new ScreenManager(primaryStage);
+        final ScreenManager screenManager = new ScreenManager(primaryStage);
         primaryStage.getScene()
                 .getStylesheets()
                 .add(DEFAULT_STYLESHEET_PATH);

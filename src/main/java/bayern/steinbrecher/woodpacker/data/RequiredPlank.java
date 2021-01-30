@@ -26,7 +26,7 @@ public class RequiredPlank extends Plank {
     }
 
     public RequiredPlank rotated() {
-        PlankGrainDirection rotatedGrainDirection = switch (getGrainDirection()) {
+        final PlankGrainDirection rotatedGrainDirection = switch (getGrainDirection()) {
             case HORIZONTAL -> PlankGrainDirection.VERTICAL;
             case VERTICAL -> PlankGrainDirection.HORIZONTAL;
             case IRRELEVANT -> PlankGrainDirection.IRRELEVANT;
