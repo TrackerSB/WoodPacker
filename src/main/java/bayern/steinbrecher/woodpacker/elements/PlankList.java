@@ -24,7 +24,7 @@ public class PlankList<T extends Plank> extends Control {
     private final BooleanProperty materialAllowed = new SimpleBooleanProperty(true);
     private final Class<T> genericRuntimeType;
 
-    public PlankList(Class<T> genericRuntimeType) {
+    public PlankList(final Class<T> genericRuntimeType) {
         this.genericRuntimeType = genericRuntimeType;
         selectedPlank.addListener((obs, previousPlank, currentPlank) -> plankSelected.set(currentPlank.isPresent()));
     }
@@ -32,7 +32,8 @@ public class PlankList<T extends Plank> extends Control {
     /**
      * Should be used in FXML only.
      */
-    public PlankList(@NamedArg("genericRuntimeType") String genericRuntimeTypeName) throws ClassNotFoundException {
+    public PlankList(@NamedArg("genericRuntimeType") final String genericRuntimeTypeName)
+            throws ClassNotFoundException {
         //noinspection unchecked
         this((Class<T>) Class.forName(genericRuntimeTypeName));
     }
@@ -50,7 +51,7 @@ public class PlankList<T extends Plank> extends Control {
         return planksProperty().get();
     }
 
-    public void setPlanks(ObservableSet<T> planks) {
+    public void setPlanks(final ObservableSet<T> planks) {
         planksProperty().set(planks);
     }
 
@@ -62,7 +63,7 @@ public class PlankList<T extends Plank> extends Control {
         return selectedPlankProperty().get();
     }
 
-    public void setSelectedPlank(T selectedPlank) {
+    public void setSelectedPlank(final T selectedPlank) {
         this.selectedPlank.set(Optional.ofNullable(selectedPlank));
     }
 
@@ -82,7 +83,7 @@ public class PlankList<T extends Plank> extends Control {
         return materialAllowedProperty().get();
     }
 
-    public void setMaterialAllowed(boolean materialAllowed) {
+    public void setMaterialAllowed(final boolean materialAllowed) {
         materialAllowedProperty().set(materialAllowed);
     }
 }

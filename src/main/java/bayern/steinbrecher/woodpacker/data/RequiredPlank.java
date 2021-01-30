@@ -16,11 +16,12 @@ public class RequiredPlank extends Plank {
     // FIXME Solely PlankProblem::determineSolution(...) should be allowed to change this member
     private transient /*final*/ BooleanProperty placedInSolution = new SimpleBooleanProperty(false);
 
-    public RequiredPlank(String id, int width, int height, PlankGrainDirection grainDirection) {
+    public RequiredPlank(final String id, final int width, final int height, final PlankGrainDirection grainDirection) {
         super(id, width, height, grainDirection);
     }
 
-    public RequiredPlank(String id, int width, int height, PlankGrainDirection grainDirection, String comment) {
+    public RequiredPlank(final String id, final int width, final int height, final PlankGrainDirection grainDirection,
+                         final String comment) {
         super(id, width, height, grainDirection, comment);
     }
 
@@ -34,13 +35,13 @@ public class RequiredPlank extends Plank {
     }
 
     @Serial
-    private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
         input.defaultReadObject();
         placedInSolution = new SimpleBooleanProperty(input.readBoolean());
     }
 
     @Serial
-    private void writeObject(ObjectOutputStream output) throws IOException, ClassNotFoundException {
+    private void writeObject(final ObjectOutputStream output) throws IOException, ClassNotFoundException {
         output.defaultWriteObject();
         output.writeBoolean(isPlacedInSolution());
     }
@@ -63,7 +64,7 @@ public class RequiredPlank extends Plank {
         return placedInSolutionProperty().get();
     }
 
-    public void setPlacedInSolution(boolean placedInSolution) {
+    public void setPlacedInSolution(final boolean placedInSolution) {
         placedInSolutionProperty().set(placedInSolution);
     }
 }

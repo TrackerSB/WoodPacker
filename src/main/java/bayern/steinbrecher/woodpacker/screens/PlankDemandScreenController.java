@@ -211,7 +211,8 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
-    private void updateVisualPlankCuttingPlan(BasePlank basePlank, Iterable<PlankSolutionRow> placedPlankRows) {
+    private void updateVisualPlankCuttingPlan(
+            final BasePlank basePlank, final Iterable<PlankSolutionRow> placedPlankRows) {
         // Update cutting plan preview
         if (basePlank == null) {
             visualPlankCuttingPlan.theoreticalWidthProperty()
@@ -282,7 +283,7 @@ public class PlankDemandScreenController extends ScreenController {
         setupCuttingPlanPreviewUpdates();
     }
 
-    public void loadPlankProblem(PlankProblem setup) {
+    public void loadPlankProblem(final PlankProblem setup) {
         plankProblem.setBasePlank(setup.getBasePlank());
         plankProblem.setRequiredPlanks(setup.getRequiredPlanks());
         plankProblem.criterionWeightsProperty()

@@ -8,15 +8,15 @@ public class ExportFailedException extends Exception {
     public ExportFailedException() {
     }
 
-    public ExportFailedException(String message) {
+    public ExportFailedException(final String message) {
         super(message);
     }
 
-    public ExportFailedException(String message, Throwable cause) {
+    public ExportFailedException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public ExportFailedException(Throwable cause) {
+    public ExportFailedException(final Throwable cause) {
         super(cause);
     }
 }

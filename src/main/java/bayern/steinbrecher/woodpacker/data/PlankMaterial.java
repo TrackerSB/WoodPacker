@@ -14,7 +14,7 @@ public enum PlankMaterial {
 
     private final String resourceKey;
 
-    PlankMaterial(String resourceKey) {
+    PlankMaterial(final String resourceKey) {
         this.resourceKey = resourceKey;
     }
 

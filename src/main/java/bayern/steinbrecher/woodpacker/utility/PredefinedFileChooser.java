@@ -23,17 +23,17 @@ public enum PredefinedFileChooser {
 
     private final FileChooser chooser = new FileChooser();
 
-    PredefinedFileChooser(ExtensionFilter... filters) {
+    PredefinedFileChooser(final ExtensionFilter... filters) {
         chooser.getExtensionFilters()
                 .addAll(filters);
         chooser.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
     }
 
-    public Optional<File> askForSavePath(Window owner) {
+    public Optional<File> askForSavePath(final Window owner) {
         return Optional.ofNullable(chooser.showSaveDialog(owner));
     }
 
-    public Optional<File> askForOpenPath(Window owner) {
+    public Optional<File> askForOpenPath(final Window owner) {
         return Optional.ofNullable(chooser.showOpenDialog(owner));
     }
 }

@@ -10,7 +10,7 @@ public enum PlankSolutionCriterion {
      */
     BREATH_DIFFERENCES("breadthDifferences") {
         @Override
-        public double getRating(PlankSolutionRow solutionRow) {
+        public double getRating(final PlankSolutionRow solutionRow) {
             return 1d / solutionRow.getBreadths().size();
         }
     },
@@ -19,13 +19,13 @@ public enum PlankSolutionCriterion {
      */
     ROW_SPACE_WASTE("rowSpaceWaste") {
         @Override
-        public double getRating(PlankSolutionRow solutionRow) {
+        public double getRating(final PlankSolutionRow solutionRow) {
             return ((double) solutionRow.getCurrentLength()) / solutionRow.getMaxLength();
         }
     };
     private final String resourceKey;
 
-    PlankSolutionCriterion(String resourceKey) {
+    PlankSolutionCriterion(final String resourceKey) {
         this.resourceKey = resourceKey;
     }
 
@@ -35,7 +35,7 @@ public enum PlankSolutionCriterion {
      * @param solutionRow The {@link PlankSolutionRow} to rate.
      * @return The higher the returned value the better the criterion is fulfilled.
      */
-    public abstract double getRating(PlankSolutionRow solutionRow);
+    public abstract double getRating(final PlankSolutionRow solutionRow);
 
     public String getResourceKey() {
         return resourceKey;

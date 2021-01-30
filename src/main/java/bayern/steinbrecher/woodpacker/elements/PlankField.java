@@ -38,7 +38,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final ReportableBase<PlankField<T>> rBase = new ReportableBase<>(this);
     private final Class<T> genericRuntimeType;
 
-    public PlankField(Class<T> genericRuntimeType) {
+    public PlankField(final Class<T> genericRuntimeType) {
         this.genericRuntimeType = genericRuntimeType;
         if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
             material.bind(selectedMaterialProperty());
@@ -55,7 +55,8 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     /**
      * Should be used in FXML only.
      */
-    public PlankField(@NamedArg("genericRuntimeType") String genericRuntimeTypeName) throws ClassNotFoundException {
+    public PlankField(@NamedArg("genericRuntimeType") final String genericRuntimeTypeName)
+            throws ClassNotFoundException {
         //noinspection unchecked
         this((Class<T>) Class.forName(genericRuntimeTypeName));
     }
@@ -89,7 +90,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         return plankIdProperty().get();
     }
 
-    public void setPlankId(String plankId) {
+    public void setPlankId(final String plankId) {
         plankIdProperty().set(plankId);
     }
 
@@ -101,7 +102,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         return plankWidthProperty().get();
     }
 
-    public void setPlankWidth(int plankWidth) {
+    public void setPlankWidth(final int plankWidth) {
         plankWidthProperty().set(plankWidth);
     }
 
@@ -113,7 +114,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         return plankHeightProperty().get();
     }
 
-    public void setPlankHeight(int plankHeight) {
+    public void setPlankHeight(final int plankHeight) {
         plankHeightProperty().set(plankHeight);
     }
 
@@ -125,7 +126,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         return grainDirectionProperty().get();
     }
 
-    public void setGrainDirection(PlankGrainDirection direction) {
+    public void setGrainDirection(final PlankGrainDirection direction) {
         grainDirectionProperty().set(direction);
     }
 
@@ -145,7 +146,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         return selectedMaterialProperty().get();
     }
 
-    public void setSelectedMaterial(PlankMaterial material) {
+    public void setSelectedMaterial(final PlankMaterial material) {
         selectedMaterialProperty().set(material);
     }
 
@@ -157,7 +158,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         return commentProperty().get();
     }
 
-    public void setComment(String comment) {
+    public void setComment(final String comment) {
         commentProperty().set(comment);
     }
 
@@ -172,7 +173,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     }
 
     @Override
-    public boolean addValidityConstraint(ObservableBooleanValue constraint) {
+    public boolean addValidityConstraint(final ObservableBooleanValue constraint) {
         return rBase.addValidityConstraint(constraint);
     }
 
@@ -182,7 +183,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     }
 
     @Override
-    public boolean addReport(ReportEntry report) {
+    public boolean addReport(final ReportEntry report) {
         return rBase.addReport(report);
     }
 }

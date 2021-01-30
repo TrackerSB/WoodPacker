@@ -30,7 +30,7 @@ public class ImageButton extends Control {
         return textProperty().get();
     }
 
-    public void setText(String text) {
+    public void setText(final String text) {
         textProperty().set(text);
     }
 
@@ -42,7 +42,7 @@ public class ImageButton extends Control {
         return imageUrlProperty().get();
     }
 
-    public void setImageUrl(String imageUrl) {
+    public void setImageUrl(final String imageUrl) {
         imageUrlProperty().set(imageUrl);
     }
 
@@ -54,7 +54,7 @@ public class ImageButton extends Control {
         return fillColorProperty().get();
     }
 
-    public void setFillColor(Paint fillColor) {
+    public void setFillColor(final Paint fillColor) {
         fillColorProperty().set(fillColor);
     }
 
@@ -66,7 +66,7 @@ public class ImageButton extends Control {
         return onActionProperty().get();
     }
 
-    public void setOnAction(EventHandler<MouseEvent> onAction) {
+    public void setOnAction(final EventHandler<MouseEvent> onAction) {
         onActionProperty().set(onAction);
     }
 }

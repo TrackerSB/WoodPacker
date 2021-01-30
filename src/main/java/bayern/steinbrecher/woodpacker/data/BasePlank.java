@@ -11,18 +11,19 @@ import java.util.Optional;
 public class BasePlank extends Plank {
     private final PlankMaterial material;
 
-    public BasePlank(String id, int width, int height, PlankGrainDirection grainDirection, PlankMaterial material) {
+    public BasePlank(final String id, final int width, final int height, final PlankGrainDirection grainDirection,
+                     final PlankMaterial material) {
         super(id, width, height, grainDirection);
         this.material = material;
     }
 
-    public BasePlank(String id, int width, int height, PlankGrainDirection grainDirection, PlankMaterial material,
-                     String comment) {
+    public BasePlank(final String id, final int width, final int height, final PlankGrainDirection grainDirection,
+                     final PlankMaterial material, final String comment) {
         super(id, width, height, grainDirection, comment);
         this.material = material;
     }
 
-    public Optional<BasePlank> heightDecreased(int decreaseBy) {
+    public Optional<BasePlank> heightDecreased( final int decreaseBy) {
         if (decreaseBy > getHeight()) {
             throw new IllegalArgumentException(
                     String.format(
@@ -36,7 +37,7 @@ public class BasePlank extends Plank {
                         getComment()));
     }
 
-    public Optional<BasePlank> widthDecreased(int decreaseBy) {
+    public Optional<BasePlank> widthDecreased(final int decreaseBy) {
         if (decreaseBy > getWidth()) {
             throw new IllegalArgumentException(
                     String.format(

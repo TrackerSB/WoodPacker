@@ -71,8 +71,8 @@ public class PlankProblem implements Serializable {
         proposedSolution = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
     }
 
-    private static PlankSolutionRow createCandidate(
-            boolean horizontal, Point2D basePlankOffset, Plank basePlank, List<RequiredPlank> sortedPlanks) {
+    private static PlankSolutionRow createCandidate(final boolean horizontal, final Point2D basePlankOffset,
+                                                    final Plank basePlank, final List<RequiredPlank> sortedPlanks) {
         assert !sortedPlanks.isEmpty() : "No planks left for creating a candidate";
         // NOTE Assume planks are sorted by height if horizontal is true; sorted by width otherwise
         int maxLength;
@@ -95,7 +95,7 @@ public class PlankProblem implements Serializable {
         return candidate;
     }
 
-    private double determineCandidateQuality(PlankSolutionRow candidate) {
+    private double determineCandidateQuality(final PlankSolutionRow candidate) {
         return criterionWeights.entrySet()
                 .stream()
                 .mapToDouble(criterion -> criterion.getKey().getRating(candidate) * criterion.getValue())
@@ -107,7 +107,7 @@ public class PlankProblem implements Serializable {
      * not fit onto the base plank (besides the already added ones).
      */
     private Pair<List<PlankSolutionRow>, Set<RequiredPlank>> determineSolution(
-            BasePlank basePlank, Set<RequiredPlank> requiredPlanks) {
+            final BasePlank basePlank, final Set<RequiredPlank> requiredPlanks) {
         List<PlankSolutionRow> placedPlanks = new ArrayList<>();
         Set<RequiredPlank> ignoredPlanks;
         if (basePlank == null) {
@@ -167,7 +167,7 @@ public class PlankProblem implements Serializable {
 
     @SuppressWarnings("unchecked")
     @Serial
-    private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
         initializeTransientMember();
 
         input.defaultReadObject();
@@ -180,7 +180,7 @@ public class PlankProblem implements Serializable {
     }
 
     @Serial
-    private void writeObject(ObjectOutputStream output) throws IOException {
+    private void writeObject(final ObjectOutputStream output) throws IOException {
         output.defaultWriteObject();
         output.writeObject(new HashMap<>(criterionWeightsProperty()));
         output.writeObject(new HashSet<>(getRequiredPlanks()));

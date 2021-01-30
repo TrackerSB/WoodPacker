@@ -41,7 +41,7 @@ public final class DrawActionGenerator {
         throw new UnsupportedOperationException("Construction of instances is prohibited");
     }
 
-    public static Consumer<GraphicsContext> forBasePlank(BasePlank basePlank) {
+    public static Consumer<GraphicsContext> forBasePlank(final BasePlank basePlank) {
         if (basePlank == null) {
             return gc -> {
             };
@@ -101,7 +101,7 @@ public final class DrawActionGenerator {
     }
 
     public static Consumer<GraphicsContext> forRequiredPlanks(
-            BasePlank basePlank, Iterable<PlankSolutionRow> placedPlankRows) {
+            final BasePlank basePlank, final Iterable<PlankSolutionRow> placedPlankRows) {
         if (placedPlankRows == null) {
             return gc -> {
             };

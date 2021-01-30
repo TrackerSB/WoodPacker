@@ -47,7 +47,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
 
     private final BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
 
-    private Node generateItemGraphic(Plank item) {
+    private Node generateItemGraphic(final Plank item) {
         Text idText = new Text(item.getId());
         idText.setFill(Color.WHITE);
         idText.setFont(ID_BADGE_FONT);
@@ -65,7 +65,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         return content;
     }
 
-    private Node createPlankView(PlankList<T> control, TextField searchField) {
+    private Node createPlankView(final PlankList<T> control, TextField searchField) {
         ListView<T> planksView = new ListView<>();
         // Sync control --> planksView
         ChangeListener<ObservableSet<T>> onPlanksChanged = (obs, previousSet, currentSet) -> {
@@ -172,7 +172,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         return scrollablePlanksView;
     }
 
-    private void updateBasePlankNameAlreadyExists(PlankList<?> control, String idForNewPlank) {
+    private void updateBasePlankNameAlreadyExists(final PlankList<?> control, final String idForNewPlank) {
         basePlankNameAlreadyExists.set(
                 control.getPlanks()
                         .stream()
@@ -180,7 +180,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         );
     }
 
-    private PlankField<T> createNewPlankField(PlankList<T> control, Class<T> genericRuntimeType) {
+    private PlankField<T> createNewPlankField(final PlankList<T> control, final Class<T> genericRuntimeType) {
         PlankField<T> newPlankField = new PlankField<>(genericRuntimeType);
 
         // Add report checking whether a new base plank can be added with the currently specified data
@@ -200,7 +200,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         return newPlankField;
     }
 
-    protected PlankListSkin(PlankList<T> control, Class<T> genericRuntimeType) {
+    protected PlankListSkin(final PlankList<T> control, final Class<T> genericRuntimeType) {
         super(control);
 
         TextField searchField = new TextField();

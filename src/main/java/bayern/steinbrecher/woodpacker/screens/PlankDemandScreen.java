@@ -16,13 +16,13 @@ public class PlankDemandScreen extends Screen<PlankDemandScreenController> {
         this(null);
     }
 
-    public PlankDemandScreen(PlankProblem initialSetup) {
+    public PlankDemandScreen(final PlankProblem initialSetup) {
         super(PlankDemandScreen.class.getResource("PlankDemandScreen.fxml"), WoodPacker.LANGUAGE_BUNDLE);
         this.initialSetup = initialSetup;
     }
 
     @Override
-    protected void afterControllerIsInitialized(@NotNull PlankDemandScreenController controller) {
+    protected void afterControllerIsInitialized(@NotNull final PlankDemandScreenController controller) {
         super.afterControllerIsInitialized(controller);
         if (initialSetup != null) {
             controller.loadPlankProblem(initialSetup);

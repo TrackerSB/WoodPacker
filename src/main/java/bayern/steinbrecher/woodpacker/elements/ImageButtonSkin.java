@@ -19,7 +19,7 @@ import javafx.scene.text.TextAlignment;
 
 public class ImageButtonSkin extends SkinBase<ImageButton> {
 
-    public ImageButtonSkin(ImageButton control) {
+    public ImageButtonSkin(final ImageButton control) {
         super(control);
 
         StackPane contentHolder = new StackPane();

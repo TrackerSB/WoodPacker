@@ -21,7 +21,7 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
             PlankGrainDirection.VERTICAL, "plankGrainVertical.png"
     );
 
-    protected PlankGrainDirectionIndicatorSkin(PlankGrainDirectionIndicator control) {
+    protected PlankGrainDirectionIndicatorSkin(final PlankGrainDirectionIndicator control) {
         super(control);
 
         Button indicatorButton = new Button();
@@ -48,7 +48,7 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
                 .add(indicatorButton);
     }
 
-    public static ImageView generateImageView(PlankGrainDirection direction) {
+    public static ImageView generateImageView(final PlankGrainDirection direction) {
         String imageName = GRAIN_DIRECTION_SYMBOL_FILE_NAMES.get(direction);
         URL symbolResource = PlankGrainDirectionIndicatorSkin.class
                 .getResource(imageName);

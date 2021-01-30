@@ -34,7 +34,7 @@ import java.util.function.BiConsumer;
 public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
     private final BooleanProperty indicatorChangedByUser = new SimpleBooleanProperty(false);
 
-    private Node createPlankIdField(PlankField<T> control) {
+    private Node createPlankIdField(final PlankField<T> control) {
         CheckedTextField plankIdField = new CheckedTextField();
         plankIdField.setPromptText(WoodPacker.getResource("identifier"));
         plankIdField.textProperty()
@@ -51,7 +51,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         return new HBox(idIcon, plankIdField);
     }
 
-    private Node createGrainIndicator(PlankField<T> control) {
+    private Node createGrainIndicator(final PlankField<T> control) {
         PlankGrainDirectionIndicator indicator = new PlankGrainDirectionIndicator();
         control.grainDirectionProperty()
                 .bindBidirectional(indicator.valueProperty());
@@ -81,7 +81,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
     /**
      * @param forWidth {@code true} for width field; {@code false} for height field
      */
-    private Node createLengthField(PlankField<T> control, boolean forWidth) {
+    private Node createLengthField(final PlankField<T> control, final boolean forWidth) {
         CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1000, 1);
         // @formatter: off
         // widthField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankWidth.png');"); // FIXME Icon not showing up
@@ -108,7 +108,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         return content;
     }
 
-    private Node createCommentField(PlankField<T> control) {
+    private Node createCommentField(final PlankField<T> control) {
         TextField commentField = new TextField();
         commentField.setPromptText(WoodPacker.getResource("description"));
         control.commentProperty()
@@ -127,7 +127,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         return content;
     }
 
-    private Node createMaterialSelection(PlankField<T> control) {
+    private Node createMaterialSelection(final PlankField<T> control) {
         CheckedComboBox<PlankMaterial> materialSelection
                 = new CheckedComboBox<>(FXCollections.observableArrayList(PlankMaterial.values()));
         materialSelection.setEditable(false);
@@ -142,7 +142,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         return materialSelection;
     }
 
-    protected PlankFieldSkin(PlankField<T> control, Class<T> genericRuntimeType) {
+    protected PlankFieldSkin(final PlankField<T> control, final Class<T> genericRuntimeType) {
         super(control);
 
         Node plankIdField = createPlankIdField(control);

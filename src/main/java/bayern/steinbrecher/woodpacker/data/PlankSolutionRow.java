@@ -29,7 +29,8 @@ public class PlankSolutionRow {
      * @param maxLength     The maximum space in the direction in which {@link Plank}s are added
      * @param breadth       The maximum space orthogonal to the direction in which {@link Plank}s are added
      */
-    public PlankSolutionRow(Point2D startOffset, boolean addHorizontal, int maxLength, int breadth) {
+    public PlankSolutionRow(final Point2D startOffset, final boolean addHorizontal, final int maxLength,
+                            final int breadth) {
         this.startOffset = startOffset;
         this.addHorizontal = addHorizontal;
         this.maxLength = maxLength;
@@ -71,11 +72,11 @@ public class PlankSolutionRow {
         return currentLength;
     }
 
-    private int getPlankLength(Plank plank) {
+    private int getPlankLength(final Plank plank) {
         return addHorizontal() ? plank.getWidth() : plank.getHeight();
     }
 
-    private int getPlankBreadth(Plank plank) {
+    private int getPlankBreadth(final Plank plank) {
         return addHorizontal() ? plank.getHeight() : plank.getWidth();
     }
 
@@ -86,25 +87,25 @@ public class PlankSolutionRow {
                 .collect(Collectors.toSet());
     }
 
-    private boolean isRotatedAsRow(Plank plank) {
+    private boolean isRotatedAsRow(final Plank plank) {
         return getPlanks().isEmpty()
                 || plank.matchesGrainDirection(getPlanks().iterator().next().getGrainDirection());
     }
 
-    public boolean canContain(PlankSolutionRow toBeAdded) {
+    public boolean canContain(final PlankSolutionRow toBeAdded) {
         return (getCurrentLength() + toBeAdded.getCurrentLength()) < getMaxLength()
                 && toBeAdded.getBreadth() <= getBreadth()
                 && toBeAdded.getPlanks().stream().allMatch(p -> isRotatedAsRow(p) && !getPlanks().contains(p));
     }
 
-    public boolean canContain(Plank toBeAdded) {
+    public boolean canContain(final Plank toBeAdded) {
         return (getCurrentLength() + getPlankLength(toBeAdded)) <= getMaxLength()
                 && getPlankBreadth(toBeAdded) <= getBreadth()
                 && isRotatedAsRow(toBeAdded)
                 && !getPlanks().contains(toBeAdded);
     }
 
-    public boolean addPlank(RequiredPlank plank) {
+    public boolean addPlank(final RequiredPlank plank) {
         if (canContain(plank)) {
             boolean addedPlank = planks.add(plank);
             assert addedPlank : String.format(

@@ -12,7 +12,7 @@ public final class SerializationUtility {
         throw new UnsupportedOperationException("Construction of instances prohibited");
     }
 
-    public static <T extends Serializable> byte[] serialize(T toSerialize) throws IOException {
+    public static <T extends Serializable> byte[] serialize(final T toSerialize) throws IOException {
         ByteArrayOutputStream serializedBasePlank = new ByteArrayOutputStream();
         try (ObjectOutputStream serializer = new ObjectOutputStream(serializedBasePlank)) {
             serializer.writeObject(toSerialize);
@@ -21,7 +21,7 @@ public final class SerializationUtility {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Serializable> T deserialize(byte[] toDeserialize)
+    public static <T extends Serializable> T deserialize(final byte[] toDeserialize)
             throws IOException, ClassNotFoundException {
         try (ObjectInputStream deserializer = new ObjectInputStream(new ByteArrayInputStream(toDeserialize))) {
             Object deserializedObject = deserializer.readObject();

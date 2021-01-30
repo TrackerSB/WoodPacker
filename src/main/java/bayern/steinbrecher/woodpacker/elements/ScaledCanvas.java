@@ -102,7 +102,7 @@ public class ScaledCanvas extends Region {
         return theoreticalWidthProperty().get();
     }
 
-    public void setTheoreticalWidth(double theoreticalWidth) {
+    public void setTheoreticalWidth(final double theoreticalWidth) {
         theoreticalWidthProperty().set(theoreticalWidth);
     }
 
@@ -114,7 +114,7 @@ public class ScaledCanvas extends Region {
         return theoreticalHeightProperty().get();
     }
 
-    public void setTheoreticalHeight(double theoreticalHeight) {
+    public void setTheoreticalHeight(final double theoreticalHeight) {
         theoreticalHeightProperty().set(theoreticalHeight);
     }
 
@@ -126,7 +126,7 @@ public class ScaledCanvas extends Region {
         return drawingActionsProperty().get();
     }
 
-    public void setDrawingActions(Consumer<GraphicsContext> drawingActions) {
+    public void setDrawingActions(final Consumer<GraphicsContext> drawingActions) {
         drawingActionsProperty().set(drawingActions);
     }
 }

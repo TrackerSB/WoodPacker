@@ -18,11 +18,12 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
     private final PlankGrainDirection grainDirection;
     private final String comment;
 
-    public Plank(String id, int width, int height, PlankGrainDirection grainDirection) {
+    public Plank(final String id, final int width, final int height, final PlankGrainDirection grainDirection) {
         this(id, width, height, grainDirection, "");
     }
 
-    public Plank(String id, int width, int height, PlankGrainDirection grainDirection, String comment) {
+    public Plank(final String id, final int width, final int height, final PlankGrainDirection grainDirection,
+                 final String comment) {
         this.id = id;
         if (width <= 0) {
             throw new IllegalArgumentException("Width has to be positive");
@@ -61,14 +62,14 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
      * @return {@code true} iff this planks grain direction is compatible with direction of a plank from which this
      * plank might be cut out of.
      */
-    public boolean matchesGrainDirection(PlankGrainDirection direction) {
+    public boolean matchesGrainDirection(final PlankGrainDirection direction) {
         return direction == PlankGrainDirection.IRRELEVANT
                 || getGrainDirection() == PlankGrainDirection.IRRELEVANT
                 || getGrainDirection() == direction;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -85,7 +86,7 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
     }
 
     @Override
-    public int compareTo(Plank other) {
+    public int compareTo(final Plank other) {
         return Collator.getInstance()
                 .compare(this.getId(), other.getId());
     }

@@ -27,7 +27,7 @@ public class PlankGrainDirectionIndicator extends Control {
         return valueProperty().get();
     }
 
-    public void setValue(PlankGrainDirection direction) {
+    public void setValue(final PlankGrainDirection direction) {
         valueProperty().set(direction);
     }
 }

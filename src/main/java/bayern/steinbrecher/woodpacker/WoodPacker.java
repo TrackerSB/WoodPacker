@@ -34,7 +34,7 @@ public class WoodPacker extends Application {
     public static /*final*/ DialogGenerator DIALOG_GENERATOR = null;
 
     @Override
-    public void start(Stage primaryStage) throws ScreenSwitchFailedException {
+    public void start(final Stage primaryStage) throws ScreenSwitchFailedException {
         DIALOG_GENERATOR = new DialogGenerator(
                 primaryStage, Modality.APPLICATION_MODAL, StageStyle.UTILITY, DEFAULT_STYLESHEET_PATH);
 
@@ -49,7 +49,7 @@ public class WoodPacker extends Application {
         primaryStage.show();
     }
 
-    public static String getResource(String resourceKey, Object... arguments) {
+    public static String getResource(final String resourceKey, final Object... arguments) {
         if (LANGUAGE_BUNDLE.containsKey(resourceKey)) {
             return new MessageFormat(LANGUAGE_BUNDLE.getString(resourceKey))
                     .format(arguments);
