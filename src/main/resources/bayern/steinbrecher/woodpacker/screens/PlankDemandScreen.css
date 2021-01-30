@@ -16,7 +16,7 @@ Slider {
 }
 
 #exportPlanksButton {
-   -fx-graphic: url("export.png");
+    -fx-graphic: url("export.png");
 }
 
 #printPreview {
