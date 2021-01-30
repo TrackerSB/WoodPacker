@@ -86,11 +86,11 @@ public class PlankProblem implements Serializable {
             breadth = sortedPlanks.get(0)
                     .getWidth();
         }
-        PlankSolutionRow candidate = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, breadth);
-        Iterator<RequiredPlank> iterator = sortedPlanks.iterator();
+        final PlankSolutionRow candidate = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, breadth);
+        final Iterator<RequiredPlank> iterator = sortedPlanks.iterator();
         //noinspection StatementWithEmptyBody
-        while (iterator.hasNext() && candidate.addPlank(iterator.next())) {
-            // NOTE Operation already done by addPlank
+        while (iterator.hasNext() && candidate.addPlank(iterator.next())) { // NOPMD
+            // Operation already done by addPlank
         }
         return candidate;
     }
@@ -108,19 +108,19 @@ public class PlankProblem implements Serializable {
      */
     private Pair<List<PlankSolutionRow>, Set<RequiredPlank>> determineSolution(
             final BasePlank basePlank, final Set<RequiredPlank> requiredPlanks) {
-        List<PlankSolutionRow> placedPlanks = new ArrayList<>();
+        final List<PlankSolutionRow> placedPlanks = new ArrayList<>();
         Set<RequiredPlank> ignoredPlanks;
         if (basePlank == null) {
             ignoredPlanks = requiredPlanks;
         } else {
-            Collection<RequiredPlank> rotatedPlanks = requiredPlanks.stream()
+            final Collection<RequiredPlank> rotatedPlanks = requiredPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .collect(Collectors.toList());
-            List<RequiredPlank> planksToPlaceByHeight = rotatedPlanks.stream()
+            final List<RequiredPlank> planksToPlaceByHeight = rotatedPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .sorted((p1, p2) -> p2.getHeight() - p1.getHeight())
                     .collect(Collectors.toList());
-            List<RequiredPlank> planksToPlaceByWidth = rotatedPlanks.stream()
+            final List<RequiredPlank> planksToPlaceByWidth = rotatedPlanks.stream()
                     .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
                     .sorted((p1, p2) -> p2.getWidth() - p1.getWidth())
                     .collect(Collectors.toList());
@@ -128,17 +128,17 @@ public class PlankProblem implements Serializable {
             Optional<BasePlank> remainingBasePlank = Optional.of(basePlank);
             Point2D remainingBasePlankOffset = Point2D.ZERO;
             while (remainingBasePlank.isPresent() && !planksToPlaceByHeight.isEmpty()) {
-                PlankSolutionRow horizontalCandidate = createCandidate(
+                final PlankSolutionRow horizontalCandidate = createCandidate(
                         true, remainingBasePlankOffset, remainingBasePlank.get(), planksToPlaceByHeight);
-                PlankSolutionRow verticalCandidate = createCandidate(
+                final PlankSolutionRow verticalCandidate = createCandidate(
                         false, remainingBasePlankOffset, remainingBasePlank.get(), planksToPlaceByWidth);
 
                 if (horizontalCandidate.getPlanks().isEmpty()
                         && verticalCandidate.getPlanks().isEmpty()) {
                     remainingBasePlank = Optional.empty();
                 } else {
-                    double horizontalCandidateQuality = determineCandidateQuality(horizontalCandidate);
-                    double verticalCandidateQuality = determineCandidateQuality(verticalCandidate);
+                    final double horizontalCandidateQuality = determineCandidateQuality(horizontalCandidate);
+                    final double verticalCandidateQuality = determineCandidateQuality(verticalCandidate);
                     PlankSolutionRow bestCandidate;
                     if (horizontalCandidateQuality > verticalCandidateQuality) {
                         bestCandidate = horizontalCandidate;
@@ -192,11 +192,11 @@ public class PlankProblem implements Serializable {
         return criterionWeights;
     }
 
-    public double getCriterionWeight(PlankSolutionCriterion criterion) {
+    public double getCriterionWeight(final PlankSolutionCriterion criterion) {
         return criterionWeights.get(criterion);
     }
 
-    public void setCriterionWeight(PlankSolutionCriterion criterion, double weight) {
+    public void setCriterionWeight(final PlankSolutionCriterion criterion, double weight) {
         criterionWeights.put(criterion, weight);
     }
 
@@ -208,7 +208,7 @@ public class PlankProblem implements Serializable {
         return requiredPlanksProperty().get();
     }
 
-    public void setRequiredPlanks(ObservableSet<RequiredPlank> requiredPlanks) {
+    public void setRequiredPlanks(final ObservableSet<RequiredPlank> requiredPlanks) {
         requiredPlanksProperty().set(requiredPlanks);
     }
 
@@ -220,7 +220,7 @@ public class PlankProblem implements Serializable {
         return basePlankProperty().get();
     }
 
-    public void setBasePlank(BasePlank basePlank) {
+    public void setBasePlank(final BasePlank basePlank) {
         basePlankProperty().set(basePlank);
     }
 

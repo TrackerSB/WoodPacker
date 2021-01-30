@@ -35,7 +35,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
     private final BooleanProperty indicatorChangedByUser = new SimpleBooleanProperty(false);
 
     private Node createPlankIdField(final PlankField<T> control) {
-        CheckedTextField plankIdField = new CheckedTextField();
+        final CheckedTextField plankIdField = new CheckedTextField();
         plankIdField.setPromptText(WoodPacker.getResource("identifier"));
         plankIdField.textProperty()
                 .bindBidirectional(control.plankIdProperty());
@@ -44,7 +44,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         String externalIconPath = getClass()
                 .getResource("bookmark.png")
                 .toExternalForm();
-        ImageView idIcon = new ImageView(externalIconPath);
+        final ImageView idIcon = new ImageView(externalIconPath);
         idIcon.setPreserveRatio(true);
         idIcon.fitHeightProperty()
                 .bind(plankIdField.heightProperty());
@@ -52,11 +52,11 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
     }
 
     private Node createGrainIndicator(final PlankField<T> control) {
-        PlankGrainDirectionIndicator indicator = new PlankGrainDirectionIndicator();
+        final PlankGrainDirectionIndicator indicator = new PlankGrainDirectionIndicator();
         control.grainDirectionProperty()
                 .bindBidirectional(indicator.valueProperty());
 
-        Rectangle autoStateBackground = new Rectangle();
+        final Rectangle autoStateBackground = new Rectangle();
         autoStateBackground.setFill(Color.rgb(255, 255, 255, 0.5));
         autoStateBackground.widthProperty()
                 .bind(indicator.widthProperty());
@@ -65,11 +65,11 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         autoStateBackground.visibleProperty()
                 .bind(indicatorChangedByUser.not());
 
-        Text autoStateText = new Text("A");
+        final Text autoStateText = new Text("A");
         autoStateText.visibleProperty()
                 .bind(indicatorChangedByUser.not());
 
-        StackPane indicatorNode = new StackPane(indicator, autoStateBackground, autoStateText);
+        final StackPane indicatorNode = new StackPane(indicator, autoStateBackground, autoStateText);
         indicatorNode.setOnMouseClicked(mevt -> {
             indicatorChangedByUser.set(true);
             indicator.fireEvent(mevt); // FIXME This event does not reach the underlying button
@@ -82,53 +82,53 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
      * @param forWidth {@code true} for width field; {@code false} for height field
      */
     private Node createLengthField(final PlankField<T> control, final boolean forWidth) {
-        CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1000, 1);
+        final CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1000, 1);
         // @formatter: off
         // widthField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankWidth.png');"); // FIXME Icon not showing up
         // heightField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankHeight.png');"); // FIXME Icon not showing up
         // @formatter: on
         lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
-        IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
+        final IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
         lengthProperty.bind(lengthField.valueProperty());
         lengthProperty.addListener((ob, oldLength, newLength)
                 -> lengthField.getEditor().setText(String.valueOf(newLength)));
         control.addValidityConstraint(lengthField.validProperty());
 
-        String externalIconPath = getClass()
+        final String externalIconPath = getClass()
                 .getResource(forWidth ? "plankWidth.png" : "plankHeight.png")
                 .toExternalForm();
-        ImageView lengthIcon = new ImageView(externalIconPath);
+        final ImageView lengthIcon = new ImageView(externalIconPath);
         lengthIcon.setPreserveRatio(true);
         lengthIcon.fitHeightProperty()
                 .bind(lengthField.heightProperty());
 
-        HBox content = new HBox(lengthIcon, lengthField);
+        final HBox content = new HBox(lengthIcon, lengthField);
         content.setAlignment(Pos.CENTER_LEFT);
         return content;
     }
 
     private Node createCommentField(final PlankField<T> control) {
-        TextField commentField = new TextField();
+        final TextField commentField = new TextField();
         commentField.setPromptText(WoodPacker.getResource("description"));
         control.commentProperty()
                 .bindBidirectional(commentField.textProperty());
 
-        String externalIconPath = getClass()
+        final String externalIconPath = getClass()
                 .getResource("notepad.png")
                 .toExternalForm();
-        ImageView commentIcon = new ImageView(externalIconPath);
+        final ImageView commentIcon = new ImageView(externalIconPath);
         commentIcon.setPreserveRatio(true);
         commentIcon.fitHeightProperty()
                 .bind(commentField.heightProperty());
-        HBox content = new HBox(commentIcon, commentField);
+        final HBox content = new HBox(commentIcon, commentField);
         content.setAlignment(Pos.CENTER_LEFT);
         content.setSpacing(5);
         return content;
     }
 
     private Node createMaterialSelection(final PlankField<T> control) {
-        CheckedComboBox<PlankMaterial> materialSelection
+        final CheckedComboBox<PlankMaterial> materialSelection
                 = new CheckedComboBox<>(FXCollections.observableArrayList(PlankMaterial.values()));
         materialSelection.setEditable(false);
         materialSelection.getSelectionModel().select(PlankMaterial.UNDEFINED); // Ensure initial state
@@ -145,9 +145,9 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
     protected PlankFieldSkin(final PlankField<T> control, final Class<T> genericRuntimeType) {
         super(control);
 
-        Node plankIdField = createPlankIdField(control);
+        final Node plankIdField = createPlankIdField(control);
 
-        BiConsumer<Integer, Integer> autoUpdateIndicator = (plankWidth, plankHeight) -> {
+        final BiConsumer<Integer, Integer> autoUpdateIndicator = (plankWidth, plankHeight) -> {
             if (!indicatorChangedByUser.get()) {
                 control.setGrainDirection(
                         (plankHeight > plankWidth)
@@ -156,37 +156,37 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
             }
         };
 
-        Node widthField = createLengthField(control, true);
+        final Node widthField = createLengthField(control, true);
         control.plankWidthProperty()
                 .addListener((ob, oldWidth, newWidth)
                         -> autoUpdateIndicator.accept(newWidth.intValue(), control.getPlankHeight()));
 
-        Label separator = new Label("\u2a09");
+        final Label separator = new Label("\u2a09");
 
-        Node heightField = createLengthField(control, false);
+        final Node heightField = createLengthField(control, false);
         control.plankHeightProperty()
                 .addListener((ob, oldHeight, newHeight)
                         -> autoUpdateIndicator.accept(control.getPlankWidth(), newHeight.intValue()));
 
-        HBox sizeRow = new HBox(widthField, separator, heightField);
+        final HBox sizeRow = new HBox(widthField, separator, heightField);
         sizeRow.setAlignment(Pos.CENTER_LEFT);
 
-        HBox propertyRow = new HBox();
+        final HBox propertyRow = new HBox();
         propertyRow.setAlignment(Pos.CENTER_LEFT);
         propertyRow.setSpacing(5);
-        Node commentField = createCommentField(control);
+        final Node commentField = createCommentField(control);
         propertyRow.getChildren()
                 .add(commentField);
-        Node indicatorNode = createGrainIndicator(control);
+        final Node indicatorNode = createGrainIndicator(control);
         propertyRow.getChildren()
                 .add(indicatorNode);
         if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
-            Node materialSelection = createMaterialSelection(control);
+            final Node materialSelection = createMaterialSelection(control);
             propertyRow.getChildren()
                     .add(materialSelection);
         }
 
-        VBox content = new VBox(plankIdField, sizeRow, propertyRow);
+        final VBox content = new VBox(plankIdField, sizeRow, propertyRow);
         content.setAlignment(Pos.TOP_LEFT);
         content.setSpacing(5);
 

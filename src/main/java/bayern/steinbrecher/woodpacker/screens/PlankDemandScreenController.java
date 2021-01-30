@@ -88,14 +88,14 @@ public class PlankDemandScreenController extends ScreenController {
     private void readUserDefinedBasePlanks() {
         // FIXME Show graphical feedback to user in any case where a logger is used
         try {
-            for (String basePlankName : USER_DEFINED_BASE_PLANKS.keys()) {
-                byte[] serializedBasePlank = USER_DEFINED_BASE_PLANKS.getByteArray(basePlankName, null);
+            for (final String basePlankName : USER_DEFINED_BASE_PLANKS.keys()) {
+                final byte[] serializedBasePlank = USER_DEFINED_BASE_PLANKS.getByteArray(basePlankName, null);
                 if (serializedBasePlank == null) {
                     LOGGER.log(Level.WARNING,
                             String.format("The serialized data for '%s' is not available", basePlankName));
                 } else {
                     try {
-                        BasePlank basePlank = SerializationUtility.deserialize(serializedBasePlank);
+                        final BasePlank basePlank = SerializationUtility.deserialize(serializedBasePlank);
                         basePlankList.getPlanks()
                                 .add(basePlank);
                     } catch (IOException | ClassNotFoundException ex) {
@@ -110,7 +110,7 @@ public class PlankDemandScreenController extends ScreenController {
 
     private void initializeBasePlankList() {
         // Ensure planks being sorted
-        ObservableSet<BasePlank> sortedBasePlanks
+        final ObservableSet<BasePlank> sortedBasePlanks
                 = FXCollections.observableSet(new TreeSet<>(basePlankList.getPlanks()));
         basePlankList.setPlanks(sortedBasePlanks);
 
@@ -148,7 +148,7 @@ public class PlankDemandScreenController extends ScreenController {
 
     private void initializeRequiredPlanksList() {
         // Ensure planks being sorted
-        ObservableSet<RequiredPlank> sortedRequiredPlanks
+        final ObservableSet<RequiredPlank> sortedRequiredPlanks
                 = FXCollections.observableSet(new TreeSet<>(requiredPlanksView.getPlanks()));
         requiredPlanksView.setPlanks(sortedRequiredPlanks);
 
@@ -178,8 +178,8 @@ public class PlankDemandScreenController extends ScreenController {
     }
 
     private void initializeCriteriaPane() {
-        for (PlankSolutionCriterion criterion : PlankSolutionCriterion.values()) {
-            Slider weightControl = new Slider(0, 10, plankProblem.getCriterionWeight(criterion));
+        for (final PlankSolutionCriterion criterion : PlankSolutionCriterion.values()) {
+            final Slider weightControl = new Slider(0, 10, plankProblem.getCriterionWeight(criterion));
             weightControl.setShowTickLabels(true);
             weightControl.setShowTickMarks(true);
             weightControl.setSnapToTicks(true);
@@ -205,7 +205,7 @@ public class PlankDemandScreenController extends ScreenController {
                         }
                     });
 
-            String criterionDescription = WoodPacker.getResource(criterion.getResourceKey());
+            final String criterionDescription = WoodPacker.getResource(criterion.getResourceKey());
             criteriaPane.getChildren()
                     .addAll(new Label(criterionDescription), weightControl);
         }
@@ -240,10 +240,10 @@ public class PlankDemandScreenController extends ScreenController {
                     .unbind();
             visualPlankCuttingPlan.setTheoreticalHeight(basePlank.getHeight());
 
-            Consumer<GraphicsContext> basePlankActions = DrawActionGenerator.forBasePlank(basePlank);
-            Consumer<GraphicsContext> requiredPlanksActions
+            final Consumer<GraphicsContext> basePlankActions = DrawActionGenerator.forBasePlank(basePlank);
+            final Consumer<GraphicsContext> requiredPlanksActions
                     = DrawActionGenerator.forRequiredPlanks(basePlank, placedPlankRows);
-            Consumer<GraphicsContext> drawingActions = gc -> {
+            final Consumer<GraphicsContext> drawingActions = gc -> {
                 basePlankActions.accept(gc);
                 requiredPlanksActions.accept(gc);
             };
@@ -265,7 +265,7 @@ public class PlankDemandScreenController extends ScreenController {
                     plankProblemSaved.set(false);
                 });
         // Ensure initial state
-        Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
+        final Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
         updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), proposedSolution.getKey());
 
         // Creating binding signaling whether a cutting plan should be drawn
@@ -296,16 +296,16 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private boolean askUserExportPlankProblem() throws DialogCreationException {
         boolean exportSucceeded = false;
-        Optional<File> exportFile = PredefinedFileChooser.PLANK_PROBLEM
+        final Optional<File> exportFile = PredefinedFileChooser.PLANK_PROBLEM
                 .askForSavePath(requiredPlanksView.getScene().getWindow());
         if (exportFile.isPresent()) {
             try {
-                byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
+                final byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
                 Files.write(exportFile.get().toPath(), serializedSnapshot);
             } catch (IOException ex) {
                 LOGGER.log(Level.SEVERE,
                         String.format("Could export plank problem to '%s'", exportFile.get().getAbsolutePath()));
-                Alert exportFailedAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert exportFailedAlert = WoodPacker.DIALOG_GENERATOR
                         .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));
                 DialogGenerator.showAndWait(exportFailedAlert);
             }
@@ -323,13 +323,13 @@ public class PlankDemandScreenController extends ScreenController {
             switchToPreviousScreen();
         } else {
             try {
-                Alert unsavedChangesAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert unsavedChangesAlert = WoodPacker.DIALOG_GENERATOR
                         .createInteractiveAlert(
                                 AlertType.CONFIRMATION, WoodPacker.getResource("unsavedChanges"),
                                 ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-                Optional<ButtonType> userResponse = DialogGenerator.showAndWait(unsavedChangesAlert);
+                final Optional<ButtonType> userResponse = DialogGenerator.showAndWait(unsavedChangesAlert);
                 if (userResponse.isPresent()) {
-                    ButtonType buttonType = userResponse.get();
+                    final ButtonType buttonType = userResponse.get();
                     if (buttonType == ButtonType.YES) {
                         askUserExportPlankProblem();
                         if (isPlankProblemSaved()) {
@@ -347,9 +347,9 @@ public class PlankDemandScreenController extends ScreenController {
     }
 
     private Image generateCuttingPlan() throws IOException {
-        WritableImage snapshot = visualPlankCuttingPlan.snapshotDrawingArea();
-        BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
-        boolean rotateVertical = bufferedSnapshot.getWidth() > bufferedSnapshot.getHeight();
+        final WritableImage snapshot = visualPlankCuttingPlan.snapshotDrawingArea();
+        final BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
+        final boolean rotateVertical = bufferedSnapshot.getWidth() > bufferedSnapshot.getHeight();
         BufferedImage monochromeSnapshot;
         if (rotateVertical) {
             monochromeSnapshot = new BufferedImage(
@@ -358,7 +358,7 @@ public class PlankDemandScreenController extends ScreenController {
             monochromeSnapshot = new BufferedImage(
                     bufferedSnapshot.getWidth(), bufferedSnapshot.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
         }
-        Graphics2D monochromeSnapshotGraphics = monochromeSnapshot.createGraphics();
+        final Graphics2D monochromeSnapshotGraphics = monochromeSnapshot.createGraphics();
         if (rotateVertical) {
             // Move origin to right upper corner
             monochromeSnapshotGraphics.translate(
@@ -368,9 +368,9 @@ public class PlankDemandScreenController extends ScreenController {
                     -monochromeSnapshot.getHeight() / 2d, -monochromeSnapshot.getWidth() / 2d);
         }
         monochromeSnapshotGraphics.drawImage(bufferedSnapshot, 0, 0, null);
-        ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
+        final ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
         ImageIO.write(monochromeSnapshot, "png", snapshotByteStream);
-        Image snapshotImage = new Image(ImageDataFactory.create(snapshotByteStream.toByteArray()));
+        final Image snapshotImage = new Image(ImageDataFactory.create(snapshotByteStream.toByteArray()));
         snapshotImage.setAutoScale(true);
         return snapshotImage;
     }
@@ -378,22 +378,22 @@ public class PlankDemandScreenController extends ScreenController {
     @SuppressWarnings("unused")
     @FXML
     private void printPreview() throws DialogCreationException {
-        Optional<File> savePath = PredefinedFileChooser.CUTTING_PLAN
+        final Optional<File> savePath = PredefinedFileChooser.CUTTING_PLAN
                 .askForSavePath(requiredPlanksView.getScene().getWindow());
         if (savePath.isPresent()) {
             try (Document document = new Document(new PdfDocument(new PdfWriter(savePath.get())))) {
                 try {
-                    PdfDocumentInfo documentInfo = document.getPdfDocument()
+                    final PdfDocumentInfo documentInfo = document.getPdfDocument()
                             .getDocumentInfo();
                     documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
 
-                    Image cuttingPlan = generateCuttingPlan();
+                    final Image cuttingPlan = generateCuttingPlan();
                     float leftMargin = (document.getPdfDocument().getDefaultPageSize().getWidth()
                             - cuttingPlan.getImageWidth()) / 2;
                     cuttingPlan.setMarginLeft(leftMargin);
                     document.add(cuttingPlan);
                 } catch (IOException ex) {
-                    throw new ExportFailedException("Could not generate snapshot of cutting plan preview");
+                    throw new ExportFailedException("Could not generate snapshot of cutting plan preview", ex);
                 }
                 try {
                     Desktop.getDesktop()
@@ -404,13 +404,13 @@ public class PlankDemandScreenController extends ScreenController {
             } catch (FileNotFoundException ex) {
                 LOGGER.log(Level.SEVERE,
                         String.format("Could not open '%s' for writing", savePath.get().getAbsolutePath()), ex);
-                Alert writeAccessDeniedAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert writeAccessDeniedAlert = WoodPacker.DIALOG_GENERATOR
                         .createErrorAlert(WoodPacker.getResource(
                                 "writeAccessDenied", savePath.get().getAbsolutePath()));
                 DialogGenerator.showAndWait(writeAccessDeniedAlert);
             } catch (ExportFailedException ex) {
                 LOGGER.log(Level.SEVERE, "Could not export cutting plan", ex);
-                Alert cuttingPlanExportFailed = WoodPacker.DIALOG_GENERATOR
+                final Alert cuttingPlanExportFailed = WoodPacker.DIALOG_GENERATOR
                         .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));
                 DialogGenerator.showAndWait(cuttingPlanExportFailed);
             }

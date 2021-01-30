@@ -27,9 +27,9 @@ import java.util.function.Consumer;
  */
 public final class DrawActionGenerator {
     // Base planks drawing action configuration
-    private static final int minNumGrainIndicationSteps = 10;
-    private static final int maxNumGrainIndicationSteps = 50;
-    private static final int preferredGrainIndicationStepSize = 30;
+    private static final int MIN_NUM_GRAIN_INDICATION_STEPS = 10;
+    private static final int MAX_NUM_GRAIN_INDICATION_STEPS = 50;
+    private static final int PREFERRED_GRAIN_INDICATION_STEP_SIZE = 30;
 
     // Required planks drawing action configuration
     /**
@@ -47,11 +47,11 @@ public final class DrawActionGenerator {
             };
         }
 
-        List<Line> grainLines = switch (basePlank.getGrainDirection()) {
+        final List<Line> grainLines = switch (basePlank.getGrainDirection()) {
             case HORIZONTAL -> {
                 final int numSteps = CompareUtility.clamp(
-                        basePlank.getHeight() / preferredGrainIndicationStepSize,
-                        minNumGrainIndicationSteps, maxNumGrainIndicationSteps);
+                        basePlank.getHeight() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
+                        MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
                 final double stepSize = basePlank.getHeight() / (double) numSteps;
                 List<Line> lines = new ArrayList<>();
                 for (double yPos = stepSize; yPos < basePlank.getHeight(); yPos += stepSize) {
@@ -61,8 +61,8 @@ public final class DrawActionGenerator {
             }
             case VERTICAL -> {
                 final int numSteps = CompareUtility.clamp(
-                        basePlank.getWidth() / preferredGrainIndicationStepSize,
-                        minNumGrainIndicationSteps, maxNumGrainIndicationSteps);
+                        basePlank.getWidth() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
+                        MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
                 final double stepSize = basePlank.getWidth() / (double) numSteps;
                 List<Line> lines = new ArrayList<>();
                 for (double xPos = stepSize; xPos < basePlank.getWidth(); xPos += stepSize) {
@@ -73,8 +73,8 @@ public final class DrawActionGenerator {
             case IRRELEVANT -> {
                 final double topBottomXDelta = basePlank.getHeight() / Math.tan(Math.toRadians(45));
                 final int numSteps = CompareUtility.clamp(
-                        basePlank.getWidth() / preferredGrainIndicationStepSize,
-                        minNumGrainIndicationSteps, maxNumGrainIndicationSteps);
+                        basePlank.getWidth() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
+                        MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
                 final double stepSize = basePlank.getWidth() / (double) numSteps;
                 List<Line> lines = new ArrayList<>();
                 for (double xPos = -topBottomXDelta + stepSize; xPos < basePlank.getWidth(); xPos += stepSize) {
@@ -93,7 +93,7 @@ public final class DrawActionGenerator {
             gc.stroke();
             gc.closePath();
 
-            for (Line grainLine : grainLines) {
+            for (final Line grainLine : grainLines) {
                 gc.strokeLine(grainLine.getStartX(), grainLine.getStartY(),
                         grainLine.getEndX(), grainLine.getEndY());
             }
@@ -109,14 +109,14 @@ public final class DrawActionGenerator {
 
         return gc -> {
             gc.setTextAlign(TextAlignment.CENTER);
-            for (PlankSolutionRow row : placedPlankRows) {
-                Point2D rowToBasePlankOffset = row.getStartOffset();
+            for (final PlankSolutionRow row : placedPlankRows) {
+                final Point2D rowToBasePlankOffset = row.getStartOffset();
                 double plankToRowXOffset = 0;
                 double plankToRowYOffset = 0;
-                for (Plank plank : row.getPlanks()) {
+                for (final Plank plank : row.getPlanks()) {
                     // Draw plank shape
-                    double plankXPos = rowToBasePlankOffset.getX() + plankToRowXOffset;
-                    double plankYPos = rowToBasePlankOffset.getY() + plankToRowYOffset;
+                    final double plankXPos = rowToBasePlankOffset.getX() + plankToRowXOffset;
+                    final double plankYPos = rowToBasePlankOffset.getY() + plankToRowYOffset;
 
                     gc.beginPath();
                     gc.rect(plankXPos, plankYPos, plank.getWidth(), plank.getHeight());
@@ -126,21 +126,21 @@ public final class DrawActionGenerator {
                     gc.stroke();
                     gc.closePath();
 
-                    boolean drawLabelVertical = plank.getHeight() > plank.getWidth();
+                    final boolean drawLabelVertical = plank.getHeight() > plank.getWidth();
                     // Size in text direction
-                    double availableLength = drawLabelVertical ? plank.getHeight() : plank.getWidth();
+                    final double availableLength = drawLabelVertical ? plank.getHeight() : plank.getWidth();
                     // Size orthogonal to text direction
-                    double availableHeight = drawLabelVertical ? plank.getWidth() : plank.getHeight();
+                    final double availableHeight = drawLabelVertical ? plank.getWidth() : plank.getHeight();
 
                     // Draw plank label
                     gc.setTextBaseline(VPos.CENTER);
                     gc.setFill(Color.BLACK);
-                    double maxLabelLength = MAX_LABEL_SIZE_FACTOR * availableLength;
-                    double maxLabelHeight = MAX_LABEL_SIZE_FACTOR * availableHeight;
-                    double labelFontSize = Math.min(basePlank.getHeight() / 20d, maxLabelHeight);
+                    final double maxLabelLength = MAX_LABEL_SIZE_FACTOR * availableLength;
+                    final double maxLabelHeight = MAX_LABEL_SIZE_FACTOR * availableHeight;
+                    final double labelFontSize = Math.min(basePlank.getHeight() / 20d, maxLabelHeight);
                     gc.setFont(Font.font(labelFontSize));
-                    double labelXOffset = plankXPos + (plank.getWidth() / 2d);
-                    double labelYOffset = plankYPos + (plank.getHeight() / 2d);
+                    final double labelXOffset = plankXPos + (plank.getWidth() / 2d);
+                    final double labelYOffset = plankYPos + (plank.getHeight() / 2d);
                     if (drawLabelVertical) {
                         gc.translate(labelXOffset, labelYOffset);
                         gc.rotate(-90);
@@ -152,7 +152,7 @@ public final class DrawActionGenerator {
                     }
 
                     // Draw dimensioning labels
-                    double dimensioningLabelFontSize
+                    final double dimensioningLabelFontSize
                             = Math.min(availableLength - maxLabelLength, availableHeight - maxLabelHeight) / 2;
                     gc.setFont(Font.font(dimensioningLabelFontSize));
                     gc.setTextBaseline(VPos.TOP);
@@ -177,8 +177,8 @@ public final class DrawActionGenerator {
                 }
 
                 gc.setStroke(Color.RED);
-                double rowWidth = row.addHorizontal() ? row.getCurrentLength() : row.getBreadth();
-                double rowHeight = row.addHorizontal() ? row.getBreadth() : row.getCurrentLength();
+                final double rowWidth = row.addHorizontal() ? row.getCurrentLength() : row.getBreadth();
+                final double rowHeight = row.addHorizontal() ? row.getBreadth() : row.getCurrentLength();
                 gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
             }
         };

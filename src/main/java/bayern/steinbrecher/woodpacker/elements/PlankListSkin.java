@@ -48,28 +48,28 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
     private final BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
 
     private Node generateItemGraphic(final Plank item) {
-        Text idText = new Text(item.getId());
+        final Text idText = new Text(item.getId());
         idText.setFill(Color.WHITE);
         idText.setFont(ID_BADGE_FONT);
-        double backgroundWidth = Math.max(idText.getBoundsInLocal().getWidth(), ID_BADGE_MIN_WIDTH)
+        final double backgroundWidth = Math.max(idText.getBoundsInLocal().getWidth(), ID_BADGE_MIN_WIDTH)
                 + (2 * ID_BADGE_PADDING);
-        Rectangle idBackground = new Rectangle(backgroundWidth, 2 * ID_BADGE_FONT.getSize(), Color.BLACK);
+        final Rectangle idBackground = new Rectangle(backgroundWidth, 2 * ID_BADGE_FONT.getSize(), Color.BLACK);
         idBackground.setArcWidth(idBackground.getHeight() / 2);
         idBackground.setArcHeight(idBackground.getHeight() / 2);
-        StackPane idBadge = new StackPane(idBackground, idText);
-        ImageView grainDirectionIcon
+        final StackPane idBadge = new StackPane(idBackground, idText);
+        final ImageView grainDirectionIcon
                 = PlankGrainDirectionIndicatorSkin.generateImageView(item.getGrainDirection());
-        HBox content = new HBox(idBadge, grainDirectionIcon);
+        final HBox content = new HBox(idBadge, grainDirectionIcon);
         content.setAlignment(Pos.CENTER_LEFT);
         content.setSpacing(10);
         return content;
     }
 
-    private Node createPlankView(final PlankList<T> control, TextField searchField) {
-        ListView<T> planksView = new ListView<>();
+    private Node createPlankView(final PlankList<T> control, final TextField searchField) {
+        final ListView<T> planksView = new ListView<>();
         // Sync control --> planksView
-        ChangeListener<ObservableSet<T>> onPlanksChanged = (obs, previousSet, currentSet) -> {
-            FilteredList<T> filterableItems = new FilteredList<>(FXCollections.observableArrayList(currentSet));
+        final ChangeListener<ObservableSet<T>> onPlanksChanged = (obs, previousSet, currentSet) -> {
+            final FilteredList<T> filterableItems = new FilteredList<>(FXCollections.observableArrayList(currentSet));
             searchField.textProperty()
                     .addListener((obss, previousSearchText, currentSearchText) -> {
                         String lowerCaseSearchText = currentSearchText
@@ -102,7 +102,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
 
         planksView.setCellFactory(list -> new ListCell<>() {
             @Override
-            protected void updateItem(T item, boolean empty) {
+            protected void updateItem(final T item, final boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
                     setText("");
@@ -111,7 +111,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                 } else {
                     setText(item.toString());
                     if (item instanceof RequiredPlank) {
-                        RequiredPlank requiredPlank = (RequiredPlank) item;
+                        final RequiredPlank requiredPlank = (RequiredPlank) item;
                         textFillProperty()
                                 .bind(new When(requiredPlank.placedInSolutionProperty())
                                         .then(Color.BLACK)
@@ -124,11 +124,11 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
 
                     setGraphic(generateItemGraphic(item));
 
-                    ImageView deletePlankItemGraphic
+                    final ImageView deletePlankItemGraphic
                             = new ImageView(getClass().getResource("trash.png").toExternalForm());
                     deletePlankItemGraphic.setFitHeight(20);
                     deletePlankItemGraphic.setPreserveRatio(true);
-                    MenuItem deletePlankItem
+                    final MenuItem deletePlankItem
                             = new MenuItem(WoodPacker.getResource("delete"), deletePlankItemGraphic);
                     deletePlankItem.setOnAction(evt -> control.getPlanks().remove(item));
                     setContextMenu(new ContextMenu(deletePlankItem));
@@ -142,7 +142,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         planksView.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, previousItem, currentItem) -> control.setSelectedPlank(currentItem));
-        ChangeListener<Optional<T>> onModelSelectedPlankChanged = (obs, previouslySelected, currentlySelected) -> {
+        final ChangeListener<Optional<T>> onModelSelectedPlankChanged = (obs, previouslySelected, currentlySelected) -> {
             /* NOTE 2021-01-15: The underlying ListView does not guarantee the uniqueness of planks. If there is
              * some bug which results in having multiple identical planks in the ListView then trying to select
              * the "selected plank" in the model in the ListView may change the "selected plank" in the model
@@ -164,7 +164,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         // Ensure initial state
         onModelSelectedPlankChanged.changed(null, null, control.getSelectedPlank());
 
-        ScrollPane scrollablePlanksView = new ScrollPane(planksView);
+        final ScrollPane scrollablePlanksView = new ScrollPane(planksView);
         scrollablePlanksView.setFitToWidth(true);
         scrollablePlanksView.setFitToHeight(true);
         VBox.setVgrow(scrollablePlanksView, Priority.ALWAYS);
@@ -181,13 +181,13 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
     }
 
     private PlankField<T> createNewPlankField(final PlankList<T> control, final Class<T> genericRuntimeType) {
-        PlankField<T> newPlankField = new PlankField<>(genericRuntimeType);
+        final PlankField<T> newPlankField = new PlankField<>(genericRuntimeType);
 
         // Add report checking whether a new base plank can be added with the currently specified data
         newPlankField.plankIdProperty()
                 .addListener(
                         (observable, previousId, currentId) -> updateBasePlankNameAlreadyExists(control, currentId));
-        ChangeListener<ObservableSet<T>> onItemsPropertyUpdate = (obs, previousItemList, currentItemList) -> {
+        final ChangeListener<ObservableSet<T>> onItemsPropertyUpdate = (obs, previousItemList, currentItemList) -> {
             updateBasePlankNameAlreadyExists(control, newPlankField.getPlankId());
             currentItemList.addListener((InvalidationListener) obss
                     -> updateBasePlankNameAlreadyExists(control, newPlankField.getPlankId()));
@@ -203,16 +203,16 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
     protected PlankListSkin(final PlankList<T> control, final Class<T> genericRuntimeType) {
         super(control);
 
-        TextField searchField = new TextField();
+        final TextField searchField = new TextField();
         searchField.setPromptText(WoodPacker.getResource("searchFor"));
 
-        Node plankView = createPlankView(control, searchField);
-        PlankField<T> newPlankField = createNewPlankField(control, genericRuntimeType);
+        final Node plankView = createPlankView(control, searchField);
+        final PlankField<T> newPlankField = createNewPlankField(control, genericRuntimeType);
 
-        ImageView addPlankGraphic = new ImageView(getClass().getResource("add.png").toExternalForm());
+        final ImageView addPlankGraphic = new ImageView(getClass().getResource("add.png").toExternalForm());
         addPlankGraphic.setFitHeight(20);
         addPlankGraphic.setPreserveRatio(true);
-        Button addPlankButton = new Button(WoodPacker.getResource("add"), addPlankGraphic);
+        final Button addPlankButton = new Button(WoodPacker.getResource("add"), addPlankGraphic);
         newPlankField.validProperty()
                 .addListener((obs, wasValid, isValid) -> addPlankButton.setDisable(!isValid));
         addPlankButton.setOnAction(aevt -> {
@@ -225,26 +225,26 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         });
         ButtonBar.setButtonData(addPlankButton, ButtonData.APPLY);
 
-        ImageView clearAllPlanksGraphic = new ImageView(
+        final ImageView clearAllPlanksGraphic = new ImageView(
                 getClass().getResource("clearedClipboard.png").toExternalForm());
         clearAllPlanksGraphic.setFitHeight(20);
         clearAllPlanksGraphic.setPreserveRatio(true);
-        Button clearAllPlanksButton
+        final Button clearAllPlanksButton
                 = new Button(WoodPacker.getResource("clearAll"), clearAllPlanksGraphic);
         clearAllPlanksButton.setOnAction(aevt -> control.getPlanks().clear());
 
-        ChangeListener<Boolean> onPlankListEmptyChanged
+        final ChangeListener<Boolean> onPlankListEmptyChanged
                 = (obs, wasEmpty, isEmpty) -> clearAllPlanksButton.setDisable(isEmpty);
         control.planksProperty()
                 .emptyProperty()
                 .addListener(onPlankListEmptyChanged);
         onPlankListEmptyChanged.changed(null, null, control.getPlanks().isEmpty());
 
-        ButtonBar actionsBar = new ButtonBar();
+        final ButtonBar actionsBar = new ButtonBar();
         actionsBar.getButtons()
                 .addAll(addPlankButton, clearAllPlanksButton);
 
-        VBox content = new VBox(searchField, plankView, newPlankField, actionsBar);
+        final VBox content = new VBox(searchField, plankView, newPlankField, actionsBar);
         content.setSpacing(5);
         content.setAlignment(Pos.TOP_LEFT);
         getChildren()
