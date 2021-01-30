@@ -3,6 +3,7 @@ package bayern.steinbrecher.woodpacker.screens;
 import bayern.steinbrecher.javaUtility.DialogCreationException;
 import bayern.steinbrecher.javaUtility.DialogGenerator;
 import bayern.steinbrecher.screenSwitcher.ScreenController;
+import bayern.steinbrecher.woodpacker.BuildConfig;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
@@ -17,6 +18,7 @@ import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Image;
@@ -29,7 +31,6 @@ import javafx.collections.SetChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -45,6 +46,7 @@ import javafx.util.Pair;
 
 import javax.imageio.ImageIO;
 import java.awt.Desktop;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -343,6 +345,35 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
+    private Image generateCuttingPlan() throws IOException {
+        WritableImage snapshot = visualPlankCuttingPlan.snapshotDrawingArea();
+        BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
+        boolean rotateVertical = bufferedSnapshot.getWidth() > bufferedSnapshot.getHeight();
+        BufferedImage monochromeSnapshot;
+        if (rotateVertical) {
+            monochromeSnapshot = new BufferedImage(
+                    bufferedSnapshot.getHeight(), bufferedSnapshot.getWidth(), BufferedImage.TYPE_BYTE_BINARY);
+        } else {
+            monochromeSnapshot = new BufferedImage(
+                    bufferedSnapshot.getWidth(), bufferedSnapshot.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+        }
+        Graphics2D monochromeSnapshotGraphics = monochromeSnapshot.createGraphics();
+        if (rotateVertical) {
+            // Move origin to right upper corner
+            monochromeSnapshotGraphics.translate(
+                    monochromeSnapshot.getWidth() / 2d, monochromeSnapshot.getHeight() / 2d);
+            monochromeSnapshotGraphics.rotate(Math.PI / 2);
+            monochromeSnapshotGraphics.translate(
+                    -monochromeSnapshot.getHeight() / 2d, -monochromeSnapshot.getWidth() / 2d);
+        }
+        monochromeSnapshotGraphics.drawImage(bufferedSnapshot, 0, 0, null);
+        ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
+        ImageIO.write(monochromeSnapshot, "png", snapshotByteStream);
+        Image snapshotImage = new Image(ImageDataFactory.create(snapshotByteStream.toByteArray()));
+        snapshotImage.setAutoScale(true);
+        return snapshotImage;
+    }
+
     @SuppressWarnings("unused")
     @FXML
     private void printPreview() throws DialogCreationException {
@@ -350,15 +381,19 @@ public class PlankDemandScreenController extends ScreenController {
                 .askForSavePath(requiredPlanksView.getScene().getWindow());
         if (savePath.isPresent()) {
             try (Document document = new Document(new PdfDocument(new PdfWriter(savePath.get())))) {
-                WritableImage snapshot = visualPlankCuttingPlan.snapshot(new SnapshotParameters(), null);
-                BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
-                BufferedImage monochromeSnapshot = new BufferedImage(
-                        bufferedSnapshot.getWidth(), bufferedSnapshot.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
-                monochromeSnapshot.createGraphics()
-                        .drawImage(bufferedSnapshot, 0, 0, null);
-                ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
-                ImageIO.write(monochromeSnapshot, "png", snapshotByteStream);
-                document.add(new Image(ImageDataFactory.create(snapshotByteStream.toByteArray())));
+                try {
+                    PdfDocumentInfo documentInfo = document.getPdfDocument()
+                            .getDocumentInfo();
+                    documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
+
+                    Image cuttingPlan = generateCuttingPlan();
+                    float leftMargin = (document.getPdfDocument().getDefaultPageSize().getWidth()
+                            - cuttingPlan.getImageWidth()) / 2;
+                    cuttingPlan.setMarginLeft(leftMargin);
+                    document.add(cuttingPlan);
+                } catch (IOException ex) {
+                    throw new ExportFailedException("Could not generate snapshot of cutting plan preview");
+                }
                 try {
                     Desktop.getDesktop()
                             .open(savePath.get());
@@ -372,7 +407,7 @@ public class PlankDemandScreenController extends ScreenController {
                         .createErrorAlert(WoodPacker.getResource(
                                 "writeAccessDenied", savePath.get().getAbsolutePath()));
                 DialogGenerator.showAndWait(writeAccessDeniedAlert);
-            } catch (IOException ex) {
+            } catch (ExportFailedException ex) {
                 LOGGER.log(Level.SEVERE, "Could not export cutting plan", ex);
                 Alert cuttingPlanExportFailed = WoodPacker.DIALOG_GENERATOR
                         .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));

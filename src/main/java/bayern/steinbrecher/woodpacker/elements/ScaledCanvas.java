@@ -6,8 +6,10 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -30,10 +32,9 @@ public class ScaledCanvas extends Region {
     private final DoubleProperty theoreticalWidth = new SimpleDoubleProperty();
     private final DoubleProperty theoreticalHeight = new SimpleDoubleProperty();
     private final ObjectProperty<Consumer<GraphicsContext>> drawingActions = new SimpleObjectProperty<>();
+    private final Canvas drawingArea = new Canvas();
 
     public ScaledCanvas() {
-        Canvas drawingArea = new Canvas();
-
         // Fit content holder to expected user defined dimensions
         StackPane contentHolder = new StackPane(drawingArea);
         contentHolder.minWidthProperty()
@@ -87,6 +88,10 @@ public class ScaledCanvas extends Region {
         theoreticalHeightProperty().addListener(observable -> redraw.run());
         theoreticalToActualDrawingAreaFactor.addListener(observable -> redraw.run());
         drawingActionsProperty().addListener(observable -> redraw.run());
+    }
+
+    public WritableImage snapshotDrawingArea() {
+        return drawingArea.snapshot(new SnapshotParameters(), null);
     }
 
     public DoubleProperty theoreticalWidthProperty() {
