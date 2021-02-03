@@ -13,6 +13,9 @@ import java.io.Serial;
  * @since 0.1
  */
 public class RequiredPlank extends Plank {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    // FIXME Should there be a subclass of RequiredPlank like PlacedPlank containing the following additional property?
     // FIXME Solely PlankProblem::determineSolution(...) should be allowed to change this member
     private transient /*final*/ BooleanProperty placedInSolution = new SimpleBooleanProperty(false);
 
