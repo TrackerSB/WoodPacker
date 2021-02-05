@@ -89,7 +89,7 @@ public class PlankProblem implements Serializable {
     private double determineCandidateQuality(final PlankSolutionRow candidate) {
         return criterionWeights.entrySet()
                 .stream()
-                .mapToDouble(criterion -> criterion.getKey().getRating(candidate) * criterion.getValue())
+                .mapToDouble(criterion -> criterion.getKey().getRating(candidate, this) * criterion.getValue())
                 .sum();
     }
 
@@ -185,8 +185,14 @@ public class PlankProblem implements Serializable {
                     placedPlanks.add(bestCandidate);
                     bestCandidate.getPlanks()
                             .forEach(p -> {
-                                p.setPlacedInSolution(true);
-                                unplacedPlank.removeIf(up -> up.getPivot().equals(p));
+                                unplacedPlank.removeIf(up -> {
+                                    final RequiredPlank pivot = up.getPivot();
+                                    final boolean wasPlaced = pivot.equals(p);
+                                    if (wasPlaced) {
+                                        pivot.setPlacedInSolution(true);
+                                    }
+                                    return wasPlaced;
+                                });
                             });
                 }
             }

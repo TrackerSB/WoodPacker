@@ -8,34 +8,38 @@ public enum PlankSolutionCriterion {
     BREATH_DIFFERENCES("breadthDifferences") {
         /**
          * The less the breadths of the planks differs the better. Having exactly one breadth is perfect.
-         * @return Values in [0; 1]
          */
         @Override
-        public double getRating(final PlankSolutionRow solutionRow) {
+        public double getRating(final PlankSolutionRow solutionRow, final PlankProblem plankProblem) {
             final int numBreadths = solutionRow.getBreadths()
                     .size();
-            return (numBreadths > 0) ? (1d / numBreadths) : 0;
+            return (numBreadths > 0) ? (1d / numBreadths) : 0d;
         }
     },
-    NUM_PLANKS("numPlanks"){
+    NUM_PLANKS("numPlanks") {
         /**
          * The more planks in a row the better.
-         * @return Values in [0; Inf)
          */
         @Override
-        public double getRating(PlankSolutionRow solutionRow) {
-            return solutionRow.getPlanks()
-                    .size();
+        public double getRating(PlankSolutionRow solutionRow, final PlankProblem plankProblem) {
+            return ((double) solutionRow.getPlanks().size())
+                    / plankProblem.getRequiredPlanks().size();
         }
     },
     ROW_SPACE_WASTE("rowSpaceWaste") {
         /**
          * The less space a row wastes the better.
-         * @return Values in [0; 1]
          */
         @Override
-        public double getRating(final PlankSolutionRow solutionRow) {
-            return ((double) solutionRow.getCurrentLength()) / solutionRow.getMaxLength();
+        public double getRating(final PlankSolutionRow solutionRow, final PlankProblem plankProblem) {
+            final int usedArea = solutionRow.getUsedArea();
+            if (usedArea <= 0) {
+                return 0d;
+            }
+            return ((double) solutionRow.getPlanks()
+                    .stream()
+                    .mapToInt(RequiredPlank::getArea)
+                    .sum()) / usedArea;
         }
     };
     private final String resourceKey;
@@ -47,10 +51,12 @@ public enum PlankSolutionCriterion {
     /**
      * Rate the given row without considering any weight.
      *
-     * @param solutionRow The {@link PlankSolutionRow} to rate.
-     * @return The higher the returned value the better the criterion is fulfilled.
+     * @param solutionRow  The {@link PlankSolutionRow} to rate.
+     * @param plankProblem The {@link PlankProblem} the {@link PlankSolutionRow} to rate belongs to.
+     * @return The returned values area normalized to [0; 1]. The higher the returned value the better the criterion is
+     * fulfilled.
      */
-    public abstract double getRating(final PlankSolutionRow solutionRow);
+    public abstract double getRating(final PlankSolutionRow solutionRow, final PlankProblem plankProblem);
 
     public String getResourceKey() {
         return resourceKey;

@@ -37,6 +37,7 @@ public class PlankSolutionRow {
         this.maxLength = maxLength;
         this.maxBreadth = maxBreath;
 
+        // FIXME Is this additional sorting required?
         // If horizontal row sort by height descending; otherwise sort by width descending
         final Function<Plank, Integer> compareMethod = addHorizontal() ? Plank::getHeight : Plank::getWidth;
         final Comparator<Plank> descendingBreadthComparator = (pA, pB) -> {
@@ -51,6 +52,8 @@ public class PlankSolutionRow {
 
     public PlankSolutionRow(final PlankSolutionRow toCopy) {
         this(toCopy.getStartOffset(), toCopy.addHorizontal(), toCopy.getMaxLength(), toCopy.getMaxBreadth());
+        currentBreadth = toCopy.getCurrentBreadth();
+        currentLength = toCopy.getCurrentLength();
         planks.addAll(toCopy.getPlanks());
     }
 
@@ -80,6 +83,10 @@ public class PlankSolutionRow {
 
     public int getCurrentBreadth() {
         return currentBreadth;
+    }
+
+    public int getUsedArea() {
+        return getCurrentBreadth() * getCurrentLength();
     }
 
     private int getPlankLength(final Plank plank) {
