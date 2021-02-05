@@ -5,19 +5,34 @@ package bayern.steinbrecher.woodpacker.data;
  * @since 0.1
  */
 public enum PlankSolutionCriterion {
-    /**
-     * The less the breadths of the planks differs the better.
-     */
     BREATH_DIFFERENCES("breadthDifferences") {
+        /**
+         * The less the breadths of the planks differs the better. Having exactly one breadth is perfect.
+         * @return Values in [0; 1]
+         */
         @Override
         public double getRating(final PlankSolutionRow solutionRow) {
-            return 1d / solutionRow.getBreadths().size();
+            final int numBreadths = solutionRow.getBreadths()
+                    .size();
+            return (numBreadths > 0) ? (1d / numBreadths) : 0;
         }
     },
-    /**
-     * The less space a row wastes the better.
-     */
+    NUM_PLANKS("numPlanks"){
+        /**
+         * The more planks in a row the better.
+         * @return Values in [0; Inf)
+         */
+        @Override
+        public double getRating(PlankSolutionRow solutionRow) {
+            return solutionRow.getPlanks()
+                    .size();
+        }
+    },
     ROW_SPACE_WASTE("rowSpaceWaste") {
+        /**
+         * The less space a row wastes the better.
+         * @return Values in [0; 1]
+         */
         @Override
         public double getRating(final PlankSolutionRow solutionRow) {
             return ((double) solutionRow.getCurrentLength()) / solutionRow.getMaxLength();

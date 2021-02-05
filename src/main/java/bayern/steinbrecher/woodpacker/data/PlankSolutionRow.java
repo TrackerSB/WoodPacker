@@ -18,23 +18,24 @@ public class PlankSolutionRow {
     private final Point2D startOffset;
     private final boolean addHorizontal;
     private final int maxLength;
-    private final int breadth;
+    private final int maxBreadth;
     private final SortedSet<RequiredPlank> planks;
     private int currentLength;
+    private int currentBreadth;
 
     /**
      * @param startOffset   The position in the base plank space of the left upper corner
      * @param addHorizontal The direction in which {@link Plank}s are added. {@code true} iff adding in X direction,
      *                      {@code false} iff adding in Y direction.
      * @param maxLength     The maximum space in the direction in which {@link Plank}s are added
-     * @param breadth       The maximum space orthogonal to the direction in which {@link Plank}s are added
+     * @param maxBreath     The maximum space orthogonal to the direction in which {@link Plank}s are added
      */
     public PlankSolutionRow(final Point2D startOffset, final boolean addHorizontal, final int maxLength,
-                            final int breadth) {
+                            final int maxBreath) {
         this.startOffset = startOffset;
         this.addHorizontal = addHorizontal;
         this.maxLength = maxLength;
-        this.breadth = breadth;
+        this.maxBreadth = maxBreath;
 
         // If horizontal row sort by height descending; otherwise sort by width descending
         final Function<Plank, Integer> compareMethod = addHorizontal() ? Plank::getHeight : Plank::getWidth;
@@ -46,6 +47,11 @@ public class PlankSolutionRow {
             return (diff == 0) ? pA.getId().compareTo(pB.getId()) : diff;
         };
         this.planks = new TreeSet<>(descendingBreadthComparator);
+    }
+
+    public PlankSolutionRow(final PlankSolutionRow toCopy) {
+        this(toCopy.getStartOffset(), toCopy.addHorizontal(), toCopy.getMaxLength(), toCopy.getMaxBreadth());
+        planks.addAll(toCopy.getPlanks());
     }
 
     public Point2D getStartOffset() {
@@ -60,8 +66,8 @@ public class PlankSolutionRow {
         return maxLength;
     }
 
-    public int getBreadth() {
-        return breadth;
+    public int getMaxBreadth() {
+        return maxBreadth;
     }
 
     public Set<RequiredPlank> getPlanks() {
@@ -70,6 +76,10 @@ public class PlankSolutionRow {
 
     public int getCurrentLength() {
         return currentLength;
+    }
+
+    public int getCurrentBreadth() {
+        return currentBreadth;
     }
 
     private int getPlankLength(final Plank plank) {
@@ -94,13 +104,13 @@ public class PlankSolutionRow {
 
     public boolean canContain(final PlankSolutionRow toBeAdded) {
         return (getCurrentLength() + toBeAdded.getCurrentLength()) < getMaxLength()
-                && toBeAdded.getBreadth() <= getBreadth()
+                && toBeAdded.getCurrentBreadth() <= getMaxBreadth()
                 && toBeAdded.getPlanks().stream().allMatch(p -> isRotatedAsRow(p) && !getPlanks().contains(p));
     }
 
     public boolean canContain(final Plank toBeAdded) {
         return (getCurrentLength() + getPlankLength(toBeAdded)) <= getMaxLength()
-                && getPlankBreadth(toBeAdded) <= getBreadth()
+                && getPlankBreadth(toBeAdded) <= getMaxBreadth()
                 && isRotatedAsRow(toBeAdded)
                 && !getPlanks().contains(toBeAdded);
     }
@@ -112,6 +122,7 @@ public class PlankSolutionRow {
             assert addedPlank : String.format(
                     "Plank '%s' was not added even though the row could contain it", plank.getId());
             currentLength = getCurrentLength() + getPlankLength(plank);
+            currentBreadth = Math.max(getCurrentBreadth(), getPlankBreadth(plank));
         }
         return containable;
     }

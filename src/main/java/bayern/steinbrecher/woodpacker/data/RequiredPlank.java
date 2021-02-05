@@ -37,6 +37,10 @@ public class RequiredPlank extends Plank {
         return new RequiredPlank(getId(), getHeight(), getWidth(), rotatedGrainDirection, getComment());
     }
 
+    public int getArea() {
+        return getHeight() * getWidth();
+    }
+
     @Serial
     private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
         input.defaultReadObject();

@@ -21,13 +21,16 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +40,18 @@ import java.util.stream.Collectors;
 public class PlankProblem implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+    /**
+     * Sort {@link PlankSolutionRow} by descending area and ascending by the name of the pivot element ascending.
+     */
+    private static final Comparator<PlankVariationGroup> plankVariationGroupComparator = (rpA, rpB) -> {
+        final RequiredPlank pivotA = rpA.getPivot();
+        final RequiredPlank pivotB = rpB.getPivot();
+        final int areaDifference = pivotB.getArea() - pivotA.getArea();
+        if (areaDifference == 0) {
+            return pivotA.getId().compareTo(pivotB.getId());
+        }
+        return areaDifference;
+    };
     private transient /*final*/ ObservableMap<PlankSolutionCriterion, Double> criterionWeights;
     private transient /*final*/ SetProperty<RequiredPlank> requiredPlanks;
     private transient /*final*/ ObjectProperty<BasePlank> basePlank;
@@ -71,35 +86,51 @@ public class PlankProblem implements Serializable {
         proposedSolution = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
     }
 
-    private static PlankSolutionRow createCandidate(final boolean horizontal, final Point2D basePlankOffset,
-                                                    final Plank basePlank, final List<RequiredPlank> sortedPlanks) {
-        assert !sortedPlanks.isEmpty() : "No planks left for creating a candidate";
-        // NOTE Assume planks are sorted by height if horizontal is true; sorted by width otherwise
-        int maxLength;
-        int breadth;
-        if (horizontal) {
-            maxLength = basePlank.getWidth();
-            breadth = sortedPlanks.get(0)
-                    .getHeight();
-        } else {
-            maxLength = basePlank.getHeight();
-            breadth = sortedPlanks.get(0)
-                    .getWidth();
-        }
-        final PlankSolutionRow candidate = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, breadth);
-        final Iterator<RequiredPlank> iterator = sortedPlanks.iterator();
-        //noinspection StatementWithEmptyBody
-        while (iterator.hasNext() && candidate.addPlank(iterator.next())) { // NOPMD
-            // Operation already done by addPlank
-        }
-        return candidate;
-    }
-
     private double determineCandidateQuality(final PlankSolutionRow candidate) {
         return criterionWeights.entrySet()
                 .stream()
                 .mapToDouble(criterion -> criterion.getKey().getRating(candidate) * criterion.getValue())
                 .sum();
+    }
+
+    private PlankSolutionRow createCandidate(
+            final boolean horizontal, final Point2D basePlankOffset, final Plank availablePlank,
+            final Set<PlankVariationGroup> plankVariations) {
+        assert !plankVariations.isEmpty() : "No planks left for creating a candidate";
+        int maxLength;
+        int maxBreadth;
+        if (horizontal) {
+            maxLength = availablePlank.getWidth();
+            maxBreadth = availablePlank.getHeight();
+        } else {
+            maxLength = availablePlank.getHeight();
+            maxBreadth = availablePlank.getWidth();
+        }
+        final PlankSolutionRow finalCandidate
+                = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, maxBreadth);
+        double finalQuality = determineCandidateQuality(finalCandidate);
+        for (PlankVariationGroup group : plankVariations) {
+            final Optional<Pair<RequiredPlank, Double>> optBestVariant = group.getVariations()
+                    .stream()
+                    .map(v -> {
+                        final PlankSolutionRow currentVariant = new PlankSolutionRow(finalCandidate);
+                        if (currentVariant.addPlank(v)) {
+                            final double currentVariantQuality = determineCandidateQuality(currentVariant);
+                            return new Pair<>(v, currentVariantQuality);
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .max(Comparator.comparing(Pair::getValue));
+            if (optBestVariant.isPresent()) {
+                final Pair<RequiredPlank, Double> bestVariant = optBestVariant.get();
+                if (bestVariant.getValue() > finalQuality) {
+                    finalCandidate.addPlank(bestVariant.getKey());
+                    finalQuality = bestVariant.getValue();
+                }
+            }
+        }
+        return finalCandidate;
     }
 
     /**
@@ -113,25 +144,25 @@ public class PlankProblem implements Serializable {
         if (basePlank == null) {
             ignoredPlanks = requiredPlanks;
         } else {
-            final Collection<RequiredPlank> rotatedPlanks = requiredPlanks.stream()
-                    .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
-                    .collect(Collectors.toList());
-            final List<RequiredPlank> planksToPlaceByHeight = rotatedPlanks.stream()
-                    .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
-                    .sorted((p1, p2) -> p2.getHeight() - p1.getHeight())
-                    .collect(Collectors.toList());
-            final List<RequiredPlank> planksToPlaceByWidth = rotatedPlanks.stream()
-                    .map(plank -> plank.matchesGrainDirection(basePlank.getGrainDirection()) ? plank : plank.rotated())
-                    .sorted((p1, p2) -> p2.getWidth() - p1.getWidth())
-                    .collect(Collectors.toList());
+            /* The following collection contains all not yet placed planks in all variations in which they are allowed.
+             * In case the base plank as well as the required plank have a grain direction there is only one allowed
+             * variation of the plank. If either the base plank or the required plank have no grain direction the
+             * collection contains two versions of the plank (i.e. rotated and not rotated).
+             */
+            final SortedSet<PlankVariationGroup> unplacedPlank = requiredPlanks.stream()
+                    .peek(rp -> rp.setPlacedInSolution(false))
+                    .map(rp -> new PlankVariationGroup(rp, basePlank))
+                    // Sort by area decreasing
+                    .collect(Collectors.toCollection(() -> new TreeSet<>(plankVariationGroupComparator)));
 
             Optional<BasePlank> remainingBasePlank = Optional.of(basePlank);
-            Point2D remainingBasePlankOffset = Point2D.ZERO;
-            while (remainingBasePlank.isPresent() && !planksToPlaceByHeight.isEmpty()) {
+            // FIXME There may be more than a single position where to place the next candidate
+            Point2D remainingBasePlankOffset = Point2D.ZERO; // Left upper corner
+            while (remainingBasePlank.isPresent() && !unplacedPlank.isEmpty()) {
                 final PlankSolutionRow horizontalCandidate = createCandidate(
-                        true, remainingBasePlankOffset, remainingBasePlank.get(), planksToPlaceByHeight);
+                        true, remainingBasePlankOffset, remainingBasePlank.get(), unplacedPlank);
                 final PlankSolutionRow verticalCandidate = createCandidate(
-                        false, remainingBasePlankOffset, remainingBasePlank.get(), planksToPlaceByWidth);
+                        false, remainingBasePlankOffset, remainingBasePlank.get(), unplacedPlank);
 
                 if (horizontalCandidate.getPlanks().isEmpty()
                         && verticalCandidate.getPlanks().isEmpty()) {
@@ -143,23 +174,26 @@ public class PlankProblem implements Serializable {
                     if (horizontalCandidateQuality > verticalCandidateQuality) {
                         bestCandidate = horizontalCandidate;
                         remainingBasePlank = remainingBasePlank.get()
-                                .heightDecreased(bestCandidate.getBreadth());
-                        remainingBasePlankOffset = remainingBasePlankOffset.add(0, bestCandidate.getBreadth());
+                                .heightDecreased(bestCandidate.getCurrentBreadth());
+                        remainingBasePlankOffset = remainingBasePlankOffset.add(0, bestCandidate.getCurrentBreadth());
                     } else {
                         bestCandidate = verticalCandidate;
                         remainingBasePlank = remainingBasePlank.get()
-                                .widthDecreased(bestCandidate.getBreadth());
-                        remainingBasePlankOffset = remainingBasePlankOffset.add(bestCandidate.getBreadth(), 0);
+                                .widthDecreased(bestCandidate.getCurrentBreadth());
+                        remainingBasePlankOffset = remainingBasePlankOffset.add(bestCandidate.getCurrentBreadth(), 0);
                     }
                     placedPlanks.add(bestCandidate);
                     bestCandidate.getPlanks()
-                            .forEach(p -> p.setPlacedInSolution(true));
-                    planksToPlaceByHeight.removeAll(bestCandidate.getPlanks());
-                    planksToPlaceByWidth.removeAll(bestCandidate.getPlanks());
+                            .forEach(p -> {
+                                p.setPlacedInSolution(true);
+                                unplacedPlank.removeIf(up -> up.getPivot().equals(p));
+                            });
                 }
             }
             // NOTE Ignored planks may not have same rotation as initially given
-            ignoredPlanks = new HashSet<>(planksToPlaceByWidth);
+            ignoredPlanks = unplacedPlank.stream()
+                    .map(PlankVariationGroup::getPivot)
+                    .collect(Collectors.toSet());
             ignoredPlanks.forEach(p -> p.setPlacedInSolution(false));
         }
         return new Pair<>(placedPlanks, ignoredPlanks);
@@ -230,5 +264,54 @@ public class PlankProblem implements Serializable {
 
     public Pair<List<PlankSolutionRow>, Set<RequiredPlank>> getProposedSolution() {
         return proposedSolutionProperty().get();
+    }
+
+    private static class PlankVariationGroup {
+        private final RequiredPlank pivot;
+        private final List<RequiredPlank> variations = new ArrayList<>();
+
+        public PlankVariationGroup(RequiredPlank pivot, BasePlank basePlank) {
+            this.pivot = pivot;
+
+            /* A plank can be placed if either its grain direction the base planks grain direction is irrelevant or
+             * the grain direction matches the base planks grain direction.
+             */
+            if (pivot.matchesGrainDirection(basePlank.getGrainDirection())) {
+                variations.add(pivot);
+            }
+            RequiredPlank rotatedPivot = pivot.rotated();
+            if (rotatedPivot.matchesGrainDirection(basePlank.getGrainDirection())) {
+                variations.add(pivot.rotated());
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            PlankVariationGroup that = (PlankVariationGroup) o;
+            return this.getPivot().equals(that.getPivot());
+        }
+
+        @Override
+        public int hashCode() {
+            return getPivot().hashCode();
+        }
+
+        /**
+         * @return The pivot element which yielded all variations. NOTE It is not necessarily the case that this pivot
+         * is an allowed variation itself.
+         */
+        public RequiredPlank getPivot() {
+            return pivot;
+        }
+
+        public List<RequiredPlank> getVariations() {
+            return Collections.unmodifiableList(variations);
+        }
     }
 }

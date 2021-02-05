@@ -177,8 +177,8 @@ public final class DrawActionGenerator {
                 }
 
                 gc.setStroke(Color.RED);
-                final double rowWidth = row.addHorizontal() ? row.getCurrentLength() : row.getBreadth();
-                final double rowHeight = row.addHorizontal() ? row.getBreadth() : row.getCurrentLength();
+                final double rowWidth = row.addHorizontal() ? row.getCurrentLength() : row.getCurrentBreadth();
+                final double rowHeight = row.addHorizontal() ? row.getCurrentBreadth() : row.getCurrentLength();
                 gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
             }
         };
