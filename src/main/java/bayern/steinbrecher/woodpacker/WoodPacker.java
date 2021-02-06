@@ -44,6 +44,12 @@ public class WoodPacker extends Application {
                 .add(DEFAULT_STYLESHEET_PATH);
         screenManager.switchTo(new WelcomeScreen());
         primaryStage.setFullScreen(true);
+        primaryStage.fullScreenProperty()
+                .addListener((obs, wasFullScreen, isFullScreen) -> {
+                    if (wasFullScreen) {
+                        primaryStage.setMaximized(true);
+                    }
+                });
         primaryStage.getIcons()
                 .add(new Image(getClass().getResource("logo.png").toExternalForm()));
         primaryStage.show();
