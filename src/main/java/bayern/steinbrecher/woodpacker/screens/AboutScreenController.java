@@ -73,19 +73,19 @@ public class AboutScreenController extends ScreenController {
 
         int currentRow = 0;
         for (final Pair<String, Collection<String>> entry : AUTHOR_INFO_ENTRIES) {
-            authorInfo.add(new Text(entry.getKey()), 0, currentRow);
+            authorInfo.add(new Text(entry.getKey()), 0, currentRow); // NOPMD
             final String rolesList = entry.getValue()
                     .stream()
                     .map(WoodPacker::getResource)
                     .collect(Collectors.joining(", "));
-            authorInfo.add(new Text(rolesList), 1, currentRow);
+            authorInfo.add(new Text(rolesList), 1, currentRow); // NOPMD
             currentRow++;
         }
 
         currentRow = 0;
         for (final Pair<String, String> entry : BUILD_INFO_ENTRIES) {
-            buildInfo.add(new Text(WoodPacker.getResource(entry.getKey())), 0, currentRow);
-            buildInfo.add(new Text(entry.getValue()), 1, currentRow);
+            buildInfo.add(new Text(WoodPacker.getResource(entry.getKey())), 0, currentRow); // NOPMD
+            buildInfo.add(new Text(entry.getValue()), 1, currentRow); // NOPMD
             currentRow++;
         }
 

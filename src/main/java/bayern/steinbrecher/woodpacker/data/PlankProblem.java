@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,12 +46,12 @@ public class PlankProblem implements Serializable {
     /**
      * Sort {@link PlankSolutionRow} by descending area and ascending by the name of the pivot element ascending.
      */
-    private static final Comparator<PlankVariationGroup> plankVariationGroupComparator = (rpA, rpB) -> {
+    private static final Comparator<PlankVariationGroup> VARIATION_GROUP_SORTER = (rpA, rpB) -> {
         final RequiredPlank pivotA = rpA.getPivot();
         final RequiredPlank pivotB = rpB.getPivot();
         final int areaDifference = pivotB.getArea() - pivotA.getArea();
         if (areaDifference == 0) {
-            return pivotA.getId().compareTo(pivotB.getId());
+            return pivotA.getPlankId().compareTo(pivotB.getPlankId());
         }
         return areaDifference;
     };
@@ -111,7 +112,7 @@ public class PlankProblem implements Serializable {
         final PlankSolutionRow finalCandidate
                 = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, maxBreadth);
         double finalQuality = determineCandidateQuality(finalCandidate);
-        for (PlankVariationGroup group : plankVariations) {
+        for (final PlankVariationGroup group : plankVariations) {
             final Optional<Pair<RequiredPlank, Double>> optBestVariant = group.getVariations()
                     .stream()
                     .map(v -> {
@@ -155,9 +156,9 @@ public class PlankProblem implements Serializable {
                     .peek(rp -> rp.setPlacedInSolution(false))
                     .map(rp -> new PlankVariationGroup(rp, basePlank))
                     // Sort by area decreasing
-                    .collect(Collectors.toCollection(() -> new TreeSet<>(plankVariationGroupComparator)));
+                    .collect(Collectors.toCollection(() -> new TreeSet<>(VARIATION_GROUP_SORTER)));
 
-            Map<Point2D, BasePlank> remainingPartitions = new HashMap<>();
+            final Map<Point2D, BasePlank> remainingPartitions = new ConcurrentHashMap<>();
             remainingPartitions.put(Point2D.ZERO, basePlank);
             while (!remainingPartitions.isEmpty() && !unplacedPlank.isEmpty()) {
                 // Determine best candidate
@@ -299,7 +300,7 @@ public class PlankProblem implements Serializable {
         private final RequiredPlank pivot;
         private final List<RequiredPlank> variations = new ArrayList<>();
 
-        public PlankVariationGroup(RequiredPlank pivot, BasePlank basePlank) {
+        public PlankVariationGroup(final RequiredPlank pivot, final BasePlank basePlank) {
             this.pivot = pivot;
 
             /* A plank can be placed if either its grain direction the base planks grain direction is irrelevant or
@@ -308,22 +309,24 @@ public class PlankProblem implements Serializable {
             if (pivot.matchesGrainDirection(basePlank.getGrainDirection())) {
                 variations.add(pivot);
             }
-            RequiredPlank rotatedPivot = pivot.rotated();
+            final RequiredPlank rotatedPivot = pivot.rotated();
             if (rotatedPivot.matchesGrainDirection(basePlank.getGrainDirection())) {
                 variations.add(pivot.rotated());
             }
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
+        public boolean equals(Object other) {
+            boolean isEqual;
+            if (this == other) {
+                isEqual = true;
+            } else if (other == null || getClass() != other.getClass()) {
+                isEqual = false;
+            } else {
+                final PlankVariationGroup that = (PlankVariationGroup) other;
+                isEqual = this.getPivot().equals(that.getPivot());
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            PlankVariationGroup that = (PlankVariationGroup) o;
-            return this.getPivot().equals(that.getPivot());
+            return isEqual;
         }
 
         @Override

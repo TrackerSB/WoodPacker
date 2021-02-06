@@ -121,7 +121,7 @@ public class PlankDemandScreenController extends ScreenController {
                     if (change.wasAdded()) {
                         try {
                             USER_DEFINED_BASE_PLANKS.putByteArray(
-                                    change.getElementAdded().getId(),
+                                    change.getElementAdded().getPlankId(),
                                     SerializationUtility.serialize(change.getElementAdded()));
                         } catch (IOException ex) {
                             LOGGER.log(Level.WARNING, "Could not persistently store new base plank", ex);
@@ -129,7 +129,7 @@ public class PlankDemandScreenController extends ScreenController {
                         }
                     }
                     if (change.wasRemoved()) {
-                        USER_DEFINED_BASE_PLANKS.remove(change.getElementRemoved().getId());
+                        USER_DEFINED_BASE_PLANKS.remove(change.getElementRemoved().getPlankId());
                     }
                     // FIXME Treat change.wasUpdated()?
                 });
@@ -179,7 +179,7 @@ public class PlankDemandScreenController extends ScreenController {
 
     private void initializeCriteriaPane() {
         for (final PlankSolutionCriterion criterion : PlankSolutionCriterion.values()) {
-            final Slider weightControl = new Slider(0, 10, plankProblem.getCriterionWeight(criterion));
+            final Slider weightControl = new Slider(0, 10, plankProblem.getCriterionWeight(criterion)); // NOPMD
             weightControl.setShowTickLabels(true);
             weightControl.setShowTickMarks(true);
             weightControl.setSnapToTicks(true);
@@ -207,7 +207,7 @@ public class PlankDemandScreenController extends ScreenController {
 
             final String criterionDescription = WoodPacker.getResource(criterion.getResourceKey());
             criteriaPane.getChildren()
-                    .addAll(new Label(criterionDescription), weightControl);
+                    .addAll(new Label(criterionDescription), weightControl); // NOPMD
         }
     }
 

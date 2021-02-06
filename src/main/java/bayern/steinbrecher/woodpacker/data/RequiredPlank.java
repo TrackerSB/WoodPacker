@@ -19,13 +19,14 @@ public class RequiredPlank extends Plank {
     // FIXME Solely PlankProblem::determineSolution(...) should be allowed to change this member
     private transient /*final*/ BooleanProperty placedInSolution = new SimpleBooleanProperty(false);
 
-    public RequiredPlank(final String id, final int width, final int height, final PlankGrainDirection grainDirection) {
-        super(id, width, height, grainDirection);
+    public RequiredPlank(final String plankId, final int width, final int height,
+                         final PlankGrainDirection grainDirection) {
+        super(plankId, width, height, grainDirection);
     }
 
-    public RequiredPlank(final String id, final int width, final int height, final PlankGrainDirection grainDirection,
-                         final String comment) {
-        super(id, width, height, grainDirection, comment);
+    public RequiredPlank(final String plankId, final int width, final int height,
+                         final PlankGrainDirection grainDirection, final String comment) {
+        super(plankId, width, height, grainDirection, comment);
     }
 
     public RequiredPlank rotated() {
@@ -34,7 +35,7 @@ public class RequiredPlank extends Plank {
             case VERTICAL -> PlankGrainDirection.HORIZONTAL;
             case IRRELEVANT -> PlankGrainDirection.IRRELEVANT;
         };
-        return new RequiredPlank(getId(), getHeight(), getWidth(), rotatedGrainDirection, getComment());
+        return new RequiredPlank(getPlankId(), getHeight(), getWidth(), rotatedGrainDirection, getComment());
     }
 
     public int getArea() {
@@ -55,12 +56,14 @@ public class RequiredPlank extends Plank {
 
     @Override
     public String toString() {
+        String plankDescription;
         if (getComment() == null || getComment().isBlank()) {
-            return String.format("\"%s\": %d [mm] x %d [mm]", getId(), getWidth(), getHeight());
+            plankDescription = String.format("\"%s\": %d [mm] x %d [mm]", getPlankId(), getWidth(), getHeight());
         } else {
-            return String.format("\"%s\": %d [mm] x %d [mm]\n%s",
-                    getId(), getWidth(), getHeight(), getComment());
+            plankDescription = String.format("\"%s\": %d [mm] x %d [mm]\n%s",
+                    getPlankId(), getWidth(), getHeight(), getComment());
         }
+        return plankDescription;
     }
 
     public BooleanProperty placedInSolutionProperty() {

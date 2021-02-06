@@ -150,7 +150,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         final BiConsumer<Integer, Integer> autoUpdateIndicator = (plankWidth, plankHeight) -> {
             if (!indicatorChangedByUser.get()) {
                 control.setGrainDirection(
-                        (plankHeight > plankWidth)
+                        (plankHeight > plankWidth) // NOPMD - Parenthesis clarify structure
                                 ? PlankGrainDirection.VERTICAL
                                 : PlankGrainDirection.HORIZONTAL);
             }

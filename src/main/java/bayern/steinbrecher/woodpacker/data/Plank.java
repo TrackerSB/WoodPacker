@@ -12,19 +12,19 @@ import java.util.Objects;
 public abstract class Plank implements Comparable<Plank>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private final String id;
+    private final String plankId;
     private final int width; // in mm
     private final int height; // in mm
     private final PlankGrainDirection grainDirection;
     private final String comment;
 
-    public Plank(final String id, final int width, final int height, final PlankGrainDirection grainDirection) {
-        this(id, width, height, grainDirection, "");
+    public Plank(final String plankId, final int width, final int height, final PlankGrainDirection grainDirection) {
+        this(plankId, width, height, grainDirection, "");
     }
 
-    public Plank(final String id, final int width, final int height, final PlankGrainDirection grainDirection,
+    public Plank(final String plankId, final int width, final int height, final PlankGrainDirection grainDirection,
                  final String comment) {
-        this.id = id;
+        this.plankId = plankId;
         if (width <= 0) {
             throw new IllegalArgumentException("Width has to be positive");
         }
@@ -37,8 +37,8 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
         this.comment = comment;
     }
 
-    public String getId() {
-        return id;
+    public String getPlankId() {
+        return plankId;
     }
 
     public int getWidth() {
@@ -69,25 +69,27 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
+    public boolean equals(final Object other) {
+        boolean isEqual;
+        if (this == other) {
+            isEqual = true;
+        } else if (other == null || getClass() != other.getClass()) {
+            isEqual = false;
+        } else {
+            final Plank plank = (Plank) other;
+            isEqual = getPlankId().equals(plank.getPlankId());
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Plank plank = (Plank) o;
-        return getId().equals(plank.getId());
+        return isEqual;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getPlankId());
     }
 
     @Override
     public int compareTo(final Plank other) {
         return Collator.getInstance()
-                .compare(this.getId(), other.getId());
+                .compare(this.getPlankId(), other.getPlankId());
     }
 }

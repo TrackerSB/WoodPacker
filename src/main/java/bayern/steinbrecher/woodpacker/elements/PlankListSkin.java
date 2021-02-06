@@ -48,7 +48,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
     private final BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
 
     private Node generateItemGraphic(final Plank item) {
-        final Text idText = new Text(item.getId());
+        final Text idText = new Text(item.getPlankId());
         idText.setFill(Color.WHITE);
         idText.setFont(ID_BADGE_FONT);
         final double backgroundWidth = Math.max(idText.getBoundsInLocal().getWidth(), ID_BADGE_MIN_WIDTH)
@@ -65,9 +65,8 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         return content;
     }
 
-    private Node createPlankView(final PlankList<T> control, final TextField searchField) {
-        final ListView<T> planksView = new ListView<>();
-        // Sync control --> planksView
+    private void setupSyncPlanksView(
+            final ListView<T> planksView, final PlankList<T> control, final TextField searchField) {
         final ChangeListener<ObservableSet<T>> onPlanksChanged = (obs, previousSet, currentSet) -> {
             final FilteredList<T> filterableItems = new FilteredList<>(FXCollections.observableArrayList(currentSet));
             searchField.textProperty()
@@ -76,7 +75,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                                 .toLowerCase(Locale.ROOT);
                         filterableItems.setPredicate(
                                 plank -> {
-                                    String lowerCaseId = plank.getId()
+                                    String lowerCaseId = plank.getPlankId()
                                             .toLowerCase(Locale.ROOT);
                                     String lowerCaseComment = plank.getComment()
                                             .toLowerCase(Locale.ROOT);
@@ -99,6 +98,40 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         control.planksProperty()
                 .addListener(onPlanksChanged);
         onPlanksChanged.changed(null, null, control.getPlanks()); // Ensure initial state
+    }
+
+    private void syncSelectedPlank(final PlankList<T> control, final ListView<T> planksView) {
+        planksView.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, previousItem, currentItem) -> control.setSelectedPlank(currentItem));
+        final ChangeListener<Optional<T>> onModelSelectedPlankChanged =
+                (obs, previouslySelected, currentlySelected) -> {
+                    /* NOTE 2021-01-15: The underlying ListView does not guarantee the uniqueness of planks. If there is
+                     * some bug which results in having multiple identical planks in the ListView then trying to select
+                     * the "selected plank" in the model in the ListView may change the "selected plank" in the model
+                     * once more due to its ambiguity. In this case an infinite recursion in the sync could be the
+                     * result.
+                     */
+                    if (currentlySelected.isPresent()) {
+                        if (!currentlySelected.get().equals(planksView.getSelectionModel().getSelectedItem())) {
+                            planksView.getSelectionModel()
+                                    .select(currentlySelected.get());
+                        }
+                    } else {
+                        planksView.getSelectionModel()
+                                .clearSelection();
+                    }
+                };
+        control.selectedPlankProperty()
+                .addListener(onModelSelectedPlankChanged);
+        // Ensure initial state
+        onModelSelectedPlankChanged.changed(null, null, control.getSelectedPlank());
+    }
+
+    private Node createPlankView(final PlankList<T> control, final TextField searchField) {
+        final ListView<T> planksView = new ListView<>();
+
+        setupSyncPlanksView(planksView, control, searchField);
 
         planksView.setCellFactory(list -> new ListCell<>() {
             @Override
@@ -138,31 +171,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         planksView.getSelectionModel()
                 .setSelectionMode(SelectionMode.SINGLE);
 
-        // Sync visually selected plank <--> selected plank in model
-        planksView.getSelectionModel()
-                .selectedItemProperty()
-                .addListener((obs, previousItem, currentItem) -> control.setSelectedPlank(currentItem));
-        final ChangeListener<Optional<T>> onModelSelectedPlankChanged = (obs, previouslySelected, currentlySelected) -> {
-            /* NOTE 2021-01-15: The underlying ListView does not guarantee the uniqueness of planks. If there is
-             * some bug which results in having multiple identical planks in the ListView then trying to select
-             * the "selected plank" in the model in the ListView may change the "selected plank" in the model
-             * once more due to its ambiguity. In this case an infinite recursion in the sync could be the
-             * result.
-             */
-            if (currentlySelected.isPresent()) {
-                if (!currentlySelected.get().equals(planksView.getSelectionModel().getSelectedItem())) {
-                    planksView.getSelectionModel()
-                            .select(currentlySelected.get());
-                }
-            } else {
-                planksView.getSelectionModel()
-                        .clearSelection();
-            }
-        };
-        control.selectedPlankProperty()
-                .addListener(onModelSelectedPlankChanged);
-        // Ensure initial state
-        onModelSelectedPlankChanged.changed(null, null, control.getSelectedPlank());
+        syncSelectedPlank(control, planksView);
 
         final ScrollPane scrollablePlanksView = new ScrollPane(planksView);
         scrollablePlanksView.setFitToWidth(true);
@@ -176,7 +185,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         basePlankNameAlreadyExists.set(
                 control.getPlanks()
                         .stream()
-                        .anyMatch(plank -> plank.getId().equals(idForNewPlank))
+                        .anyMatch(plank -> plank.getPlankId().equals(idForNewPlank))
         );
     }
 

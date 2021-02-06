@@ -72,17 +72,17 @@ public class ScaledCanvas extends Region {
 
         // Trigger redraw
         final Runnable redraw = () -> {
-            GraphicsContext gc = drawingArea.getGraphicsContext2D();
-            gc.save(); // Ensure that the set scales do not stack on each redraw
-            gc.setFill(Color.WHITE);
-            gc.fillRect(0, 0, drawingArea.getWidth(), drawingArea.getHeight());
-            gc.scale(theoreticalToActualDrawingAreaFactor.doubleValue(),
+            GraphicsContext context = drawingArea.getGraphicsContext2D();
+            context.save(); // Ensure that the set scales do not stack on each redraw
+            context.setFill(Color.WHITE);
+            context.fillRect(0, 0, drawingArea.getWidth(), drawingArea.getHeight());
+            context.scale(theoreticalToActualDrawingAreaFactor.doubleValue(),
                     theoreticalToActualDrawingAreaFactor.doubleValue());
             if (getDrawingActions() != null) {
                 getDrawingActions()
-                        .accept(gc);
+                        .accept(context);
             }
-            gc.restore();
+            context.restore();
         };
         contentHolder.widthProperty().addListener(observable -> redraw.run());
         contentHolder.heightProperty().addListener(observable -> redraw.run());

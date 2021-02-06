@@ -56,12 +56,14 @@ public class WoodPacker extends Application {
     }
 
     public static String getResource(final String resourceKey, final Object... arguments) {
+        String resource;
         if (LANGUAGE_BUNDLE.containsKey(resourceKey)) {
-            return new MessageFormat(LANGUAGE_BUNDLE.getString(resourceKey))
+            resource = new MessageFormat(LANGUAGE_BUNDLE.getString(resourceKey))
                     .format(arguments);
         } else {
             LOGGER.log(Level.WARNING, String.format("Could not find resource for key '%s'", resourceKey));
-            return resourceKey;
+            resource = resourceKey;
         }
+        return resource;
     }
 }

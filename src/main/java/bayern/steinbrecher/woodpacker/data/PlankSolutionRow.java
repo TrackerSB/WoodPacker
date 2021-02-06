@@ -45,7 +45,7 @@ public class PlankSolutionRow {
             /* NOTE The IDs of the planks have to be considered since otherwise the sorted set of planks could not
              * contain planks of the same size.
              */
-            return (diff == 0) ? pA.getId().compareTo(pB.getId()) : diff;
+            return (diff == 0) ? pA.getPlankId().compareTo(pB.getPlankId()) : diff;
         };
         this.planks = new TreeSet<>(descendingBreadthComparator);
     }
@@ -127,7 +127,7 @@ public class PlankSolutionRow {
         if (containable) {
             final boolean addedPlank = planks.add(plank);
             assert addedPlank : String.format(
-                    "Plank '%s' was not added even though the row could contain it", plank.getId());
+                    "Plank '%s' was not added even though the row could contain it", plank.getPlankId());
             currentLength = getCurrentLength() + getPlankLength(plank);
             currentBreadth = Math.max(getCurrentBreadth(), getPlankBreadth(plank));
         }

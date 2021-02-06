@@ -42,62 +42,64 @@ public final class DrawActionGenerator {
     }
 
     public static Consumer<GraphicsContext> forBasePlank(final BasePlank basePlank) {
+        Consumer<GraphicsContext> drawingActions;
         if (basePlank == null) {
-            return gc -> {
+            drawingActions = gc -> {
+            };
+        } else {
+            final List<Line> grainLines = switch (basePlank.getGrainDirection()) {
+                case HORIZONTAL -> {
+                    final int numSteps = CompareUtility.clamp(
+                            basePlank.getHeight() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
+                            MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
+                    final double stepSize = basePlank.getHeight() / (double) numSteps;
+                    List<Line> lines = new ArrayList<>();
+                    for (double yPos = stepSize; yPos < basePlank.getHeight(); yPos += stepSize) {
+                        lines.add(new Line(0, yPos, basePlank.getWidth(), yPos));
+                    }
+                    yield lines;
+                }
+                case VERTICAL -> {
+                    final int numSteps = CompareUtility.clamp(
+                            basePlank.getWidth() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
+                            MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
+                    final double stepSize = basePlank.getWidth() / (double) numSteps;
+                    List<Line> lines = new ArrayList<>();
+                    for (double xPos = stepSize; xPos < basePlank.getWidth(); xPos += stepSize) {
+                        lines.add(new Line(xPos, 0, xPos, basePlank.getHeight()));
+                    }
+                    yield lines;
+                }
+                case IRRELEVANT -> {
+                    final double topBottomXDelta = basePlank.getHeight() / Math.tan(Math.toRadians(45));
+                    final int numSteps = CompareUtility.clamp(
+                            basePlank.getWidth() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
+                            MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
+                    final double stepSize = basePlank.getWidth() / (double) numSteps;
+                    List<Line> lines = new ArrayList<>();
+                    for (double xPos = -topBottomXDelta + stepSize; xPos < basePlank.getWidth(); xPos += stepSize) {
+                        lines.add(new Line(xPos, basePlank.getHeight(), xPos + topBottomXDelta, 0));
+                    }
+                    yield lines;
+                }
+            };
+
+            drawingActions = gc -> {
+                gc.beginPath();
+                gc.rect(0, 0, basePlank.getWidth(), basePlank.getHeight());
+                gc.setFill(Color.BURLYWOOD);
+                gc.fill();
+                gc.setStroke(Color.BLACK);
+                gc.stroke();
+                gc.closePath();
+
+                for (final Line grainLine : grainLines) {
+                    gc.strokeLine(grainLine.getStartX(), grainLine.getStartY(),
+                            grainLine.getEndX(), grainLine.getEndY());
+                }
             };
         }
-
-        final List<Line> grainLines = switch (basePlank.getGrainDirection()) {
-            case HORIZONTAL -> {
-                final int numSteps = CompareUtility.clamp(
-                        basePlank.getHeight() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
-                        MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
-                final double stepSize = basePlank.getHeight() / (double) numSteps;
-                List<Line> lines = new ArrayList<>();
-                for (double yPos = stepSize; yPos < basePlank.getHeight(); yPos += stepSize) {
-                    lines.add(new Line(0, yPos, basePlank.getWidth(), yPos));
-                }
-                yield lines;
-            }
-            case VERTICAL -> {
-                final int numSteps = CompareUtility.clamp(
-                        basePlank.getWidth() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
-                        MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
-                final double stepSize = basePlank.getWidth() / (double) numSteps;
-                List<Line> lines = new ArrayList<>();
-                for (double xPos = stepSize; xPos < basePlank.getWidth(); xPos += stepSize) {
-                    lines.add(new Line(xPos, 0, xPos, basePlank.getHeight()));
-                }
-                yield lines;
-            }
-            case IRRELEVANT -> {
-                final double topBottomXDelta = basePlank.getHeight() / Math.tan(Math.toRadians(45));
-                final int numSteps = CompareUtility.clamp(
-                        basePlank.getWidth() / PREFERRED_GRAIN_INDICATION_STEP_SIZE,
-                        MIN_NUM_GRAIN_INDICATION_STEPS, MAX_NUM_GRAIN_INDICATION_STEPS);
-                final double stepSize = basePlank.getWidth() / (double) numSteps;
-                List<Line> lines = new ArrayList<>();
-                for (double xPos = -topBottomXDelta + stepSize; xPos < basePlank.getWidth(); xPos += stepSize) {
-                    lines.add(new Line(xPos, basePlank.getHeight(), xPos + topBottomXDelta, 0));
-                }
-                yield lines;
-            }
-        };
-
-        return gc -> {
-            gc.beginPath();
-            gc.rect(0, 0, basePlank.getWidth(), basePlank.getHeight());
-            gc.setFill(Color.BURLYWOOD);
-            gc.fill();
-            gc.setStroke(Color.BLACK);
-            gc.stroke();
-            gc.closePath();
-
-            for (final Line grainLine : grainLines) {
-                gc.strokeLine(grainLine.getStartX(), grainLine.getStartY(),
-                        grainLine.getEndX(), grainLine.getEndY());
-            }
-        };
+        return drawingActions;
     }
 
     public static Consumer<GraphicsContext> forRequiredPlanks(
@@ -144,11 +146,11 @@ public final class DrawActionGenerator {
                     if (drawLabelVertical) {
                         gc.translate(labelXOffset, labelYOffset);
                         gc.rotate(-90);
-                        gc.fillText(plank.getId(), 0, 0, maxLabelLength);
+                        gc.fillText(plank.getPlankId(), 0, 0, maxLabelLength);
                         gc.rotate(90);
                         gc.translate(-labelXOffset, -labelYOffset);
                     } else {
-                        gc.fillText(plank.getId(), labelXOffset, labelYOffset, maxLabelLength);
+                        gc.fillText(plank.getPlankId(), labelXOffset, labelYOffset, maxLabelLength);
                     }
 
                     // Draw dimensioning labels

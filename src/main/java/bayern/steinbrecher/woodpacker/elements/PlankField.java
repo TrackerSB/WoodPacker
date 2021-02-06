@@ -69,19 +69,21 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     }
 
     public T createPlank() {
+        T createdPlank;
         if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
-            return (T) new RequiredPlank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(),
+            createdPlank = (T) new RequiredPlank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(),
                     getComment());
-        }
-        if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
+        } else if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
-            return (T) new BasePlank(
+            createdPlank = (T) new BasePlank(
                     getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(), getMaterial(),
                     getComment());
+        } else {
+            throw new UnsupportedOperationException(
+                    String.format("Creating instances for %s is not supported", genericRuntimeType.getCanonicalName()));
         }
-        throw new UnsupportedOperationException(
-                String.format("Creating instances for %s is not supported", genericRuntimeType.getCanonicalName()));
+        return createdPlank;
     }
 
     public StringProperty plankIdProperty() {
