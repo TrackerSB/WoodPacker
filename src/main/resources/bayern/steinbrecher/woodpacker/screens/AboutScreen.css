@@ -23,13 +23,13 @@ GridPane {
     -fx-graphic: url("cpu.png");
 }
 
-#licenseInfoPane {
-    -fx-graphic: url("license.png");
-}
-
-#root {
+#contentRoot {
     -fx-alignment: CENTER;
     -fx-max-width: 500;
+}
+
+#licenseInfoPane {
+    -fx-graphic: url("license.png");
 }
 
 #title HBox, #title VBox, #title .text {

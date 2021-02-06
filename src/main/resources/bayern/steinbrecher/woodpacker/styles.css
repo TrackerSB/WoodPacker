@@ -5,6 +5,10 @@
     -fx-highlight-fill: red;
 }
 
+.screen {
+    -fx-background-color: white;
+}
+
 .to-previous-screen {
     -fx-graphic: url("return.png");
 }

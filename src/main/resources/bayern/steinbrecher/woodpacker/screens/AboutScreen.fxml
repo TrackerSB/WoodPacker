@@ -6,38 +6,40 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="bayern.steinbrecher.woodpacker.screens.AboutScreenController"
-      stylesheets="@AboutScreen.css"
-      id="root">
-    <HBox id="title">
-        <ImageView>
-            <Image url="@../logo.png"
-                   preserveRatio="true"
-                   requestedWidth="200"/>
-        </ImageView>
-        <VBox>
-            <Text id="appName"
-                  text="${controller.appName}"/>
-            <Text fx:id="version"/>
-        </VBox>
-    </HBox>
-    <TitledPane id="authorInfoPane"
-                text="%authorInfo">
-        <GridPane fx:id="authorInfo"/>
-    </TitledPane>
-    <TitledPane id="buildInfoPane"
-                text="%buildInfo">
-        <GridPane fx:id="buildInfo"/>
-    </TitledPane>
-    <TitledPane id="licenseInfoPane"
-                text="%licensesInfo">
-        <VBox fx:id="licensesInfo"/>
-    </TitledPane>
-    <Button text="%backToMainMenu"
-            onAction="#switchToPreviousScreen"
-            styleClass="to-previous-screen"/>
-</VBox>
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="bayern.steinbrecher.woodpacker.screens.AboutScreenController"
+           stylesheets="@AboutScreen.css">
+    <VBox id="contentRoot">
+        <HBox id="title">
+            <ImageView>
+                <Image url="@../logo.png"
+                       preserveRatio="true"
+                       requestedWidth="200"/>
+            </ImageView>
+            <VBox>
+                <Text id="appName"
+                      text="${controller.appName}"/>
+                <Text fx:id="version"/>
+            </VBox>
+        </HBox>
+        <TitledPane id="authorInfoPane"
+                    text="%authorInfo">
+            <GridPane fx:id="authorInfo"/>
+        </TitledPane>
+        <TitledPane id="buildInfoPane"
+                    text="%buildInfo">
+            <GridPane fx:id="buildInfo"/>
+        </TitledPane>
+        <TitledPane id="licenseInfoPane"
+                    text="%licensesInfo">
+            <VBox fx:id="licensesInfo"/>
+        </TitledPane>
+        <Button text="%backToMainMenu"
+                onAction="#switchToPreviousScreen"
+                styleClass="to-previous-screen"/>
+    </VBox>
+</StackPane>
