@@ -26,12 +26,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Stefan Huber
@@ -155,35 +157,53 @@ public class PlankProblem implements Serializable {
                     // Sort by area decreasing
                     .collect(Collectors.toCollection(() -> new TreeSet<>(plankVariationGroupComparator)));
 
-            Optional<BasePlank> remainingBasePlank = Optional.of(basePlank);
-            // FIXME There may be more than a single position where to place the next candidate
-            Point2D remainingBasePlankOffset = Point2D.ZERO; // Left upper corner
-            while (remainingBasePlank.isPresent() && !unplacedPlank.isEmpty()) {
-                final PlankSolutionRow horizontalCandidate = createCandidate(
-                        true, remainingBasePlankOffset, remainingBasePlank.get(), unplacedPlank);
-                final PlankSolutionRow verticalCandidate = createCandidate(
-                        false, remainingBasePlankOffset, remainingBasePlank.get(), unplacedPlank);
+            Map<Point2D, BasePlank> remainingPartitions = new HashMap<>();
+            remainingPartitions.put(Point2D.ZERO, basePlank);
+            while (!remainingPartitions.isEmpty() && !unplacedPlank.isEmpty()) {
+                // Determine best candidate
+                final Optional<Pair<PlankSolutionRow, Double>> optBestCandidate = remainingPartitions.entrySet()
+                        .stream()
+                        .flatMap(entry -> Stream.of(
+                                createCandidate(true, entry.getKey(), entry.getValue(), unplacedPlank),
+                                createCandidate(false, entry.getKey(), entry.getValue(), unplacedPlank)))
+                        .filter(c -> c.getPlanks().size() > 0)
+                        .map(c -> new Pair<>(c, determineCandidateQuality(c)))
+                        .max(Comparator.comparing(Pair::getValue));
+                if (optBestCandidate.isPresent()) {
+                    final Pair<PlankSolutionRow, Double> bestCandidate = optBestCandidate.get();
+                    final PlankSolutionRow bestCandidateRow = bestCandidate.getKey();
+                    final Point2D selectedOffset = bestCandidateRow.getStartOffset();
+                    final BasePlank selectedPartition = remainingPartitions.remove(selectedOffset);
 
-                if (horizontalCandidate.getPlanks().isEmpty()
-                        && verticalCandidate.getPlanks().isEmpty()) {
-                    remainingBasePlank = Optional.empty();
-                } else {
-                    final double horizontalCandidateQuality = determineCandidateQuality(horizontalCandidate);
-                    final double verticalCandidateQuality = determineCandidateQuality(verticalCandidate);
-                    PlankSolutionRow bestCandidate;
-                    if (horizontalCandidateQuality > verticalCandidateQuality) {
-                        bestCandidate = horizontalCandidate;
-                        remainingBasePlank = remainingBasePlank.get()
-                                .heightDecreased(bestCandidate.getCurrentBreadth());
-                        remainingBasePlankOffset = remainingBasePlankOffset.add(0, bestCandidate.getCurrentBreadth());
+                    // Split partition containing the best candidate into remaining partitions
+                    if (bestCandidateRow.addHorizontal()) {
+                        final Optional<BasePlank> remainingPartitionNotInRow
+                                = selectedPartition.heightDecreased(bestCandidateRow.getCurrentBreadth());
+                        remainingPartitionNotInRow.ifPresent(
+                                bp -> remainingPartitions.put(
+                                        selectedOffset.add(0, bestCandidateRow.getCurrentBreadth()), bp));
+                        final Optional<BasePlank> remainingPartitionInRow = selectedPartition.heightDecreased(
+                                remainingPartitionNotInRow.map(Plank::getHeight).orElse(0))
+                                .flatMap(bp -> bp.widthDecreased(bestCandidateRow.getCurrentLength()));
+                        remainingPartitionInRow.ifPresent(
+                                bp -> remainingPartitions.put(
+                                        selectedOffset.add(bestCandidateRow.getCurrentLength(), 0), bp));
                     } else {
-                        bestCandidate = verticalCandidate;
-                        remainingBasePlank = remainingBasePlank.get()
-                                .widthDecreased(bestCandidate.getCurrentBreadth());
-                        remainingBasePlankOffset = remainingBasePlankOffset.add(bestCandidate.getCurrentBreadth(), 0);
+                        final Optional<BasePlank> remainingPartitionNotInRow
+                                = selectedPartition.widthDecreased(bestCandidateRow.getCurrentBreadth());
+                        remainingPartitionNotInRow.ifPresent(
+                                bp -> remainingPartitions.put(
+                                        selectedOffset.add(bestCandidateRow.getCurrentBreadth(), 0), bp));
+                        final Optional<BasePlank> remainingPartitionInRow = selectedPartition.widthDecreased(
+                                remainingPartitionNotInRow.map(Plank::getWidth).orElse(0))
+                                .flatMap(bp -> bp.heightDecreased(bestCandidateRow.getCurrentLength()));
+                        remainingPartitionInRow.ifPresent(
+                                bp -> remainingPartitions.put(
+                                        selectedOffset.add(0, bestCandidateRow.getCurrentLength()), bp));
                     }
-                    placedPlanks.add(bestCandidate);
-                    bestCandidate.getPlanks()
+
+                    placedPlanks.add(bestCandidateRow);
+                    bestCandidateRow.getPlanks()
                             .forEach(p -> {
                                 unplacedPlank.removeIf(up -> {
                                     final RequiredPlank pivot = up.getPivot();
@@ -194,9 +214,14 @@ public class PlankProblem implements Serializable {
                                     return wasPlaced;
                                 });
                             });
+                } else {
+                    /* NOTE 2021-02-06: This is the case if the best candidate contains no planks. This may be the case
+                     * if all criteria have a weight of zero.
+                     */
+                    break;
                 }
             }
-            // NOTE Ignored planks may not have same rotation as initially given
+
             ignoredPlanks = unplacedPlank.stream()
                     .map(PlankVariationGroup::getPivot)
                     .collect(Collectors.toSet());
