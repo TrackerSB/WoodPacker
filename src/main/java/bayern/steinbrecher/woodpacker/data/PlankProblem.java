@@ -316,7 +316,7 @@ public class PlankProblem implements Serializable {
         }
 
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(final Object other) {
             boolean isEqual;
             if (this == other) {
                 isEqual = true;

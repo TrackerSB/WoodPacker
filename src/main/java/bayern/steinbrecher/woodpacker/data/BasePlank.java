@@ -11,9 +11,9 @@ import java.util.Optional;
 public class BasePlank extends Plank {
     private final PlankMaterial material;
 
-    public BasePlank(final String id, final int width, final int height, final PlankGrainDirection grainDirection,
+    public BasePlank(final String plankId, final int width, final int height, final PlankGrainDirection grainDirection,
                      final PlankMaterial material) {
-        super(id, width, height, grainDirection);
+        super(plankId, width, height, grainDirection);
         this.material = material;
     }
 
@@ -46,12 +46,15 @@ public class BasePlank extends Plank {
                     String.format(
                             "Cannot decrease planks width by %d since its height is %d", decreaseBy, getHeight()));
         }
+        Optional<BasePlank> resizedPlank;
         if (decreaseBy == getWidth()) {
-            return Optional.empty();
+            resizedPlank = Optional.empty();
+        } else {
+            resizedPlank = Optional.of(
+                    new BasePlank(getPlankId(), getWidth() - decreaseBy, getHeight(), getGrainDirection(),
+                            getMaterial(), getComment()));
         }
-        return Optional.of(
-                new BasePlank(getPlankId(), getWidth() - decreaseBy, getHeight(), getGrainDirection(), getMaterial(),
-                        getComment()));
+        return resizedPlank;
     }
 
     @Override
