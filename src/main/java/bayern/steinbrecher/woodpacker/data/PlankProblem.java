@@ -204,16 +204,14 @@ public class PlankProblem implements Serializable {
 
                     placedPlanks.add(bestCandidateRow);
                     bestCandidateRow.getPlanks()
-                            .forEach(p -> {
-                                unplacedPlank.removeIf(up -> {
-                                    final RequiredPlank pivot = up.getPivot();
-                                    final boolean wasPlaced = pivot.equals(p);
-                                    if (wasPlaced) {
-                                        pivot.setPlacedInSolution(true);
-                                    }
-                                    return wasPlaced;
-                                });
-                            });
+                            .forEach(p -> unplacedPlank.removeIf(up -> {
+                                final RequiredPlank pivot = up.getPivot();
+                                final boolean wasPlaced = pivot.equals(p);
+                                if (wasPlaced) {
+                                    pivot.setPlacedInSolution(true);
+                                }
+                                return wasPlaced;
+                            }));
                 } else {
                     /* NOTE 2021-02-06: This is the case if the best candidate contains no planks. This may be the case
                      * if all criteria have a weight of zero.
