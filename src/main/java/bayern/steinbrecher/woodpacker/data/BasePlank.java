@@ -2,6 +2,7 @@ package bayern.steinbrecher.woodpacker.data;
 
 import bayern.steinbrecher.woodpacker.WoodPacker;
 
+import java.io.Serial;
 import java.util.Optional;
 
 /**
@@ -9,6 +10,8 @@ import java.util.Optional;
  * @since 0.1
  */
 public class BasePlank extends Plank {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final PlankMaterial material;
 
     public BasePlank(final String plankId, final int width, final int height, final PlankGrainDirection grainDirection,
