@@ -1,6 +1,6 @@
 package bayern.steinbrecher.woodpacker.utility;
 
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
 /**
  * @author Stefan Huber
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
  */
 public class SerializationUtilityTest {
     @Test
-    void emptyTest() {
+    public void emptyTest() {
         System.out.println(42);
     }
 }
