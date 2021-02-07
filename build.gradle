@@ -17,6 +17,13 @@ repositories {
     }
 }
 
+sourceCompatibility = 15
+targetCompatibility = 15
+
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation "bayern.steinbrecher:CheckedElements:0.12-rc.1-SNAPSHOT"
     implementation "bayern.steinbrecher:JavaUtility:0.18-rc.4-SNAPSHOT"
@@ -48,7 +55,7 @@ buildConfig {
 }
 
 javafx {
-    version = "14"
+    version = "$sourceCompatibility"
     modules = [
             "javafx.controls",
             "javafx.fxml",
