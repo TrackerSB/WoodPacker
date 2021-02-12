@@ -3,6 +3,7 @@ package bayern.steinbrecher.woodpacker.test.utility;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -20,17 +21,22 @@ public final class ComparisonUtility {
         throw new UnsupportedOperationException("Construction of instances is prohibited");
     }
 
-    public static <T> Optional<String> comparePublicValues(Class<T> typeDummy, T actual, T expected) {
-        final Set<Method> getterMethods = Stream.of(typeDummy.getMethods())
+    public static <T> Optional<String> comparePublicValues(
+            Class<T> typeDummy, T actual, T expected, String... methodsToIgnore) {
+        final List<String> methodsToIgnoreLowerCase = Arrays.stream(methodsToIgnore)
+                .map(m -> m.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toList());
+        final Set<Method> getterMethodsToCheck = Stream.of(typeDummy.getMethods())
                 .filter(m -> {
-                    final String methodName = m.getName()
+                    final String methodNameLowerCase = m.getName()
                             .toLowerCase(Locale.ROOT);
-                    return methodName.startsWith("get") || methodName.startsWith("is");
+                    return (methodNameLowerCase.startsWith("get") || methodNameLowerCase.startsWith("is"))
+                            && !methodsToIgnoreLowerCase.contains(methodNameLowerCase);
                 })
                 .filter(m -> m.getParameterCount() <= 0)
                 .collect(Collectors.toSet());
         final List<Method> failedComparisons = new ArrayList<>();
-        for (final Method getterMethod : getterMethods) {
+        for (final Method getterMethod : getterMethodsToCheck) {
             try {
                 final Object actualValue = getterMethod.invoke(actual);
                 final Object expectedValue = getterMethod.invoke(expected);
