@@ -17,6 +17,7 @@ import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
 import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -388,9 +389,10 @@ public class PlankDemandScreenController extends ScreenController {
                     documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
 
                     final Image cuttingPlan = generateCuttingPlan();
-                    final float leftMargin = (document.getPdfDocument().getDefaultPageSize().getWidth()
-                            - cuttingPlan.getImageWidth()) / 2;
-                    cuttingPlan.setMarginLeft(leftMargin);
+                    final PageSize pageSize = document.getPdfDocument().getDefaultPageSize();
+                    cuttingPlan.scaleToFit(pageSize.getWidth(), pageSize.getHeight());
+                    final float leftMargin = (pageSize.getWidth() - cuttingPlan.getImageScaledWidth()) / 2;
+                    cuttingPlan.setMarginLeft(Math.max(0, leftMargin));
                     document.add(cuttingPlan);
                 } catch (IOException ex) {
                     throw new ExportFailedException("Could not generate snapshot of cutting plan preview", ex);
