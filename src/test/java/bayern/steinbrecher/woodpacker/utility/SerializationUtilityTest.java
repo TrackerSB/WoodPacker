@@ -73,7 +73,7 @@ public final class SerializationUtilityTest {
     }
 
     @Test
-    public void chekBasePlankSerializationCurrentVersion() throws IOException, ClassNotFoundException {
+    public void checkBasePlankSerializationCurrentVersion() throws IOException, ClassNotFoundException {
         final byte[] serializedBasePlank = SerializationUtility.serialize(BASE_PLANK_REFERENCE);
         final BasePlank deserializedBasePlank = SerializationUtility.deserialize(serializedBasePlank);
         final Optional<String> failMessage
