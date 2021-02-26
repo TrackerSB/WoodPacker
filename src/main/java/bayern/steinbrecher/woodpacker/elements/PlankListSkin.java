@@ -20,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -170,6 +171,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         });
         planksView.getSelectionModel()
                 .setSelectionMode(SelectionMode.SINGLE);
+        planksView.setPlaceholder(new Label(WoodPacker.getResource("noPlanksAdded")));
 
         syncSelectedPlank(control, planksView);
 
