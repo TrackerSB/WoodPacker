@@ -6,10 +6,10 @@ import bayern.steinbrecher.screenSwitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.BuildConfig;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
+import bayern.steinbrecher.woodpacker.data.CuttingPlan;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionCriterion;
-import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
@@ -54,7 +54,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -213,7 +214,7 @@ public class PlankDemandScreenController extends ScreenController {
     }
 
     private void updateVisualPlankCuttingPlan(
-            final BasePlank basePlank, final Iterable<PlankSolutionRow> placedPlankRows) {
+            final BasePlank basePlank, final Iterable<CuttingPlan> cuttingPlans) {
         // Update cutting plan preview
         if (basePlank == null) {
             visualPlankCuttingPlan.theoreticalWidthProperty()
@@ -242,8 +243,15 @@ public class PlankDemandScreenController extends ScreenController {
             visualPlankCuttingPlan.setTheoreticalHeight(basePlank.getHeight());
 
             final Consumer<GraphicsContext> basePlankActions = DrawActionGenerator.forBasePlank(basePlank);
-            final Consumer<GraphicsContext> requiredPlanksActions
-                    = DrawActionGenerator.forRequiredPlanks(basePlank, placedPlankRows);
+            final Iterator<CuttingPlan> cuttingPlanIterator = cuttingPlans.iterator();
+            Consumer<GraphicsContext> requiredPlanksActions;
+            // FIXME Print all cutting plans
+            if (cuttingPlanIterator.hasNext()) {
+                requiredPlanksActions = DrawActionGenerator.forCuttingPlan(basePlank, cuttingPlanIterator.next());
+            } else {
+                requiredPlanksActions = gc -> {
+                };
+            }
             final Consumer<GraphicsContext> drawingActions = gc -> {
                 basePlankActions.accept(gc);
                 requiredPlanksActions.accept(gc);
@@ -256,7 +264,7 @@ public class PlankDemandScreenController extends ScreenController {
         // Trigger updates of visual cutting plank
         plankProblem.basePlankProperty()
                 .addListener((obs, oldBasePlank, newBasePlank) -> {
-                    final Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem
+                    final Pair<Collection<CuttingPlan>, Set<RequiredPlank>> proposedSolution = plankProblem
                             .getProposedSolution();
                     updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey());
                 });
@@ -266,7 +274,7 @@ public class PlankDemandScreenController extends ScreenController {
                     plankProblemSaved.set(false);
                 });
         // Ensure initial state
-        final Pair<List<PlankSolutionRow>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
+        final Pair<Collection<CuttingPlan>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
         updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), proposedSolution.getKey());
 
         // Creating binding signaling whether a cutting plan should be drawn

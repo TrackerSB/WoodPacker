@@ -21,6 +21,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,7 +35,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Stefan Huber
@@ -58,7 +58,7 @@ public class PlankProblem implements Serializable {
     private transient /*final*/ ObservableMap<PlankSolutionCriterion, Double> criterionWeights;
     private transient /*final*/ SetProperty<RequiredPlank> requiredPlanks;
     private transient /*final*/ ObjectProperty<BasePlank> basePlank;
-    private transient /*final*/ ReadOnlyObjectWrapper<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>>
+    private transient /*final*/ ReadOnlyObjectWrapper<Pair<Collection<CuttingPlan>, Set<RequiredPlank>>>
             proposedSolution;
 
     public PlankProblem() {
@@ -137,14 +137,16 @@ public class PlankProblem implements Serializable {
     }
 
     /**
-     * @return A list of rows of planks which can be placed on the base plank and a list of the remaining planks that do
-     * not fit onto the base plank (besides the already added ones).
+     * @return A list of cutting planks that fit on the given {@link BasePlank} and a list of the remaining planks that
+     * do not fit onto the base plank.
      */
-    private Pair<List<PlankSolutionRow>, Set<RequiredPlank>> determineSolution(
+    private Pair<Collection<CuttingPlan>, Set<RequiredPlank>> determineSolution(
             final BasePlank basePlank, final Set<RequiredPlank> requiredPlanks) {
-        final List<PlankSolutionRow> placedPlanks = new ArrayList<>();
+        final Collection<CuttingPlan> cuttingPlans = new ArrayList<>();
         Set<RequiredPlank> ignoredPlanks;
-        if (basePlank == null) {
+        if (basePlank == null
+                // Do not place planks if all criteria are disabled, i.e. if they are all neither positive nor negative
+                || criterionWeights.values().stream().allMatch(d -> d == 0)) {
             ignoredPlanks = requiredPlanks;
         } else {
             /* The following collection contains all not yet placed planks in all variations in which they are allowed.
@@ -152,15 +154,20 @@ public class PlankProblem implements Serializable {
              * variation of the plank. If either the base plank or the required plank have no grain direction the
              * collection contains two versions of the plank (i.e. rotated and not rotated).
              */
-            final SortedSet<PlankVariationGroup> unplacedPlank = requiredPlanks.stream()
+            final SortedSet<PlankVariationGroup> unplacedPlanks = requiredPlanks.stream()
                     .peek(rp -> rp.setPlacedInSolution(false))
                     .map(rp -> new PlankVariationGroup(rp, basePlank))
                     // Sort by area decreasing
                     .collect(Collectors.toCollection(() -> new TreeSet<>(VARIATION_GROUP_SORTER)));
 
+            /* FIXME Clarify structure of conditions and avoid duplicated code (e.g. for resetting remaining base plank
+             * partitions or setting up the list of current solution rows.
+             */
             final Map<Point2D, RemainingBasePlank> remainingPartitions = new ConcurrentHashMap<>();
             remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
-            while (!remainingPartitions.isEmpty() && !unplacedPlank.isEmpty()) {
+            final Collection<PlankSolutionRow> currentSolutionRows = new ArrayList<>();
+            boolean potentialForMorePlacements = true;
+            while (!remainingPartitions.isEmpty() && !unplacedPlanks.isEmpty() && potentialForMorePlacements) {
                 // Determine best candidate
                 final Optional<Pair<PlankSolutionRow, Double>> optBestCandidate = remainingPartitions.entrySet()
                         .stream()
@@ -170,12 +177,12 @@ public class PlankProblem implements Serializable {
                             if (remaining.isRestrictToVerticalCandidates() == null
                                     || remaining.isRestrictToVerticalCandidates()) {
                                 candidates.add(createCandidate(
-                                        false, entry.getKey(), remaining.getBasePlank(), unplacedPlank));
+                                        false, entry.getKey(), remaining.getBasePlank(), unplacedPlanks));
                             }
                             if (remaining.isRestrictToVerticalCandidates() == null
                                     || !remaining.isRestrictToVerticalCandidates()) {
                                 candidates.add(createCandidate(
-                                        true, entry.getKey(), remaining.getBasePlank(), unplacedPlank));
+                                        true, entry.getKey(), remaining.getBasePlank(), unplacedPlanks));
                             }
                             return candidates.stream();
                         })
@@ -220,9 +227,9 @@ public class PlankProblem implements Serializable {
                                         new RemainingBasePlank(false, bp)));
                     }
 
-                    placedPlanks.add(bestCandidateRow);
+                    currentSolutionRows.add(bestCandidateRow);
                     bestCandidateRow.getPlanks()
-                            .forEach(p -> unplacedPlank.removeIf(up -> {
+                            .forEach(p -> unplacedPlanks.removeIf(up -> {
                                 final RequiredPlank pivot = up.getPivot();
                                 final boolean wasPlaced = pivot.equals(p);
                                 if (wasPlaced) {
@@ -231,19 +238,28 @@ public class PlankProblem implements Serializable {
                                 return wasPlaced;
                             }));
                 } else {
-                    /* NOTE 2021-02-06: This is the case if the best candidate contains no planks. This may be the case
-                     * if all criteria have a weight of zero.
-                     */
-                    break;
+                    // No further candidates can be found for the current set of remaining base plank partitions
+                    if (currentSolutionRows.isEmpty()) { // If on an empty base plank there are no candidates available
+                        potentialForMorePlacements = false;
+                    } else {
+                        // Add another empty base plank
+                        cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows)));
+                        currentSolutionRows.clear();
+                        remainingPartitions.clear();
+                        remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
+                    }
                 }
             }
+            if (!currentSolutionRows.isEmpty()) {
+                cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows)));
+            }
 
-            ignoredPlanks = unplacedPlank.stream()
+            ignoredPlanks = unplacedPlanks.stream()
                     .map(PlankVariationGroup::getPivot)
                     .collect(Collectors.toSet());
             ignoredPlanks.forEach(p -> p.setPlacedInSolution(false));
         }
-        return new Pair<>(placedPlanks, ignoredPlanks);
+        return new Pair<>(cuttingPlans, ignoredPlanks);
     }
 
     @SuppressWarnings("unchecked")
@@ -305,11 +321,11 @@ public class PlankProblem implements Serializable {
         basePlankProperty().set(basePlank);
     }
 
-    public ReadOnlyObjectProperty<Pair<List<PlankSolutionRow>, Set<RequiredPlank>>> proposedSolutionProperty() {
+    public ReadOnlyObjectProperty<Pair<Collection<CuttingPlan>, Set<RequiredPlank>>> proposedSolutionProperty() {
         return proposedSolution.getReadOnlyProperty();
     }
 
-    public Pair<List<PlankSolutionRow>, Set<RequiredPlank>> getProposedSolution() {
+    public Pair<Collection<CuttingPlan>, Set<RequiredPlank>> getProposedSolution() {
         return proposedSolutionProperty().get();
     }
 

@@ -2,6 +2,7 @@ package bayern.steinbrecher.woodpacker.utility;
 
 import bayern.steinbrecher.javaUtility.CompareUtility;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
+import bayern.steinbrecher.woodpacker.data.CuttingPlan;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
@@ -102,8 +103,7 @@ public final class DrawActionGenerator {
         return drawingActions;
     }
 
-    public static Consumer<GraphicsContext> forRequiredPlanks(
-            final BasePlank basePlank, final Iterable<PlankSolutionRow> placedPlankRows) {
+    public static Consumer<GraphicsContext> forCuttingPlan(final BasePlank basePlank, final CuttingPlan cuttingPlan) {
         Consumer<GraphicsContext> drawingActions;
         if (basePlank == null) {
             drawingActions = gc -> {
@@ -111,7 +111,7 @@ public final class DrawActionGenerator {
         } else {
             drawingActions = gc -> {
                 gc.setTextAlign(TextAlignment.CENTER);
-                for (final PlankSolutionRow row : placedPlankRows) {
+                for (final PlankSolutionRow row : cuttingPlan.getRows()) {
                     final Point2D rowToBasePlankOffset = row.getStartOffset();
                     double plankToRowXOffset = 0;
                     double plankToRowYOffset = 0;
