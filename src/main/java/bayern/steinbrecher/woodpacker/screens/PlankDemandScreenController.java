@@ -32,11 +32,13 @@ import javafx.collections.SetChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
@@ -54,8 +56,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -80,7 +83,7 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private PlankList<RequiredPlank> requiredPlanksView;
     @FXML
-    private ScaledCanvas visualPlankCuttingPlan;
+    private Pagination cuttingPlanPages;
     @FXML
     private VBox criteriaPane;
     private final PlankProblem plankProblem = new PlankProblem();
@@ -213,50 +216,57 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
-    private void updateVisualPlankCuttingPlan(
+    private void updateVisualPlankCuttingPlans(
             final BasePlank basePlank, final Iterable<CuttingPlan> cuttingPlans) {
-        // Update cutting plan preview
+        // Update current cutting plan preview
         if (basePlank == null) {
-            visualPlankCuttingPlan.theoreticalWidthProperty()
-                    .bind(visualPlankCuttingPlan.widthProperty());
-            visualPlankCuttingPlan.theoreticalHeightProperty()
-                    .bind(visualPlankCuttingPlan.heightProperty());
-            visualPlankCuttingPlan.setDrawingActions(gc -> {
-                gc.setFill(Color.GRAY);
-                gc.fillRect(0, 0, visualPlankCuttingPlan.getTheoreticalWidth(),
-                        visualPlankCuttingPlan.getTheoreticalHeight());
-                gc.setFill(Color.WHITE);
-                gc.setFont(Font.font(visualPlankCuttingPlan.getTheoreticalHeight() / 10));
-                gc.setTextAlign(TextAlignment.CENTER);
-                gc.setTextBaseline(VPos.CENTER);
-                gc.fillText(WoodPacker.getResource("noBasePlankSelected"),
-                        visualPlankCuttingPlan.getTheoreticalWidth() / 2,
-                        visualPlankCuttingPlan.getTheoreticalHeight() / 2,
-                        visualPlankCuttingPlan.getTheoreticalWidth());
+            cuttingPlanPages.setPageCount(1);
+            cuttingPlanPages.setPageFactory(pageIndex -> {
+                final ScaledCanvas cuttingPlanCanvas = new ScaledCanvas();
+                cuttingPlanCanvas.theoreticalWidthProperty()
+                        .bind(cuttingPlanCanvas.widthProperty());
+                cuttingPlanCanvas.theoreticalHeightProperty()
+                        .bind(cuttingPlanCanvas.heightProperty());
+                cuttingPlanCanvas.setDrawingActions(gc -> {
+                    gc.setFill(Color.GRAY);
+                    gc.fillRect(0, 0, cuttingPlanCanvas.getTheoreticalWidth(),
+                            cuttingPlanCanvas.getTheoreticalHeight());
+                    gc.setFill(Color.WHITE);
+                    gc.setFont(Font.font(cuttingPlanCanvas.getTheoreticalHeight() / 10));
+                    gc.setTextAlign(TextAlignment.CENTER);
+                    gc.setTextBaseline(VPos.CENTER);
+                    gc.fillText(WoodPacker.getResource("noBasePlankSelected"),
+                            cuttingPlanCanvas.getTheoreticalWidth() / 2,
+                            cuttingPlanCanvas.getTheoreticalHeight() / 2,
+                            cuttingPlanCanvas.getTheoreticalWidth());
+                });
+                return cuttingPlanCanvas;
             });
         } else {
-            visualPlankCuttingPlan.theoreticalWidthProperty()
-                    .unbind();
-            visualPlankCuttingPlan.setTheoreticalWidth(basePlank.getWidth());
-            visualPlankCuttingPlan.theoreticalHeightProperty()
-                    .unbind();
-            visualPlankCuttingPlan.setTheoreticalHeight(basePlank.getHeight());
-
             final Consumer<GraphicsContext> basePlankActions = DrawActionGenerator.forBasePlank(basePlank);
-            final Iterator<CuttingPlan> cuttingPlanIterator = cuttingPlans.iterator();
-            Consumer<GraphicsContext> requiredPlanksActions;
-            // FIXME Print all cutting plans
-            if (cuttingPlanIterator.hasNext()) {
-                requiredPlanksActions = DrawActionGenerator.forCuttingPlan(basePlank, cuttingPlanIterator.next());
-            } else {
-                requiredPlanksActions = gc -> {
-                };
+            final List<Consumer<GraphicsContext>> cuttingPlanActions = new ArrayList<>();
+            for (CuttingPlan cuttingPlan : cuttingPlans) {
+                cuttingPlanActions.add(DrawActionGenerator.forCuttingPlan(basePlank, cuttingPlan));
             }
-            final Consumer<GraphicsContext> drawingActions = gc -> {
-                basePlankActions.accept(gc);
-                requiredPlanksActions.accept(gc);
-            };
-            visualPlankCuttingPlan.setDrawingActions(drawingActions);
+            if (cuttingPlanActions.isEmpty()) {
+                // Show empty base plank
+                cuttingPlanActions.add(gc -> {
+                });
+            }
+
+            cuttingPlanPages.setPageCount(cuttingPlanActions.size());
+            cuttingPlanPages.setPageFactory(pageIndex -> {
+                final ScaledCanvas cuttingPlanCanvas = new ScaledCanvas();
+                cuttingPlanCanvas.setTheoreticalWidth(basePlank.getWidth());
+                cuttingPlanCanvas.setTheoreticalHeight(basePlank.getHeight());
+                final Consumer<GraphicsContext> drawingActions = gc -> {
+                    basePlankActions.accept(gc);
+                    cuttingPlanActions.get(pageIndex)
+                            .accept(gc);
+                };
+                cuttingPlanCanvas.setDrawingActions(drawingActions);
+                return cuttingPlanCanvas;
+            });
         }
     }
 
@@ -266,16 +276,16 @@ public class PlankDemandScreenController extends ScreenController {
                 .addListener((obs, oldBasePlank, newBasePlank) -> {
                     final Pair<Collection<CuttingPlan>, Set<RequiredPlank>> proposedSolution = plankProblem
                             .getProposedSolution();
-                    updateVisualPlankCuttingPlan(newBasePlank, proposedSolution.getKey());
+                    updateVisualPlankCuttingPlans(newBasePlank, proposedSolution.getKey());
                 });
         plankProblem.proposedSolutionProperty()
                 .addListener((obs, oldSolution, newSolution) -> {
-                    updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), newSolution.getKey());
+                    updateVisualPlankCuttingPlans(plankProblem.getBasePlank(), newSolution.getKey());
                     plankProblemSaved.set(false);
                 });
         // Ensure initial state
         final Pair<Collection<CuttingPlan>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
-        updateVisualPlankCuttingPlan(plankProblem.getBasePlank(), proposedSolution.getKey());
+        updateVisualPlankCuttingPlans(plankProblem.getBasePlank(), proposedSolution.getKey());
 
         // Creating binding signaling whether a cutting plan should be drawn
         plankProblemValid.bind(
@@ -298,7 +308,7 @@ public class PlankDemandScreenController extends ScreenController {
         plankProblem.criterionWeightsProperty()
                 .putAll(setup.criterionWeightsProperty());
         plankProblemSaved.set(true);
-        updateVisualPlankCuttingPlan(setup.getBasePlank(), setup.getProposedSolution().getKey());
+        updateVisualPlankCuttingPlans(setup.getBasePlank(), setup.getProposedSolution().getKey());
     }
 
     @SuppressWarnings("unused")
@@ -355,8 +365,8 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
-    private Image generateCuttingPlan() throws IOException {
-        final WritableImage snapshot = visualPlankCuttingPlan.snapshotDrawingArea();
+    private Image generateCuttingPlan(final ScaledCanvas cuttingPlanCanvas) throws IOException {
+        final WritableImage snapshot = cuttingPlanCanvas.snapshotDrawingArea();
         final BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
         final boolean rotateVertical = bufferedSnapshot.getWidth() > bufferedSnapshot.getHeight();
         BufferedImage monochromeSnapshot;
@@ -396,12 +406,18 @@ public class PlankDemandScreenController extends ScreenController {
                             .getDocumentInfo();
                     documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
 
-                    final Image cuttingPlan = generateCuttingPlan();
-                    final PageSize pageSize = document.getPdfDocument().getDefaultPageSize();
-                    cuttingPlan.scaleToFit(pageSize.getWidth(), pageSize.getHeight());
-                    final float leftMargin = (pageSize.getWidth() - cuttingPlan.getImageScaledWidth()) / 2;
-                    cuttingPlan.setMarginLeft(Math.max(0, leftMargin));
-                    document.add(cuttingPlan);
+                    // FIXME Print all cutting plans
+                    final Node currentPage = cuttingPlanPages.getPageFactory()
+                            .call(cuttingPlanPages.getCurrentPageIndex());
+                    if (currentPage instanceof ScaledCanvas) {
+                        final ScaledCanvas cuttingPlanCanvas = ((ScaledCanvas) currentPage);
+                        final Image cuttingPlan = generateCuttingPlan(cuttingPlanCanvas);
+                        final PageSize pageSize = document.getPdfDocument().getDefaultPageSize();
+                        cuttingPlan.scaleToFit(pageSize.getWidth(), pageSize.getHeight());
+                        final float leftMargin = (pageSize.getWidth() - cuttingPlan.getImageScaledWidth()) / 2;
+                        cuttingPlan.setMarginLeft(Math.max(0, leftMargin));
+                        document.add(cuttingPlan);
+                    }
                 } catch (IOException ex) {
                     throw new ExportFailedException("Could not generate snapshot of cutting plan preview", ex);
                 }
