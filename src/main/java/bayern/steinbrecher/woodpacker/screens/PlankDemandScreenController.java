@@ -145,8 +145,10 @@ public class PlankDemandScreenController extends ScreenController {
                         -> plankProblem.setBasePlank(currentBasePlank.orElse(null)));
         plankProblem.basePlankProperty()
                 .addListener((obs, previousBasePlank, currentBasePlank) -> {
-                    basePlankList.getPlanks()
-                            .add(currentBasePlank); // Ensure the base plank to select exists
+                    if (currentBasePlank != null) {
+                        basePlankList.getPlanks()
+                                .add(currentBasePlank); // Ensure the base plank to select exists
+                    }
                     basePlankList.setSelectedPlank(currentBasePlank);
                 });
     }
