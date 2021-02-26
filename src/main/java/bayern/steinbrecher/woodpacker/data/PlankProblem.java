@@ -158,15 +158,27 @@ public class PlankProblem implements Serializable {
                     // Sort by area decreasing
                     .collect(Collectors.toCollection(() -> new TreeSet<>(VARIATION_GROUP_SORTER)));
 
-            final Map<Point2D, BasePlank> remainingPartitions = new ConcurrentHashMap<>();
-            remainingPartitions.put(Point2D.ZERO, basePlank);
+            final Map<Point2D, RemainingBasePlank> remainingPartitions = new ConcurrentHashMap<>();
+            remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
             while (!remainingPartitions.isEmpty() && !unplacedPlank.isEmpty()) {
                 // Determine best candidate
                 final Optional<Pair<PlankSolutionRow, Double>> optBestCandidate = remainingPartitions.entrySet()
                         .stream()
-                        .flatMap(entry -> Stream.of(
-                                createCandidate(true, entry.getKey(), entry.getValue(), unplacedPlank),
-                                createCandidate(false, entry.getKey(), entry.getValue(), unplacedPlank)))
+                        .flatMap(entry -> {
+                            final RemainingBasePlank remaining = entry.getValue();
+                            List<PlankSolutionRow> candidates = new ArrayList<>();
+                            if (remaining.isRestrictToVerticalCandidates() == null
+                                    || remaining.isRestrictToVerticalCandidates()) {
+                                candidates.add(createCandidate(
+                                        false, entry.getKey(), remaining.getBasePlank(), unplacedPlank));
+                            }
+                            if (remaining.isRestrictToVerticalCandidates() == null
+                                    || !remaining.isRestrictToVerticalCandidates()) {
+                                candidates.add(createCandidate(
+                                        true, entry.getKey(), remaining.getBasePlank(), unplacedPlank));
+                            }
+                            return candidates.stream();
+                        })
                         .filter(c -> c.getPlanks().size() > 0)
                         .map(c -> new Pair<>(c, determineCandidateQuality(c)))
                         .max(Comparator.comparing(Pair::getValue));
@@ -174,7 +186,8 @@ public class PlankProblem implements Serializable {
                     final Pair<PlankSolutionRow, Double> bestCandidate = optBestCandidate.get();
                     final PlankSolutionRow bestCandidateRow = bestCandidate.getKey();
                     final Point2D selectedOffset = bestCandidateRow.getStartOffset();
-                    final BasePlank selectedPartition = remainingPartitions.remove(selectedOffset);
+                    final RemainingBasePlank selectedRemaining = remainingPartitions.remove(selectedOffset);
+                    final BasePlank selectedPartition = selectedRemaining.getBasePlank();
 
                     // Split partition containing the best candidate into remaining partitions
                     if (bestCandidateRow.addHorizontal()) {
@@ -182,25 +195,29 @@ public class PlankProblem implements Serializable {
                                 = selectedPartition.heightDecreased(bestCandidateRow.getCurrentBreadth());
                         remainingPartitionNotInRow.ifPresent(
                                 bp -> remainingPartitions.put(
-                                        selectedOffset.add(0, bestCandidateRow.getCurrentBreadth()), bp));
+                                        selectedOffset.add(0, bestCandidateRow.getCurrentBreadth()),
+                                        new RemainingBasePlank(null, bp)));
                         final Optional<BasePlank> remainingPartitionInRow = selectedPartition.heightDecreased(
                                 remainingPartitionNotInRow.map(Plank::getHeight).orElse(0))
                                 .flatMap(bp -> bp.widthDecreased(bestCandidateRow.getCurrentLength()));
                         remainingPartitionInRow.ifPresent(
                                 bp -> remainingPartitions.put(
-                                        selectedOffset.add(bestCandidateRow.getCurrentLength(), 0), bp));
+                                        selectedOffset.add(bestCandidateRow.getCurrentLength(), 0),
+                                        new RemainingBasePlank(true, bp)));
                     } else {
                         final Optional<BasePlank> remainingPartitionNotInRow
                                 = selectedPartition.widthDecreased(bestCandidateRow.getCurrentBreadth());
                         remainingPartitionNotInRow.ifPresent(
                                 bp -> remainingPartitions.put(
-                                        selectedOffset.add(bestCandidateRow.getCurrentBreadth(), 0), bp));
+                                        selectedOffset.add(bestCandidateRow.getCurrentBreadth(), 0),
+                                        new RemainingBasePlank(null, bp)));
                         final Optional<BasePlank> remainingPartitionInRow = selectedPartition.widthDecreased(
                                 remainingPartitionNotInRow.map(Plank::getWidth).orElse(0))
                                 .flatMap(bp -> bp.heightDecreased(bestCandidateRow.getCurrentLength()));
                         remainingPartitionInRow.ifPresent(
                                 bp -> remainingPartitions.put(
-                                        selectedOffset.add(0, bestCandidateRow.getCurrentLength()), bp));
+                                        selectedOffset.add(0, bestCandidateRow.getCurrentLength()),
+                                        new RemainingBasePlank(false, bp)));
                     }
 
                     placedPlanks.add(bestCandidateRow);
@@ -294,6 +311,29 @@ public class PlankProblem implements Serializable {
 
     public Pair<List<PlankSolutionRow>, Set<RequiredPlank>> getProposedSolution() {
         return proposedSolutionProperty().get();
+    }
+
+    private static class RemainingBasePlank {
+        /**
+         * {@code true} --> Only vertical candidates are allowed.
+         * {@code false} --> Only horizontal candidates are allowed.
+         * {@code null} --> Both vertical and horizontal candidates are allowed.
+         */
+        private final Boolean restrictToVerticalCandidates;
+        private final BasePlank basePlank;
+
+        private RemainingBasePlank(Boolean restrictToVerticalCandidates, BasePlank basePlank) {
+            this.restrictToVerticalCandidates = restrictToVerticalCandidates;
+            this.basePlank = basePlank;
+        }
+
+        public Boolean isRestrictToVerticalCandidates() {
+            return restrictToVerticalCandidates;
+        }
+
+        public BasePlank getBasePlank() {
+            return basePlank;
+        }
     }
 
     private static class PlankVariationGroup {
