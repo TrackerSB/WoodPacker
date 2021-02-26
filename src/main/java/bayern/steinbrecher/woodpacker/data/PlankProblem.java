@@ -167,7 +167,7 @@ public class PlankProblem implements Serializable {
             remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
             final Collection<PlankSolutionRow> currentSolutionRows = new ArrayList<>();
             boolean potentialForMorePlacements = true;
-            while (!remainingPartitions.isEmpty() && !unplacedPlanks.isEmpty() && potentialForMorePlacements) {
+            while (!unplacedPlanks.isEmpty() && potentialForMorePlacements) {
                 // Determine best candidate
                 final Optional<Pair<PlankSolutionRow, Double>> optBestCandidate = remainingPartitions.entrySet()
                         .stream()
