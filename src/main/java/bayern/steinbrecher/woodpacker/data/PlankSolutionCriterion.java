@@ -28,21 +28,11 @@ public enum PlankSolutionCriterion {
     },
     ROW_SPACE_WASTE("rowSpaceWaste") {
         /**
-         * The less space a row wastes the better.
+         * The less space a row wastes when being cut off the better.
          */
         @Override
         public double getRating(final PlankSolutionRow solutionRow, final PlankProblem plankProblem) {
-            final int usedArea = solutionRow.getUsedArea();
-            double rating;
-            if (usedArea <= 0) {
-                rating = 0d;
-            } else {
-                rating = ((double) solutionRow.getPlanks()
-                        .stream()
-                        .mapToInt(RequiredPlank::getArea)
-                        .sum()) / usedArea;
-            }
-            return rating;
+            return solutionRow.getAreaUtilization();
         }
     };
     private final String resourceKey;

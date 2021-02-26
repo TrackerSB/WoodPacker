@@ -85,8 +85,21 @@ public class PlankSolutionRow {
         return currentBreadth;
     }
 
-    public int getUsedArea() {
-        return getCurrentBreadth() * getCurrentLength();
+    /**
+     * When cutting a plank one has to cut through the complete base plank. The area utilization describes how much of
+     * the cut off plank consists of actually to be used planks.
+     *
+     * @return The area utilization in [0; 1]
+     */
+    public double getAreaUtilization() {
+        final int cutOffArea = getCurrentBreadth() * getMaxLength();
+        if (cutOffArea <= 0) {
+            return 0d;
+        }
+        final int utilizedArea = planks.stream()
+                .mapToInt(RequiredPlank::getArea)
+                .sum();
+        return ((double) utilizedArea) / cutOffArea;
     }
 
     private int getPlankLength(final Plank plank) {
