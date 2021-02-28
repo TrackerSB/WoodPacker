@@ -89,7 +89,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     public void reset() {
         setPlankId("");
         // FIXME Remove width and height field contents
-        // setIndicatorChangedByUser(false);
+        // FIXME Re-enable grain direction auto mode
         setSelectedMaterial(PlankMaterial.UNDEFINED);
         setComment("");
     }
