@@ -74,6 +74,8 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                     .addListener((obss, previousSearchText, currentSearchText) -> {
                         String lowerCaseSearchText = currentSearchText
                                 .toLowerCase(Locale.ROOT);
+                        final T currentSelectedItem = planksView.getSelectionModel()
+                                .getSelectedItem();
                         filterableItems.setPredicate(
                                 plank -> {
                                     String lowerCaseId = plank.getPlankId()
@@ -83,6 +85,10 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                                     return lowerCaseId.contains(lowerCaseSearchText)
                                             || lowerCaseComment.contains(lowerCaseSearchText);
                                 });
+
+                        // Ensure that previously selected item is still selected after the visibility of items changed
+                        planksView.getSelectionModel()
+                                .select(currentSelectedItem);
                     });
             planksView.setItems(filterableItems);
             currentSet.addListener((SetChangeListener<T>) change -> {
