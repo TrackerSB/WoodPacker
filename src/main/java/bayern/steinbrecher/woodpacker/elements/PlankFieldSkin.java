@@ -6,11 +6,8 @@ import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
-import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,20 +16,13 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
-
-import java.util.function.BiConsumer;
 
 /**
  * @author Stefan Huber
  * @since 0.1
  */
 public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
-    private final BooleanProperty indicatorChangedByUser = new SimpleBooleanProperty(false);
 
     private Node createPlankIdField(final PlankField<T> control) {
         final CheckedTextField plankIdField = new CheckedTextField();
@@ -49,33 +39,6 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         idIcon.fitHeightProperty()
                 .bind(plankIdField.heightProperty());
         return new HBox(idIcon, plankIdField);
-    }
-
-    private Node createGrainIndicator(final PlankField<T> control) {
-        final PlankGrainDirectionIndicator indicator = new PlankGrainDirectionIndicator();
-        control.grainDirectionProperty()
-                .bindBidirectional(indicator.valueProperty());
-
-        final Rectangle autoStateBackground = new Rectangle();
-        autoStateBackground.setFill(Color.rgb(255, 255, 255, 0.5));
-        autoStateBackground.widthProperty()
-                .bind(indicator.widthProperty());
-        autoStateBackground.heightProperty()
-                .bind(indicator.heightProperty());
-        autoStateBackground.visibleProperty()
-                .bind(indicatorChangedByUser.not());
-
-        final Text autoStateText = new Text("A");
-        autoStateText.visibleProperty()
-                .bind(indicatorChangedByUser.not());
-
-        final StackPane indicatorNode = new StackPane(indicator, autoStateBackground, autoStateText);
-        indicatorNode.setOnMouseClicked(mevt -> {
-            indicatorChangedByUser.set(true);
-            indicator.fireEvent(mevt); // FIXME This event does not reach the underlying button
-        });
-
-        return indicatorNode;
     }
 
     /**
@@ -146,27 +109,9 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         super(control);
 
         final Node plankIdField = createPlankIdField(control);
-
-        final BiConsumer<Integer, Integer> autoUpdateIndicator = (plankWidth, plankHeight) -> {
-            if (!indicatorChangedByUser.get()) {
-                control.setGrainDirection(
-                        (plankHeight > plankWidth) // NOPMD - Parenthesis clarify structure
-                                ? PlankGrainDirection.VERTICAL
-                                : PlankGrainDirection.HORIZONTAL);
-            }
-        };
-
         final Node widthField = createLengthField(control, true);
-        control.plankWidthProperty()
-                .addListener((ob, oldWidth, newWidth)
-                        -> autoUpdateIndicator.accept(newWidth.intValue(), control.getPlankHeight()));
-
         final Label separator = new Label("\u2a09");
-
         final Node heightField = createLengthField(control, false);
-        control.plankHeightProperty()
-                .addListener((ob, oldHeight, newHeight)
-                        -> autoUpdateIndicator.accept(control.getPlankWidth(), newHeight.intValue()));
 
         final HBox sizeRow = new HBox(widthField, separator, heightField);
         sizeRow.setAlignment(Pos.CENTER_LEFT);
@@ -177,7 +122,9 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         final Node commentField = createCommentField(control);
         propertyRow.getChildren()
                 .add(commentField);
-        final Node indicatorNode = createGrainIndicator(control);
+        final PlankGrainDirectionIndicator indicatorNode = new PlankGrainDirectionIndicator(control);
+        control.grainDirectionProperty()
+                .bindBidirectional(indicatorNode.valueProperty());
         propertyRow.getChildren()
                 .add(indicatorNode);
         if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {

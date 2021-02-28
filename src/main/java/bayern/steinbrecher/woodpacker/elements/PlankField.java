@@ -86,6 +86,14 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         return createdPlank;
     }
 
+    public void reset() {
+        setPlankId("");
+        // FIXME Remove width and height field contents
+        // setIndicatorChangedByUser(false);
+        setSelectedMaterial(PlankMaterial.UNDEFINED);
+        setComment("");
+    }
+
     public StringProperty plankIdProperty() {
         return plankId;
     }

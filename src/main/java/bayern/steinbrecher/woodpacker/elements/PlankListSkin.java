@@ -236,8 +236,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
             if (newPlankField.isValid()) {
                 control.getPlanks()
                         .add(newPlankField.createPlank());
-                newPlankField.setPlankId("");
-                newPlankField.setComment("");
+                newPlankField.reset();
             }
         });
         ButtonBar.setButtonData(addPlankButton, ButtonData.APPLY);
