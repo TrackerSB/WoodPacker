@@ -93,13 +93,16 @@ public class PlankSolutionRow {
      */
     public double getAreaUtilization() {
         final int cutOffArea = getCurrentBreadth() * getMaxLength();
+        double areaUtilization;
         if (cutOffArea <= 0) {
-            return 0d;
+            areaUtilization = 0d;
+        } else {
+            final int utilizedArea = planks.stream()
+                    .mapToInt(RequiredPlank::getArea)
+                    .sum();
+            areaUtilization = ((double) utilizedArea) / cutOffArea;
         }
-        final int utilizedArea = planks.stream()
-                .mapToInt(RequiredPlank::getArea)
-                .sum();
-        return ((double) utilizedArea) / cutOffArea;
+        return areaUtilization;
     }
 
     private int getPlankLength(final Plank plank) {

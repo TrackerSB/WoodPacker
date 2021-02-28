@@ -10,7 +10,7 @@ import java.util.Collections;
 public class CuttingPlan {
     private final Collection<PlankSolutionRow> rows;
 
-    public CuttingPlan(Collection<PlankSolutionRow> rows) {
+    public CuttingPlan(final Collection<PlankSolutionRow> rows) {
         this.rows = Collections.unmodifiableCollection(rows);
     }
 

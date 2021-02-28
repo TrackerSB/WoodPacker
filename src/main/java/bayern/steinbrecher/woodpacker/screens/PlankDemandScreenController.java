@@ -247,7 +247,7 @@ public class PlankDemandScreenController extends ScreenController {
         } else {
             final Consumer<GraphicsContext> basePlankActions = DrawActionGenerator.forBasePlank(basePlank);
             final List<Consumer<GraphicsContext>> cuttingPlanActions = new ArrayList<>();
-            for (CuttingPlan cuttingPlan : cuttingPlans) {
+            for (final CuttingPlan cuttingPlan : cuttingPlans) {
                 cuttingPlanActions.add(DrawActionGenerator.forCuttingPlan(basePlank, cuttingPlan));
             }
             if (cuttingPlanActions.isEmpty()) {
@@ -412,7 +412,7 @@ public class PlankDemandScreenController extends ScreenController {
                     final Node currentPage = cuttingPlanPages.getPageFactory()
                             .call(cuttingPlanPages.getCurrentPageIndex());
                     if (currentPage instanceof ScaledCanvas) {
-                        final ScaledCanvas cuttingPlanCanvas = ((ScaledCanvas) currentPage);
+                        final ScaledCanvas cuttingPlanCanvas = (ScaledCanvas) currentPage;
                         final Image cuttingPlan = generateCuttingPlan(cuttingPlanCanvas);
                         final PageSize pageSize = document.getPdfDocument().getDefaultPageSize();
                         cuttingPlan.scaleToFit(pageSize.getWidth(), pageSize.getHeight());

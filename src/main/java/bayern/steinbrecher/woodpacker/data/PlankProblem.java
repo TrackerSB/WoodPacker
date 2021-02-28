@@ -338,7 +338,7 @@ public class PlankProblem implements Serializable {
         private final Boolean restrictToVerticalCandidates;
         private final BasePlank basePlank;
 
-        private RemainingBasePlank(Boolean restrictToVerticalCandidates, BasePlank basePlank) {
+        private RemainingBasePlank(final Boolean restrictToVerticalCandidates, final BasePlank basePlank) {
             this.restrictToVerticalCandidates = restrictToVerticalCandidates;
             this.basePlank = basePlank;
         }

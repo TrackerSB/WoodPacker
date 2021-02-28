@@ -22,7 +22,7 @@ public final class ComparisonUtility {
     }
 
     public static <T> Optional<String> comparePublicValues(
-            Class<T> typeDummy, T actual, T expected, String... methodsToIgnore) {
+            final Class<T> typeDummy, final T actual, final T expected, final String... methodsToIgnore) {
         final List<String> methodsToIgnoreLowerCase = Arrays.stream(methodsToIgnore)
                 .map(m -> m.toLowerCase(Locale.ROOT))
                 .collect(Collectors.toList());
