@@ -32,7 +32,7 @@ public class SnapshotPagination extends Pagination {
                 setCurrentPageIndex(nextIndexForSnapshot);
                 new Thread(() -> {
                     try {
-                        Thread.sleep(500); // Wait for animation
+                        Thread.sleep(500); // Wait for animation of pagination
                     } catch (InterruptedException ex) {
                         LOGGER.log(Level.WARNING,
                                 String.format("The snapshot for page %d may be inaccurate", nextIndexForSnapshot));
