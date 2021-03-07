@@ -2,6 +2,8 @@ package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
 import bayern.steinbrecher.checkedElements.report.ReportType;
+import bayern.steinbrecher.javaUtility.DialogCreationException;
+import bayern.steinbrecher.javaUtility.DialogGenerator;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
@@ -16,9 +18,12 @@ import javafx.collections.SetChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -40,8 +45,11 @@ import javafx.scene.text.Text;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
+    private static final Logger LOGGER = Logger.getLogger(PlankListSkin.class.getName());
     private static final double ID_BADGE_MIN_WIDTH = 50;
     private static final double ID_BADGE_PADDING = 5;
     private static final Font ID_BADGE_FONT = Font.font(15);
@@ -247,7 +255,22 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         clearAllPlanksGraphic.setPreserveRatio(true);
         final Button clearAllPlanksButton
                 = new Button(WoodPacker.getResource("clearAll"), clearAllPlanksGraphic);
-        clearAllPlanksButton.setOnAction(aevt -> control.getPlanks().clear());
+        clearAllPlanksButton.setOnAction(aevt -> {
+            boolean clearAllConfirmed;
+            try {
+                final Alert confirmClearAllAlert = WoodPacker.DIALOG_GENERATOR
+                        .createInteractiveAlert(AlertType.WARNING, "confirmClearAll", ButtonType.YES, ButtonType.NO);
+                final Optional<ButtonType> pressedButton = DialogGenerator.showAndWait(confirmClearAllAlert);
+                clearAllConfirmed = pressedButton.isPresent()
+                        && pressedButton.get() == ButtonType.YES;
+            } catch (DialogCreationException ex) {
+                LOGGER.log(Level.WARNING, "Could not ask user for delete confirmation. Assume deletion confirmed.", ex);
+                clearAllConfirmed = true;
+            }
+            if (clearAllConfirmed) {
+                control.getPlanks().clear();
+            }
+        });
 
         final ChangeListener<Boolean> onPlankListEmptyChanged
                 = (obs, wasEmpty, isEmpty) -> clearAllPlanksButton.setDisable(isEmpty);
