@@ -38,6 +38,12 @@ dependencies {
 
 run {
     main = "$moduleName/bayern.steinbrecher.woodpacker.WoodPacker"
+    jvmArgs = [
+            /* 2021-03-07:  Required for determining the pagination child that contains the current page content in
+             * SnapshotPagination
+             */
+            "--add-opens", "javafx.controls/javafx.scene.control.skin=$moduleName"
+    ]
 }
 
 distributions {
