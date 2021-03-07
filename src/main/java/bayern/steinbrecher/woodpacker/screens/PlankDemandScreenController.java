@@ -13,6 +13,7 @@ import bayern.steinbrecher.woodpacker.data.PlankSolutionCriterion;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import bayern.steinbrecher.woodpacker.elements.PlankList;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
+import bayern.steinbrecher.woodpacker.elements.SnapshotPagination;
 import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
 import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
@@ -22,7 +23,9 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.property.AreaBreakType;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.FXCollections;
@@ -32,13 +35,12 @@ import javafx.collections.SetChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.Pagination;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
@@ -83,7 +85,7 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private PlankList<RequiredPlank> requiredPlanksView;
     @FXML
-    private Pagination cuttingPlanPages;
+    private SnapshotPagination cuttingPlanPages;
     @FXML
     private VBox criteriaPane;
     private final PlankProblem plankProblem = new PlankProblem();
@@ -367,8 +369,7 @@ public class PlankDemandScreenController extends ScreenController {
         }
     }
 
-    private Image generateCuttingPlan(final ScaledCanvas cuttingPlanCanvas) throws IOException {
-        final WritableImage snapshot = cuttingPlanCanvas.snapshotDrawingArea();
+    private Image generatePDFImage(final WritableImage snapshot) throws IOException {
         final BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
         final boolean rotateVertical = bufferedSnapshot.getWidth() > bufferedSnapshot.getHeight();
         BufferedImage monochromeSnapshot;
@@ -396,53 +397,57 @@ public class PlankDemandScreenController extends ScreenController {
         return snapshotImage;
     }
 
+    private void generateCuttingPlanDocument(final File savePath) throws DialogCreationException {
+        try (Document document = new Document(new PdfDocument(new PdfWriter(savePath)))) {
+            final PdfDocument pdfDocument = document.getPdfDocument();
+            final PdfDocumentInfo documentInfo = pdfDocument.getDocumentInfo();
+            documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
+
+            final PageSize pageSize = pdfDocument.getDefaultPageSize();
+            final List<WritableImage> contentSnapshots = cuttingPlanPages.snapshotContents(new SnapshotParameters());
+            for (final WritableImage snapshot : contentSnapshots) {
+                final Image cuttingPlan;
+                try {
+                    cuttingPlan = generatePDFImage(snapshot);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "Could not export all cutting plans", ex);
+                    // FIXME Inform user about non exported cutting plans
+                    continue;
+                }
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                cuttingPlan.scaleToFit(pageSize.getWidth(), pageSize.getHeight());
+                final float leftMargin = (pageSize.getWidth() - cuttingPlan.getImageScaledWidth()) / 2;
+                cuttingPlan.setMarginLeft(Math.max(0, leftMargin));
+                document.add(cuttingPlan);
+            }
+
+            try {
+                Desktop.getDesktop()
+                        .open(savePath);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Could not open exported cutting plan to user", ex);
+            }
+        } catch (FileNotFoundException ex) {
+            LOGGER.log(Level.SEVERE,
+                    String.format("Could not open '%s' for writing", savePath.getAbsolutePath()), ex);
+            final Alert writeAccessDeniedAlert = WoodPacker.DIALOG_GENERATOR
+                    .createErrorAlert(WoodPacker.getResource("writeAccessDenied", savePath.getAbsolutePath()));
+            DialogGenerator.showAndWait(writeAccessDeniedAlert);
+        }
+    }
+
     @SuppressWarnings("unused")
     @FXML
-    private void printPreview() throws DialogCreationException {
+    private void exportPreview() {
         final Optional<File> savePath = PredefinedFileChooser.CUTTING_PLAN
                 .askForSavePath(requiredPlanksView.getScene().getWindow());
-        if (savePath.isPresent()) {
-            try (Document document = new Document(new PdfDocument(new PdfWriter(savePath.get())))) {
-                try {
-                    final PdfDocumentInfo documentInfo = document.getPdfDocument()
-                            .getDocumentInfo();
-                    documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
-
-                    // FIXME Print all cutting plans
-                    final Node currentPage = cuttingPlanPages.getPageFactory()
-                            .call(cuttingPlanPages.getCurrentPageIndex());
-                    if (currentPage instanceof ScaledCanvas) {
-                        final ScaledCanvas cuttingPlanCanvas = (ScaledCanvas) currentPage;
-                        final Image cuttingPlan = generateCuttingPlan(cuttingPlanCanvas);
-                        final PageSize pageSize = document.getPdfDocument().getDefaultPageSize();
-                        cuttingPlan.scaleToFit(pageSize.getWidth(), pageSize.getHeight());
-                        final float leftMargin = (pageSize.getWidth() - cuttingPlan.getImageScaledWidth()) / 2;
-                        cuttingPlan.setMarginLeft(Math.max(0, leftMargin));
-                        document.add(cuttingPlan);
-                    }
-                } catch (IOException ex) {
-                    throw new ExportFailedException("Could not generate snapshot of cutting plan preview", ex);
-                }
-                try {
-                    Desktop.getDesktop()
-                            .open(savePath.get());
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Could not open exported cutting plan to user", ex);
-                }
-            } catch (FileNotFoundException ex) {
-                LOGGER.log(Level.SEVERE,
-                        String.format("Could not open '%s' for writing", savePath.get().getAbsolutePath()), ex);
-                final Alert writeAccessDeniedAlert = WoodPacker.DIALOG_GENERATOR
-                        .createErrorAlert(WoodPacker.getResource(
-                                "writeAccessDenied", savePath.get().getAbsolutePath()));
-                DialogGenerator.showAndWait(writeAccessDeniedAlert);
-            } catch (ExportFailedException ex) {
-                LOGGER.log(Level.SEVERE, "Could not export cutting plan", ex);
-                final Alert cuttingPlanExportFailed = WoodPacker.DIALOG_GENERATOR
-                        .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));
-                DialogGenerator.showAndWait(cuttingPlanExportFailed);
+        savePath.ifPresent(file -> new Thread(() -> {
+            try {
+                generateCuttingPlanDocument(file);
+            } catch (DialogCreationException ex) {
+                LOGGER.log(Level.WARNING, "Could not show exception to user", ex);
             }
-        }
+        }).start());
     }
 
     public ReadOnlyBooleanProperty plankProblemValidProperty() {

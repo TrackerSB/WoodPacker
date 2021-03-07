@@ -5,10 +5,10 @@ since: 0.1
 -->
 
 <?import bayern.steinbrecher.woodpacker.elements.PlankList?>
+<?import bayern.steinbrecher.woodpacker.elements.SnapshotPagination?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -56,13 +56,13 @@ since: 0.1
         </left>
         <center>
             <VBox>
-                <Pagination fx:id="cuttingPlanPages"
-                            VBox.vgrow="ALWAYS"/>
+                <SnapshotPagination fx:id="cuttingPlanPages"
+                                    VBox.vgrow="ALWAYS"/>
                 <ButtonBar>
                     <buttons>
                         <Button id="printPreview"
                                 text="%print"
-                                onAction="#printPreview"
+                                onAction="#exportPreview"
                                 disable="${!controller.plankProblemValid}"/>
                     </buttons>
                 </ButtonBar>
