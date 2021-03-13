@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -232,15 +233,22 @@ public class PlankProblem implements Serializable {
 
             final Map<Point2D, RemainingBasePlank> remainingPartitions = new ConcurrentHashMap<>();
             final Collection<PlankSolutionRow> currentSolutionRows = new ArrayList<>();
+            final AtomicBoolean potentialForMorePlacements = new AtomicBoolean(true);
             Runnable resetCurrentCuttingPlan = () -> {
                 currentSolutionRows.clear();
                 remainingPartitions.clear();
-                remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
+                final Optional<BasePlank> emptyBasePlank = basePlank.widthDecreased(2 * getBasePlankOversize())
+                        .flatMap(bp -> bp.heightDecreased(2 * getBasePlankOversize()));
+                if (emptyBasePlank.isPresent()) {
+                    final Point2D initialOffset = new Point2D(getBasePlankOversize(), getBasePlankOversize());
+                    remainingPartitions.put(initialOffset, new RemainingBasePlank(null, emptyBasePlank.get()));
+                } else {
+                    potentialForMorePlacements.set(false);
+                }
             };
             resetCurrentCuttingPlan.run();
 
-            boolean potentialForMorePlacements = true;
-            while (!unplacedPlanks.isEmpty() && potentialForMorePlacements) {
+            while (!unplacedPlanks.isEmpty() && potentialForMorePlacements.get()) {
                 final Optional<PlankSolutionRow> optBestCandidate
                         = determineBestCandidate(unplacedPlanks, remainingPartitions);
                 if (optBestCandidate.isPresent()) {
@@ -260,7 +268,7 @@ public class PlankProblem implements Serializable {
                 } else {
                     // No further candidates can be found for the current set of remaining base plank partitions
                     if (currentSolutionRows.isEmpty()) { // If on an empty base plank there are no candidates available
-                        potentialForMorePlacements = false;
+                        potentialForMorePlacements.set(false);
                     } else {
                         cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows)));
                         resetCurrentCuttingPlan.run();
