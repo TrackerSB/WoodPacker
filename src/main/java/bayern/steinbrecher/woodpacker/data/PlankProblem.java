@@ -58,7 +58,7 @@ public class PlankProblem implements Serializable {
         }
         return areaDifference;
     };
-    private static final long internalSerialVersion = 1L;
+    private static final long internalSerialVersion = 92870523745L;
 
     // Since internal serial version 1
     private transient /*final*/ ObservableMap<PlankSolutionCriterion, Double> criterionWeights;

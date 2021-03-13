@@ -14,19 +14,28 @@ import java.io.Serial;
  */
 public class RequiredPlank extends Plank {
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 98072354127L;
+    private static final long internalSerialVersion = 1L;
+
+    // Since internal serial version 1
     // FIXME Should there be a subclass of RequiredPlank like PlacedPlank containing the following additional property?
     // FIXME Solely PlankProblem::determineSolution(...) should be allowed to change this member
-    private transient /*final*/ BooleanProperty placedInSolution = new SimpleBooleanProperty(false);
+    private transient /*final*/ BooleanProperty placedInSolution;
 
     public RequiredPlank(final String plankId, final int width, final int height,
                          final PlankGrainDirection grainDirection) {
         super(plankId, width, height, grainDirection);
+        initializeTransientMember();
     }
 
     public RequiredPlank(final String plankId, final int width, final int height,
                          final PlankGrainDirection grainDirection, final String comment) {
         super(plankId, width, height, grainDirection, comment);
+        initializeTransientMember();
+    }
+
+    private void initializeTransientMember() {
+        placedInSolution = new SimpleBooleanProperty(false);
     }
 
     public RequiredPlank rotated() {
@@ -42,18 +51,6 @@ public class RequiredPlank extends Plank {
         return getHeight() * getWidth();
     }
 
-    @Serial
-    private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
-        input.defaultReadObject();
-        placedInSolution = new SimpleBooleanProperty(input.readBoolean());
-    }
-
-    @Serial
-    private void writeObject(final ObjectOutputStream output) throws IOException, ClassNotFoundException {
-        output.defaultWriteObject();
-        output.writeBoolean(isPlacedInSolution());
-    }
-
     @Override
     public String toString() {
         String plankDescription;
@@ -64,6 +61,25 @@ public class RequiredPlank extends Plank {
                     getPlankId(), getWidth(), getHeight(), getComment());
         }
         return plankDescription;
+    }
+
+    @Serial
+    private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
+        initializeTransientMember();
+        final long inputSerialVersion = input.readLong();
+
+        // Internal serial version 1
+        if (inputSerialVersion >= 1) {
+            setPlacedInSolution(input.readBoolean());
+        }
+    }
+
+    @Serial
+    private void writeObject(final ObjectOutputStream output) throws IOException {
+        output.writeLong(internalSerialVersion);
+
+        // Internal serial version 1
+        output.writeBoolean(isPlacedInSolution());
     }
 
     public BooleanProperty placedInSolutionProperty() {

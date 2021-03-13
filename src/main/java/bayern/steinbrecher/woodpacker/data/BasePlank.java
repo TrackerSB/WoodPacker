@@ -2,6 +2,9 @@ package bayern.steinbrecher.woodpacker.data;
 
 import bayern.steinbrecher.woodpacker.WoodPacker;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Optional;
 
@@ -11,8 +14,11 @@ import java.util.Optional;
  */
 public class BasePlank extends Plank {
     @Serial
-    private static final long serialVersionUID = 1L;
-    private final PlankMaterial material;
+    private static final long serialVersionUID = 871234122134L;
+    private static final long internalSerialVersion = 1L;
+
+    // Since internal serial version 1
+    private /*final*/ PlankMaterial material;
 
     public BasePlank(final String plankId, final int width, final int height, final PlankGrainDirection grainDirection,
                      final PlankMaterial material) {
@@ -72,6 +78,24 @@ public class BasePlank extends Plank {
                     getPlankId(), getWidth(), getHeight(), localizedMaterial, getComment());
         }
         return plankDescription;
+    }
+
+    @Serial
+    private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
+        final long inputSerialVersion = input.readLong();
+
+        // Internal serial version 1
+        if (inputSerialVersion >= 1) {
+            material = (PlankMaterial) input.readObject();
+        }
+    }
+
+    @Serial
+    private void writeObject(final ObjectOutputStream output) throws IOException {
+        output.writeLong(internalSerialVersion);
+
+        // Internal serial version 1
+        output.writeObject(getMaterial());
     }
 
     public PlankMaterial getMaterial() {

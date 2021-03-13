@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.utility;
 
 import bayern.steinbrecher.woodpacker.data.BasePlank;
+import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
@@ -15,10 +16,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Stefan Huber
@@ -26,12 +27,63 @@ import java.util.logging.Logger;
  */
 @Test(groups = {"serialization"})
 public final class SerializationUtilityTest {
-    private static final Logger LOGGER = Logger.getLogger(SerializationUtilityTest.class.getName());
-    private static final Set<String> SERIALIZATION_VERSIONS = Set.of("v0.1");
+    private static final String referenceFilePattern = "serialized%s%d.bin";
+
+    @SuppressWarnings("unchecked")
+    private <C> void checkSerializationForClass(final Set<Long> versions, final C reference, final Class<C> typeDummy)
+            throws URISyntaxException, IOException, ClassNotFoundException {
+        List<String> failMessages = new ArrayList<>();
+        for (final long version : versions) {
+            final String referenceFileName = String.format(referenceFilePattern, typeDummy.getSimpleName(), version);
+            final Path referenceFilePath = Path.of(
+                    SerializationUtilityTest.class.getResource(referenceFileName).toURI());
+            final byte[] serializedObject = Files.readAllBytes(referenceFilePath);
+            final C deserializedObject = SerializationUtility.deserialize(serializedObject);
+            final Optional<String> failMessage
+                    = ComparisonUtility.comparePublicValues(typeDummy, deserializedObject, reference);
+            failMessage.ifPresent(failMessages::add);
+        }
+
+        Assert.assertTrue(failMessages.isEmpty(), String.join("\n", failMessages));
+    }
+
+    // Serialization of Plank
+    private static final Set<Long> PLANK_SERIAL_VERSIONS = Set.of(1L);
+    // FIXME An anonymous subclass may be a problem with serialization
+    private static final Plank PLANK_REFERENCE = new Plank(
+            "PlankReference", 15, 16, PlankGrainDirection.IRRELEVANT, "anonymous plank") {
+    };
+
+    @Test
+    public void checkSerializationForPlanks() throws URISyntaxException, IOException, ClassNotFoundException {
+        checkSerializationForClass(PLANK_SERIAL_VERSIONS, PLANK_REFERENCE, Plank.class);
+    }
+
+    // Serialization of BasePlank
+    private static final Set<Long> BASE_PLANK_SERIAL_VERSIONS = Set.of(1L);
     private static final BasePlank BASE_PLANK_REFERENCE
-            = new BasePlank("reference", 86, 42, PlankGrainDirection.IRRELEVANT, PlankMaterial.UNDEFINED);
-    private static final String BASE_PLANK_REFERENCE_PATH_PATTERN = "serializedBasePlank_%s.bin";
-    private static final PlankProblem PLANK_PROBLEM_REFERENCE = new PlankProblem(){{
+            = new BasePlank("BasePlank reference", 86, 42, PlankGrainDirection.IRRELEVANT, PlankMaterial.OAK);
+
+    @Test
+    public void checkSerializationForBasePlanks() throws URISyntaxException, IOException, ClassNotFoundException {
+        checkSerializationForClass(BASE_PLANK_SERIAL_VERSIONS, BASE_PLANK_REFERENCE, BasePlank.class);
+    }
+
+    // Serialization of RequiredPlank
+    private static final Set<Long> REQUIRED_PLANK_SERIAL_VERSIONS = Set.of(1L);
+    private static final RequiredPlank REQUIRED_PLANK_REFERENCE = new RequiredPlank(
+            "RequiredPlank reference", 17, 18, PlankGrainDirection.VERTICAL, "some required plank"
+    );
+
+    @Test
+    public void checkSerializationForRequiredPlanks() throws URISyntaxException, IOException, ClassNotFoundException {
+        checkSerializationForClass(REQUIRED_PLANK_SERIAL_VERSIONS, REQUIRED_PLANK_REFERENCE, RequiredPlank.class);
+    }
+
+    // Serialization of PlankProblem
+    private static final Set<Long> PLANK_PROBLEM_SERIAL_VERSIONS = Set.of(1L);
+    // FIXME An anonymous subclass may be a problem with serialization
+    private static final PlankProblem PLANK_PROBLEM_REFERENCE = new PlankProblem() {{
         setBasePlank(BASE_PLANK_REFERENCE);
         setCriterionWeight(PlankSolutionCriterion.BREATH_DIFFERENCES, 1);
         setCriterionWeight(PlankSolutionCriterion.NUM_PLANKS, 2);
@@ -40,73 +92,9 @@ public final class SerializationUtilityTest {
                 new RequiredPlank("first", 11, 12, PlankGrainDirection.VERTICAL, "first comment"),
                 new RequiredPlank("second", 14, 13, PlankGrainDirection.HORIZONTAL, "second comment")));
     }};
-    private static final String PLANK_PROBLEM_REFERENCE_PATH_PATTERN = "serializedPlankProblem_%s.wp";
 
     @Test
-    public void checkBasePlankSerializationCurrentVersion() throws IOException, ClassNotFoundException {
-        final byte[] serializedBasePlank = SerializationUtility.serialize(BASE_PLANK_REFERENCE);
-        final BasePlank deserializedBasePlank = SerializationUtility.deserialize(serializedBasePlank);
-        final Optional<String> failMessage
-                = ComparisonUtility.comparePublicValues(BasePlank.class, deserializedBasePlank, BASE_PLANK_REFERENCE);
-        Assert.assertTrue(failMessage.isEmpty(),
-                "Could not serialize and deserialize reference base plank with current application version: "
-                        + failMessage.orElse("<Could not retrieve fail message>"));
-    }
-
-    @Test
-    public void checkBasePlankDeserializationBackwardCompatibility()
-            throws IOException, ClassNotFoundException, URISyntaxException {
-        boolean allVersionsCompatible = true;
-        for (final String version : SERIALIZATION_VERSIONS) {
-            final Path versionFilePath = Path.of(
-                    SerializationUtilityTest.class
-                            .getResource(BASE_PLANK_REFERENCE_PATH_PATTERN.formatted(version))
-                            .toURI());
-            final byte[] serializedBasePlank = Files.readAllBytes(versionFilePath);
-            final BasePlank deserializedBasePlank = SerializationUtility.deserialize(serializedBasePlank);
-            final Optional<String> failMessage = ComparisonUtility.comparePublicValues(
-                    BasePlank.class, deserializedBasePlank, BASE_PLANK_REFERENCE);
-            if (failMessage.isPresent()) {
-                allVersionsCompatible = false;
-                LOGGER.log(Level.INFO,
-                        String.format(
-                                "Deserialization not compatible with version %s (%s)", version, failMessage.get()));
-            }
-        }
-        Assert.assertTrue(allVersionsCompatible, "Backwards compatibility of deserialization is broken");
-    }
-
-    @Test
-    public void checkPlankProblemSerializationCurrentVersion() throws IOException, ClassNotFoundException {
-        final byte[] serializedPlankProblem = SerializationUtility.serialize(PLANK_PROBLEM_REFERENCE);
-        final PlankProblem deserializedPlankProblem = SerializationUtility.deserialize(serializedPlankProblem);
-        final Optional<String> failMessage = ComparisonUtility.comparePublicValues(
-                PlankProblem.class, deserializedPlankProblem, PLANK_PROBLEM_REFERENCE, "getProposedSolution");
-        Assert.assertTrue(failMessage.isEmpty(),
-                "Could not serialize and deserialize reference plank problem with current application version: "
-                        + failMessage.orElse("<Could not retrieve fail message>"));
-    }
-
-    @Test
-    public void checkPlankProblemDeserializationBackwardCompatibility()
-            throws IOException, ClassNotFoundException, URISyntaxException {
-        boolean allVersionsCompatible = true;
-        for (final String version : SERIALIZATION_VERSIONS) {
-            final Path versionFilePath = Path.of(
-                    SerializationUtilityTest.class
-                            .getResource(PLANK_PROBLEM_REFERENCE_PATH_PATTERN.formatted(version))
-                            .toURI());
-            final byte[] serializedPlankProblem = Files.readAllBytes(versionFilePath);
-            final PlankProblem deserializedPlankProblem = SerializationUtility.deserialize(serializedPlankProblem);
-            final Optional<String> failMessage = ComparisonUtility.comparePublicValues(
-                    PlankProblem.class, deserializedPlankProblem, PLANK_PROBLEM_REFERENCE, "getProposedSolution");
-            if (failMessage.isPresent()) {
-                allVersionsCompatible = false;
-                LOGGER.log(Level.INFO,
-                        String.format(
-                                "Deserialization not compatible with version %s (%s)", version, failMessage.get()));
-            }
-        }
-        Assert.assertTrue(allVersionsCompatible, "Backwards compatibility of deserialization is broken");
+    public void checkSerializationForPlankProblems() throws URISyntaxException, IOException, ClassNotFoundException {
+        checkSerializationForClass(PLANK_PROBLEM_SERIAL_VERSIONS, PLANK_PROBLEM_REFERENCE, PlankProblem.class);
     }
 }
