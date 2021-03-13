@@ -2,7 +2,7 @@ package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.javaUtility.DialogCreationException;
 import bayern.steinbrecher.javaUtility.DialogGenerator;
-import bayern.steinbrecher.screenSwitcher.ScreenController;
+import bayern.steinbrecher.screenswitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.BuildConfig;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
@@ -442,11 +442,15 @@ public class PlankDemandScreenController extends ScreenController {
         final Optional<File> savePath = PredefinedFileChooser.CUTTING_PLAN
                 .askForSavePath(requiredPlanksView.getScene().getWindow());
         savePath.ifPresent(file -> new Thread(() -> {
+            getScreenManager()
+                    .showOverlay(WoodPacker.getResource("creatingCuttingPlanDocument"));
             try {
                 generateCuttingPlanDocument(file);
             } catch (DialogCreationException ex) {
                 LOGGER.log(Level.WARNING, "Could not show exception to user", ex);
             }
+            getScreenManager()
+                    .hideOverlay();
         }).start());
     }
 

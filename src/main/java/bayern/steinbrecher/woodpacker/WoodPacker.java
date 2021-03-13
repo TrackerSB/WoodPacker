@@ -1,8 +1,8 @@
 package bayern.steinbrecher.woodpacker;
 
 import bayern.steinbrecher.javaUtility.DialogGenerator;
-import bayern.steinbrecher.screenSwitcher.ScreenManager;
-import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
+import bayern.steinbrecher.screenswitcher.ScreenManager;
+import bayern.steinbrecher.screenswitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
 import javafx.application.Application;
 import javafx.scene.image.Image;

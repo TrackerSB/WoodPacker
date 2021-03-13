@@ -1,6 +1,6 @@
 package bayern.steinbrecher.woodpacker.screens;
 
-import bayern.steinbrecher.screenSwitcher.ScreenController;
+import bayern.steinbrecher.screenswitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.BuildConfig;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import javafx.beans.property.ReadOnlyStringProperty;

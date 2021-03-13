@@ -9,6 +9,15 @@
     -fx-background-color: white;
 }
 
+.screen-overlay {
+    -fx-fill: #00000099;
+}
+
+.screen-overlay-text {
+    -fx-fill: white;
+    -fx-font-size: 50;
+}
+
 .to-previous-screen {
     -fx-graphic: url("return.png");
 }

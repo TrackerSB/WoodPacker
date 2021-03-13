@@ -2,8 +2,8 @@ package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.javaUtility.DialogCreationException;
 import bayern.steinbrecher.javaUtility.DialogGenerator;
-import bayern.steinbrecher.screenSwitcher.ScreenController;
-import bayern.steinbrecher.screenSwitcher.ScreenSwitchFailedException;
+import bayern.steinbrecher.screenswitcher.ScreenController;
+import bayern.steinbrecher.screenswitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
 import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
