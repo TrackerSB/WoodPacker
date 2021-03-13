@@ -230,12 +230,15 @@ public class PlankProblem implements Serializable {
                     // Sort by area decreasing
                     .collect(Collectors.toCollection(() -> new TreeSet<>(VARIATION_GROUP_SORTER)));
 
-            /* FIXME Clarify structure of conditions and avoid duplicated code (e.g. for resetting remaining base plank
-             * partitions or setting up the list of current solution rows.
-             */
             final Map<Point2D, RemainingBasePlank> remainingPartitions = new ConcurrentHashMap<>();
-            remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
             final Collection<PlankSolutionRow> currentSolutionRows = new ArrayList<>();
+            Runnable resetCurrentCuttingPlan = () -> {
+                currentSolutionRows.clear();
+                remainingPartitions.clear();
+                remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
+            };
+            resetCurrentCuttingPlan.run();
+
             boolean potentialForMorePlacements = true;
             while (!unplacedPlanks.isEmpty() && potentialForMorePlacements) {
                 final Optional<PlankSolutionRow> optBestCandidate
@@ -259,11 +262,8 @@ public class PlankProblem implements Serializable {
                     if (currentSolutionRows.isEmpty()) { // If on an empty base plank there are no candidates available
                         potentialForMorePlacements = false;
                     } else {
-                        // Add another empty base plank
                         cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows)));
-                        currentSolutionRows.clear();
-                        remainingPartitions.clear();
-                        remainingPartitions.put(Point2D.ZERO, new RemainingBasePlank(null, basePlank));
+                        resetCurrentCuttingPlan.run();
                     }
                 }
             }
