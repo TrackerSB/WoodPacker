@@ -143,6 +143,31 @@ public class PlankProblem implements Serializable {
         return finalCandidate;
     }
 
+    private Optional<PlankSolutionRow> determineBestCandidate(
+            SortedSet<PlankVariationGroup> unplacedPlanks, Map<Point2D, RemainingBasePlank> remainingPartitions) {
+        return remainingPartitions.entrySet()
+                .stream()
+                .flatMap(entry -> {
+                    final RemainingBasePlank remaining = entry.getValue();
+                    List<PlankSolutionRow> candidates = new ArrayList<>();
+                    if (remaining.isRestrictToVerticalCandidates() == null
+                            || remaining.isRestrictToVerticalCandidates()) {
+                        candidates.add(createCandidate(
+                                false, entry.getKey(), remaining.getBasePlank(), unplacedPlanks));
+                    }
+                    if (remaining.isRestrictToVerticalCandidates() == null
+                            || !remaining.isRestrictToVerticalCandidates()) {
+                        candidates.add(createCandidate(
+                                true, entry.getKey(), remaining.getBasePlank(), unplacedPlanks));
+                    }
+                    return candidates.stream();
+                })
+                .filter(c -> c.getPlanks().size() > 0)
+                .map(c -> new Pair<>(c, determineCandidateQuality(c)))
+                .max(Comparator.comparing(Pair::getValue))
+                .map(Pair::getKey);
+    }
+
     private void shrinkRemainingPartitions(Map<Point2D, RemainingBasePlank> remainingPartitions,
                                            PlankSolutionRow rowToAdded) {
         final Point2D selectedOffset = rowToAdded.getStartOffset();
@@ -213,29 +238,10 @@ public class PlankProblem implements Serializable {
             final Collection<PlankSolutionRow> currentSolutionRows = new ArrayList<>();
             boolean potentialForMorePlacements = true;
             while (!unplacedPlanks.isEmpty() && potentialForMorePlacements) {
-                // Determine best candidate
-                final Optional<Pair<PlankSolutionRow, Double>> optBestCandidate = remainingPartitions.entrySet()
-                        .stream()
-                        .flatMap(entry -> {
-                            final RemainingBasePlank remaining = entry.getValue();
-                            List<PlankSolutionRow> candidates = new ArrayList<>();
-                            if (remaining.isRestrictToVerticalCandidates() == null
-                                    || remaining.isRestrictToVerticalCandidates()) {
-                                candidates.add(createCandidate(
-                                        false, entry.getKey(), remaining.getBasePlank(), unplacedPlanks));
-                            }
-                            if (remaining.isRestrictToVerticalCandidates() == null
-                                    || !remaining.isRestrictToVerticalCandidates()) {
-                                candidates.add(createCandidate(
-                                        true, entry.getKey(), remaining.getBasePlank(), unplacedPlanks));
-                            }
-                            return candidates.stream();
-                        })
-                        .filter(c -> c.getPlanks().size() > 0)
-                        .map(c -> new Pair<>(c, determineCandidateQuality(c)))
-                        .max(Comparator.comparing(Pair::getValue));
+                final Optional<PlankSolutionRow> optBestCandidate
+                        = determineBestCandidate(unplacedPlanks, remainingPartitions);
                 if (optBestCandidate.isPresent()) {
-                    final PlankSolutionRow bestCandidateRow = optBestCandidate.get().getKey();
+                    final PlankSolutionRow bestCandidateRow = optBestCandidate.get();
                     shrinkRemainingPartitions(remainingPartitions, bestCandidateRow);
 
                     currentSolutionRows.add(bestCandidateRow);
