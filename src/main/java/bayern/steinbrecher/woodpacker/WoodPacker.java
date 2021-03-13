@@ -1,10 +1,14 @@
 package bayern.steinbrecher.woodpacker;
 
+import bayern.steinbrecher.javaUtility.DialogCreationException;
 import bayern.steinbrecher.javaUtility.DialogGenerator;
 import bayern.steinbrecher.screenswitcher.ScreenManager;
 import bayern.steinbrecher.screenswitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
 import javafx.application.Application;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -12,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +57,30 @@ public class WoodPacker extends Application {
                 });
         primaryStage.getIcons()
                 .add(new Image(getClass().getResource("logo.png").toExternalForm()));
+        primaryStage.setOnCloseRequest(wevt -> {
+            Alert confirmCloseAlert;
+            try {
+                confirmCloseAlert = DIALOG_GENERATOR.createInteractiveAlert(
+                        AlertType.WARNING, getResource("confirmClose"), ButtonType.YES, ButtonType.NO);
+            } catch (DialogCreationException ex) {
+                LOGGER.log(Level.WARNING, "Could not warn user graphically before closing the application. "
+                        + "Close the application anyways.");
+                confirmCloseAlert = null;
+            }
+
+            boolean closeApplication;
+            if (confirmCloseAlert == null) {
+                closeApplication = true;
+            } else {
+                final Optional<ButtonType> userResponse = DialogGenerator.showAndWait(confirmCloseAlert);
+                closeApplication = userResponse.isPresent()
+                        && userResponse.get() == ButtonType.YES;
+            }
+
+            if (!closeApplication) {
+                wevt.consume(); // Block the close request
+            }
+        });
         primaryStage.show();
     }
 
