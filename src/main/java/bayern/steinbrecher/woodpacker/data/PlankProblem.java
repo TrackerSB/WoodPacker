@@ -65,6 +65,10 @@ public class PlankProblem implements Serializable {
     private transient /*final*/ SetProperty<RequiredPlank> requiredPlanks;
     private transient /*final*/ ObjectProperty<BasePlank> basePlank;
     private transient /*final*/ IntegerProperty basePlankOversize;
+    /**
+     * A list of cutting planks that fit on the given {@link BasePlank} and a list of the remaining planks that do not
+     * fit onto the base plank.
+     */
     private transient /*final*/ ReadOnlyObjectWrapper<Pair<Collection<CuttingPlan>, Set<RequiredPlank>>>
             proposedSolution;
 
@@ -74,19 +78,16 @@ public class PlankProblem implements Serializable {
         requiredPlanksProperty()
                 .addListener((obs, oldList, currentList) -> {
                     if (currentList != null) {
-                        currentList.addListener((InvalidationListener) observable -> {
-                            // FIXME Use observable instead of requiredPlanks?
-                            proposedSolution.set(determineSolution(getBasePlank(), getRequiredPlanks()));
-                        });
+                        currentList.addListener((InvalidationListener) observable -> updateSolution());
                     }
                 });
-        setRequiredPlanks(FXCollections.observableSet()); // Ensure initial state
         basePlankProperty()
-                .addListener((obs, previousBasePlank, currentBasePlank)
-                        -> proposedSolution.set(determineSolution(currentBasePlank, getRequiredPlanks())));
+                .addListener((obs, previousBasePlank, currentBasePlank) -> updateSolution());
         criterionWeightsProperty()
-                .addListener((MapChangeListener<? super PlankSolutionCriterion, ? super Double>) change
-                        -> proposedSolution.set(determineSolution(getBasePlank(), getRequiredPlanks())));
+                .addListener((InvalidationListener) observable -> updateSolution());
+        basePlankOversizeProperty()
+                .addListener(observable -> updateSolution());
+        updateSolution(); // Ensure initial state
     }
 
     private void initializeTransientMember() {
@@ -207,12 +208,7 @@ public class PlankProblem implements Serializable {
         }
     }
 
-    /**
-     * @return A list of cutting planks that fit on the given {@link BasePlank} and a list of the remaining planks that
-     * do not fit onto the base plank.
-     */
-    private Pair<Collection<CuttingPlan>, Set<RequiredPlank>> determineSolution(
-            final BasePlank basePlank, final Set<RequiredPlank> requiredPlanks) {
+    private void updateSolution() {
         final Collection<CuttingPlan> cuttingPlans = new ArrayList<>();
         Set<RequiredPlank> ignoredPlanks;
         if (basePlank == null
@@ -227,7 +223,7 @@ public class PlankProblem implements Serializable {
              */
             final SortedSet<PlankVariationGroup> unplacedPlanks = requiredPlanks.stream()
                     .peek(rp -> rp.setPlacedInSolution(false))
-                    .map(rp -> new PlankVariationGroup(rp, basePlank))
+                    .map(rp -> new PlankVariationGroup(rp, getBasePlank()))
                     // Sort by area decreasing
                     .collect(Collectors.toCollection(() -> new TreeSet<>(VARIATION_GROUP_SORTER)));
 
@@ -237,7 +233,7 @@ public class PlankProblem implements Serializable {
             Runnable resetCurrentCuttingPlan = () -> {
                 currentSolutionRows.clear();
                 remainingPartitions.clear();
-                final Optional<BasePlank> emptyBasePlank = basePlank.widthDecreased(2 * getBasePlankOversize())
+                final Optional<BasePlank> emptyBasePlank = getBasePlank().widthDecreased(2 * getBasePlankOversize())
                         .flatMap(bp -> bp.heightDecreased(2 * getBasePlankOversize()));
                 if (emptyBasePlank.isPresent()) {
                     final Point2D initialOffset = new Point2D(getBasePlankOversize(), getBasePlankOversize());
@@ -284,7 +280,7 @@ public class PlankProblem implements Serializable {
                     .collect(Collectors.toSet());
             ignoredPlanks.forEach(p -> p.setPlacedInSolution(false));
         }
-        return new Pair<>(cuttingPlans, ignoredPlanks);
+        proposedSolution.set(new Pair<>(cuttingPlans, ignoredPlanks));
     }
 
     @SuppressWarnings("unchecked")
@@ -301,7 +297,7 @@ public class PlankProblem implements Serializable {
                     .addAll((HashSet<RequiredPlank>) input.readObject());
             setBasePlank((BasePlank) input.readObject());
             setBasePlankOversize(input.readInt());
-            proposedSolution.set(determineSolution(getBasePlank(), getRequiredPlanks()));
+            updateSolution();
         }
     }
 

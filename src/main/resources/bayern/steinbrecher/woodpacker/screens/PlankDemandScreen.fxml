@@ -4,6 +4,7 @@ author: Stefan Huber
 since: 0.1
 -->
 
+<?import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner?>
 <?import bayern.steinbrecher.woodpacker.elements.PlankList?>
 <?import bayern.steinbrecher.woodpacker.elements.SnapshotPagination?>
 <?import javafx.scene.control.Button?>
@@ -72,13 +73,26 @@ since: 0.1
             <ScrollPane fitToWidth="true"
                         fitToHeight="true"
                         hbarPolicy="NEVER">
-                <VBox fx:id="criteriaPane"
-                      alignment="TOP_CENTER">
-                    <Text text="%optimizationCriteria"
-                          styleClass="heading"
-                          textAlignment="CENTER"/>
-                    <Text text="%optimizationCriteriaLegend"/>
-                    <Label/> <!-- FIXME Find proper way of adding a gap after the legend -->
+                <VBox>
+                    <VBox alignment="TOP_CENTER">
+                        <Text text="%settings"
+                              styleClass="heading"
+                              textAlignment="CENTER"/>
+                        <Text text="%oversize"/>
+                        <CheckedIntegerSpinner fx:id="oversizeSpinner"
+                                               min="0"
+                                               initialValue="0"
+                                               amountToStepBy="1"
+                                               editable="true"/>
+                    </VBox>
+                    <VBox fx:id="criteriaPane"
+                          alignment="TOP_CENTER">
+                        <Text text="%optimizationCriteria"
+                              styleClass="heading"
+                              textAlignment="CENTER"/>
+                        <Text text="%optimizationCriteriaLegend"/>
+                        <Label/> <!-- FIXME Find proper way of adding a gap after the legend -->
+                    </VBox>
                 </VBox>
             </ScrollPane>
         </right>

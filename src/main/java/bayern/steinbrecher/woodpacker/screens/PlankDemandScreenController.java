@@ -1,5 +1,6 @@
 package bayern.steinbrecher.woodpacker.screens;
 
+import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.javaUtility.DialogCreationException;
 import bayern.steinbrecher.javaUtility.DialogGenerator;
 import bayern.steinbrecher.screenswitcher.ScreenController;
@@ -61,6 +62,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -86,6 +88,8 @@ public class PlankDemandScreenController extends ScreenController {
     private PlankList<RequiredPlank> requiredPlanksView;
     @FXML
     private SnapshotPagination cuttingPlanPages;
+    @FXML
+    private CheckedIntegerSpinner oversizeSpinner;
     @FXML
     private VBox criteriaPane;
     private final PlankProblem plankProblem = new PlankProblem();
@@ -184,6 +188,16 @@ public class PlankDemandScreenController extends ScreenController {
                                 .remove(change.getElementRemoved());
                     }
                 });
+    }
+
+    private void initializeSettingsPane() {
+        // Sync oversize <--> plank problem
+        oversizeSpinner.valueProperty()
+                .addListener((obs, previousOversize, currentOversize)
+                        -> plankProblem.setBasePlankOversize(Objects.requireNonNullElse(currentOversize, 0)));
+        plankProblem.basePlankOversizeProperty()
+                .addListener((obs, previousOversize, currentOversize)
+                        -> oversizeSpinner.getValueFactory().setValue(currentOversize.intValue()));
     }
 
     private void initializeCriteriaPane() {
@@ -302,6 +316,7 @@ public class PlankDemandScreenController extends ScreenController {
     private void initialize() {
         initializeBasePlankList();
         initializeRequiredPlanksList();
+        initializeSettingsPane();
         initializeCriteriaPane();
         setupCuttingPlanPreviewUpdates();
     }
@@ -311,6 +326,7 @@ public class PlankDemandScreenController extends ScreenController {
         plankProblem.setRequiredPlanks(setup.getRequiredPlanks());
         plankProblem.criterionWeightsProperty()
                 .putAll(setup.criterionWeightsProperty());
+        plankProblem.setBasePlankOversize(setup.getBasePlankOversize());
         plankProblemSaved.set(true);
         updateVisualPlankCuttingPlans(setup.getBasePlank(), setup.getProposedSolution().getKey());
     }
