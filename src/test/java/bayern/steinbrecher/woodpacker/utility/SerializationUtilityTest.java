@@ -30,7 +30,8 @@ public final class SerializationUtilityTest {
     private static final String referenceFilePattern = "serialized%s%d.bin";
 
     @SuppressWarnings("unchecked")
-    private <C> void checkSerializationForClass(final Set<Long> versions, final C reference, final Class<C> typeDummy)
+    private <C> void checkSerializationForClass(
+            final Set<Long> versions, final C reference, final Class<C> typeDummy, final String... methodsToIgnore)
             throws URISyntaxException, IOException, ClassNotFoundException {
         List<String> failMessages = new ArrayList<>();
         for (final long version : versions) {
@@ -40,7 +41,7 @@ public final class SerializationUtilityTest {
             final byte[] serializedObject = Files.readAllBytes(referenceFilePath);
             final C deserializedObject = SerializationUtility.deserialize(serializedObject);
             final Optional<String> failMessage
-                    = ComparisonUtility.comparePublicValues(typeDummy, deserializedObject, reference);
+                    = ComparisonUtility.comparePublicValues(typeDummy, deserializedObject, reference, methodsToIgnore);
             failMessage.ifPresent(failMessages::add);
         }
 
@@ -95,6 +96,7 @@ public final class SerializationUtilityTest {
 
     @Test
     public void checkSerializationForPlankProblems() throws URISyntaxException, IOException, ClassNotFoundException {
-        checkSerializationForClass(PLANK_PROBLEM_SERIAL_VERSIONS, PLANK_PROBLEM_REFERENCE, PlankProblem.class);
+        checkSerializationForClass(PLANK_PROBLEM_SERIAL_VERSIONS, PLANK_PROBLEM_REFERENCE, PlankProblem.class,
+                "getProposedSolution");
     }
 }
