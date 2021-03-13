@@ -1,8 +1,8 @@
 package bayern.steinbrecher.woodpacker.elements;
 
+import bayern.steinbrecher.checkedElements.CheckableControlBase;
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
 import bayern.steinbrecher.checkedElements.report.Reportable;
-import bayern.steinbrecher.checkedElements.report.ReportableBase;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
@@ -35,7 +35,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
     private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
     private final StringProperty comment = new SimpleStringProperty("");
-    private final ReportableBase<PlankField<T>> rBase = new ReportableBase<>(this);
+    private final CheckableControlBase<PlankField<T>> rBase = new CheckableControlBase<>(this);
     private final Class<T> genericRuntimeType;
 
     public PlankField(final Class<T> genericRuntimeType) {
