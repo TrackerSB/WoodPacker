@@ -2,10 +2,12 @@ package bayern.steinbrecher.woodpacker.data;
 
 import bayern.steinbrecher.javaUtility.SupplyingMap;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SetProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
@@ -55,9 +57,13 @@ public class PlankProblem implements Serializable {
         }
         return areaDifference;
     };
+    private static final long internalSerialVersion = 1L;
+
+    // Since internal serial version 1
     private transient /*final*/ ObservableMap<PlankSolutionCriterion, Double> criterionWeights;
     private transient /*final*/ SetProperty<RequiredPlank> requiredPlanks;
     private transient /*final*/ ObjectProperty<BasePlank> basePlank;
+    private transient /*final*/ IntegerProperty basePlankOversize;
     private transient /*final*/ ReadOnlyObjectWrapper<Pair<Collection<CuttingPlan>, Set<RequiredPlank>>>
             proposedSolution;
 
@@ -86,6 +92,7 @@ public class PlankProblem implements Serializable {
         criterionWeights = FXCollections.observableMap(new SupplyingMap<>(criterion -> 1d));
         requiredPlanks = new SimpleSetProperty<>(FXCollections.observableSet());
         basePlank = new SimpleObjectProperty<>(null);
+        basePlankOversize = new SimpleIntegerProperty(0);
         proposedSolution = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
     }
 
@@ -266,22 +273,29 @@ public class PlankProblem implements Serializable {
     @Serial
     private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
         initializeTransientMember();
+        final long inputSerialVersion = input.readLong();
 
-        input.defaultReadObject();
-        criterionWeightsProperty()
-                .putAll((HashMap<PlankSolutionCriterion, Double>) input.readObject());
-        requiredPlanksProperty()
-                .addAll((HashSet<RequiredPlank>) input.readObject());
-        setBasePlank((BasePlank) input.readObject());
-        proposedSolution.set(determineSolution(getBasePlank(), getRequiredPlanks()));
+        // Internal serial version 1
+        if (inputSerialVersion >= 1) {
+            criterionWeightsProperty()
+                    .putAll((HashMap<PlankSolutionCriterion, Double>) input.readObject());
+            requiredPlanksProperty()
+                    .addAll((HashSet<RequiredPlank>) input.readObject());
+            setBasePlank((BasePlank) input.readObject());
+            setBasePlankOversize(input.readInt());
+            proposedSolution.set(determineSolution(getBasePlank(), getRequiredPlanks()));
+        }
     }
 
     @Serial
     private void writeObject(final ObjectOutputStream output) throws IOException {
-        output.defaultWriteObject();
+        output.writeLong(internalSerialVersion);
+
+        // Internal serial version 1
         output.writeObject(new HashMap<>(criterionWeightsProperty()));
         output.writeObject(new HashSet<>(getRequiredPlanks()));
         output.writeObject(getBasePlank());
+        output.writeInt(getBasePlankOversize());
     }
 
     public ObservableMap<PlankSolutionCriterion, Double> criterionWeightsProperty() {
@@ -319,6 +333,21 @@ public class PlankProblem implements Serializable {
 
     public void setBasePlank(final BasePlank basePlank) {
         basePlankProperty().set(basePlank);
+    }
+
+    public IntegerProperty basePlankOversizeProperty() {
+        return basePlankOversize;
+    }
+
+    public int getBasePlankOversize() {
+        return basePlankOversizeProperty().get();
+    }
+
+    public void setBasePlankOversize(final int basePlankOversize) {
+        if (basePlankOversize < 0) {
+            throw new IllegalArgumentException("The oversize has to be non-negative");
+        }
+        basePlankOversizeProperty().set(basePlankOversize);
     }
 
     public ReadOnlyObjectProperty<Pair<Collection<CuttingPlan>, Set<RequiredPlank>>> proposedSolutionProperty() {
