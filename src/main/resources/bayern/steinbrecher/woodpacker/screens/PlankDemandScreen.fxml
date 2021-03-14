@@ -83,7 +83,8 @@ since: 0.1
                                                min="0"
                                                initialValue="0"
                                                amountToStepBy="1"
-                                               editable="true"/>
+                                               editable="true"
+                                               promptText="%oversize"/>
                     </VBox>
                     <VBox fx:id="criteriaPane"
                           alignment="TOP_CENTER">
