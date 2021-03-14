@@ -103,13 +103,16 @@ public final class DrawActionGenerator {
         return drawingActions;
     }
 
-    public static Consumer<GraphicsContext> forCuttingPlan(final BasePlank basePlank, final CuttingPlan cuttingPlan) {
+    public static Consumer<GraphicsContext> forCuttingPlan(final CuttingPlan cuttingPlan) {
         Consumer<GraphicsContext> drawingActions;
-        if (basePlank == null) {
+        if (cuttingPlan.getBasePlank() == null) {
             drawingActions = gc -> {
             };
         } else {
             drawingActions = gc -> {
+                forBasePlank(cuttingPlan.getBasePlank())
+                        .accept(gc);
+
                 gc.setTextAlign(TextAlignment.CENTER);
                 for (final PlankSolutionRow row : cuttingPlan.getRows()) {
                     final Point2D rowToBasePlankOffset = row.getStartOffset();
@@ -139,7 +142,9 @@ public final class DrawActionGenerator {
                         gc.setFill(Color.BLACK);
                         final double maxLabelLength = MAX_LABEL_SIZE_FACTOR * availableLength;
                         final double maxLabelHeight = MAX_LABEL_SIZE_FACTOR * availableHeight;
-                        final double labelFontSize = Math.min(basePlank.getHeight() / 20d, maxLabelHeight);
+                        final double labelFontSize = Math.min(
+                                cuttingPlan.getBasePlank().getHeight() / 20d,
+                                maxLabelHeight);
                         gc.setFont(Font.font(labelFontSize));
                         final double labelXOffset = plankXPos + (plank.getWidth() / 2d);
                         final double labelYOffset = plankYPos + (plank.getHeight() / 2d);
@@ -186,5 +191,20 @@ public final class DrawActionGenerator {
             };
         }
         return drawingActions;
+    }
+
+    public static Consumer<GraphicsContext> forPlaceholder(final ScaledCanvas canvas, final String message) {
+        return gc -> {
+            gc.setFill(Color.GRAY);
+            gc.fillRect(0, 0, canvas.getTheoreticalWidth(), canvas.getTheoreticalHeight());
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font(canvas.getTheoreticalHeight() / 10));
+            gc.setTextAlign(TextAlignment.CENTER);
+            gc.setTextBaseline(VPos.CENTER);
+            gc.fillText(message,
+                    canvas.getTheoreticalWidth() / 2,
+                    canvas.getTheoreticalHeight() / 2,
+                    canvas.getTheoreticalWidth());
+        };
     }
 }

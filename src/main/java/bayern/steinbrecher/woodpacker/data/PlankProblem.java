@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
@@ -211,7 +210,7 @@ public class PlankProblem implements Serializable {
     private void updateSolution() {
         final Collection<CuttingPlan> cuttingPlans = new ArrayList<>();
         Set<RequiredPlank> ignoredPlanks;
-        if (basePlank == null
+        if (getBasePlank() == null
                 // Do not place planks if all criteria are disabled, i.e. if they are all neither positive nor negative
                 || criterionWeights.values().stream().allMatch(d -> d == 0)) {
             ignoredPlanks = requiredPlanks;
@@ -266,13 +265,13 @@ public class PlankProblem implements Serializable {
                     if (currentSolutionRows.isEmpty()) { // If on an empty base plank there are no candidates available
                         potentialForMorePlacements.set(false);
                     } else {
-                        cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows)));
+                        cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows), getBasePlank()));
                         resetCurrentCuttingPlan.run();
                     }
                 }
             }
             if (!currentSolutionRows.isEmpty()) {
-                cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows)));
+                cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows), getBasePlank()));
             }
 
             ignoredPlanks = unplacedPlanks.stream()

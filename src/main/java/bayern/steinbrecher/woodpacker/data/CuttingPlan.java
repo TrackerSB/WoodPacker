@@ -9,12 +9,18 @@ import java.util.Collections;
  */
 public class CuttingPlan {
     private final Collection<PlankSolutionRow> rows;
+    private final BasePlank basePlank;
 
-    public CuttingPlan(final Collection<PlankSolutionRow> rows) {
+    public CuttingPlan(final Collection<PlankSolutionRow> rows, BasePlank basePlank) {
         this.rows = Collections.unmodifiableCollection(rows);
+        this.basePlank = basePlank;
     }
 
     public Collection<PlankSolutionRow> getRows() {
         return rows;
+    }
+
+    public BasePlank getBasePlank() {
+        return basePlank;
     }
 }
