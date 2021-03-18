@@ -13,6 +13,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,10 +31,12 @@ public final class SerializationUtilityTest {
     private static final String referenceFilePattern = "serialized%s%d.bin";
 
     @SuppressWarnings("unchecked")
-    private <C> void checkSerializationForClass(
+    private <C extends Serializable> void checkSerializationForClass(
             final Set<Long> versions, final C reference, final Class<C> typeDummy, final String... methodsToIgnore)
             throws URISyntaxException, IOException, ClassNotFoundException {
         List<String> failMessages = new ArrayList<>();
+
+        // Check given versions
         for (final long version : versions) {
             final String referenceFileName = String.format(referenceFilePattern, typeDummy.getSimpleName(), version);
             final Path referenceFilePath = Path.of(
@@ -44,6 +47,12 @@ public final class SerializationUtilityTest {
                     = ComparisonUtility.comparePublicValues(typeDummy, deserializedObject, reference, methodsToIgnore);
             failMessage.ifPresent(failMessages::add);
         }
+
+        // Check whether current serialization and deserialization are inverse to each other
+        final byte[] serializedObject = SerializationUtility.serialize(reference);
+        final C deserialized = SerializationUtility.deserialize(serializedObject);
+        ComparisonUtility.comparePublicValues(typeDummy, deserialized, reference, methodsToIgnore)
+                .ifPresent(failMessages::add);
 
         Assert.assertTrue(failMessages.isEmpty(), String.join("\n", failMessages));
     }
