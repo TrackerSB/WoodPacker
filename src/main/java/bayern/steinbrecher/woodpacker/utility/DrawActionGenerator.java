@@ -85,11 +85,14 @@ public final class DrawActionGenerator {
                 }
             };
 
+            int maxDimension = Math.max(basePlank.getHeight(), basePlank.getWidth());
+
             drawingActions = gc -> {
                 gc.beginPath();
                 gc.rect(0, 0, basePlank.getWidth(), basePlank.getHeight());
                 gc.setFill(Color.BURLYWOOD);
                 gc.fill();
+                gc.setLineWidth(Math.max(1, maxDimension / 500d));
                 gc.setStroke(Color.BLACK);
                 gc.stroke();
                 gc.closePath();
@@ -127,6 +130,7 @@ public final class DrawActionGenerator {
                         gc.rect(plankXPos, plankYPos, plank.getWidth(), plank.getHeight());
                         gc.setFill(Color.BURLYWOOD);
                         gc.fill();
+                        // NOTE 2021-03-08: Stroke width is set by #forBasePlank(...)
                         gc.setStroke(Color.BLACK);
                         gc.stroke();
                         gc.closePath();
