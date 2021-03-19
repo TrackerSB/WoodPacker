@@ -251,7 +251,9 @@ public class PlankDemandScreenController extends ScreenController {
                     cuttingPlanCanvas.theoreticalHeightProperty()
                             .unbind();
                     cuttingPlanCanvas.setTheoreticalHeight(plankProblem.getBasePlank().getHeight());
-                    cuttingPlanCanvas.setDrawingActions(DrawActionGenerator.forBasePlank(plankProblem.getBasePlank()));
+                    cuttingPlanCanvas.setDrawingActions(
+                            DrawActionGenerator.forBasePlank(
+                                    plankProblem.getBasePlank(), plankProblem.getBasePlankOversize()));
                 }
                 return cuttingPlanCanvas;
             });
@@ -283,14 +285,20 @@ public class PlankDemandScreenController extends ScreenController {
                     updateVisualPlankCuttingPlans(newSolution.getKey());
                     plankProblemSaved.set(false);
                 });
+        /* TODO Can the following listeners be included included into proposed solution such that it triggers a visual
+         * cutting plan preview update as well?
+         */
         plankProblemValid.addListener(
                 obs -> updateVisualPlankCuttingPlans(plankProblem.getProposedSolution().getKey()));
+        plankProblem.basePlankOversizeProperty()
+                .addListener(
+                        obs -> updateVisualPlankCuttingPlans(plankProblem.getProposedSolution().getKey()));
 
         // Ensure initial state
         final Pair<Collection<CuttingPlan>, Set<RequiredPlank>> proposedSolution = plankProblem.getProposedSolution();
         updateVisualPlankCuttingPlans(proposedSolution.getKey());
 
-        /* Creating binding signaling whether the described plank problem is valid. NOTE This does not imply it yields
+        /* Create binding signaling whether the described plank problem is valid. NOTE This does not imply it yields
          * a cutting plan
          */
         plankProblemValid.bind(

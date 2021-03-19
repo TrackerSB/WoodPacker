@@ -265,13 +265,15 @@ public class PlankProblem implements Serializable {
                     if (currentSolutionRows.isEmpty()) { // If on an empty base plank there are no candidates available
                         potentialForMorePlacements.set(false);
                     } else {
-                        cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows), getBasePlank()));
+                        cuttingPlans.add(new CuttingPlan(
+                                new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize()));
                         resetCurrentCuttingPlan.run();
                     }
                 }
             }
             if (!currentSolutionRows.isEmpty()) {
-                cuttingPlans.add(new CuttingPlan(new ArrayList<>(currentSolutionRows), getBasePlank()));
+                cuttingPlans.add(new CuttingPlan(
+                        new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize()));
             }
 
             ignoredPlanks = unplacedPlanks.stream()

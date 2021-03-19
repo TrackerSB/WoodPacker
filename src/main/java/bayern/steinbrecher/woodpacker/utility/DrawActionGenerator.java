@@ -43,6 +43,10 @@ public final class DrawActionGenerator {
     }
 
     public static Consumer<GraphicsContext> forBasePlank(final BasePlank basePlank) {
+        return forBasePlank(basePlank, 0);
+    }
+
+    public static Consumer<GraphicsContext> forBasePlank(final BasePlank basePlank, final int oversize) {
         Consumer<GraphicsContext> drawingActions;
         if (basePlank == null) {
             drawingActions = gc -> {
@@ -101,6 +105,16 @@ public final class DrawActionGenerator {
                     gc.strokeLine(grainLine.getStartX(), grainLine.getStartY(),
                             grainLine.getEndX(), grainLine.getEndY());
                 }
+
+                gc.beginPath();
+                // The oversize border consists of four bars, i.e. an upper, right, lower and left bar
+                gc.rect(0, 0, basePlank.getWidth(), oversize);
+                gc.rect(basePlank.getWidth() - oversize, 0, basePlank.getWidth(), basePlank.getHeight());
+                gc.rect(0, basePlank.getHeight() - oversize, basePlank.getWidth(), basePlank.getHeight());
+                gc.rect(0, 0, oversize, basePlank.getHeight());
+                gc.setFill(Color.gray(0.5, 0.5));
+                gc.fill();
+                gc.closePath();
             };
         }
         return drawingActions;
@@ -113,7 +127,7 @@ public final class DrawActionGenerator {
             };
         } else {
             drawingActions = gc -> {
-                forBasePlank(cuttingPlan.getBasePlank())
+                forBasePlank(cuttingPlan.getBasePlank(), cuttingPlan.getOversize())
                         .accept(gc);
 
                 gc.setTextAlign(TextAlignment.CENTER);

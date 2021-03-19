@@ -10,10 +10,12 @@ import java.util.Collections;
 public class CuttingPlan {
     private final Collection<PlankSolutionRow> rows;
     private final BasePlank basePlank;
+    private final int oversize;
 
-    public CuttingPlan(final Collection<PlankSolutionRow> rows, BasePlank basePlank) {
+    public CuttingPlan(final Collection<PlankSolutionRow> rows, BasePlank basePlank, int oversize) {
         this.rows = Collections.unmodifiableCollection(rows);
         this.basePlank = basePlank;
+        this.oversize = oversize;
     }
 
     public Collection<PlankSolutionRow> getRows() {
@@ -22,5 +24,9 @@ public class CuttingPlan {
 
     public BasePlank getBasePlank() {
         return basePlank;
+    }
+
+    public int getOversize() {
+        return oversize;
     }
 }
