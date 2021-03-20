@@ -54,7 +54,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
     private static final double ID_BADGE_PADDING = 5;
     private static final Font ID_BADGE_FONT = Font.font(15);
 
-    private final BooleanProperty basePlankNameAlreadyExists = new SimpleBooleanProperty();
+    private final BooleanProperty plankNameAlreadyExists = new SimpleBooleanProperty();
 
     private Node generateItemGraphic(final Plank item) {
         final Text idText = new Text(item.getPlankId());
@@ -197,8 +197,8 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         return scrollablePlanksView;
     }
 
-    private void updateBasePlankNameAlreadyExists(final PlankList<?> control, final String idForNewPlank) {
-        basePlankNameAlreadyExists.set(
+    private void updatePlankNameAlreadyExists(final PlankList<?> control, final String idForNewPlank) {
+        plankNameAlreadyExists.set(
                 control.getPlanks()
                         .stream()
                         .anyMatch(plank -> plank.getPlankId().equals(idForNewPlank))
@@ -211,11 +211,11 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         // Add report checking whether a new base plank can be added with the currently specified data
         newPlankField.plankIdProperty()
                 .addListener(
-                        (observable, previousId, currentId) -> updateBasePlankNameAlreadyExists(control, currentId));
+                        (observable, previousId, currentId) -> updatePlankNameAlreadyExists(control, currentId));
         final ChangeListener<ObservableSet<T>> onItemsPropertyUpdate = (obs, previousItemList, currentItemList) -> {
-            updateBasePlankNameAlreadyExists(control, newPlankField.getPlankId());
+            updatePlankNameAlreadyExists(control, newPlankField.getPlankId());
             currentItemList.addListener((InvalidationListener) obss
-                    -> updateBasePlankNameAlreadyExists(control, newPlankField.getPlankId()));
+                    -> updatePlankNameAlreadyExists(control, newPlankField.getPlankId()));
         };
         control.planksProperty()
                 .addListener(onItemsPropertyUpdate);
