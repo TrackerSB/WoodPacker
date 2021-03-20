@@ -53,7 +53,12 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
         final IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
-        lengthProperty.bind(lengthField.valueProperty());
+        lengthField.valueProperty()
+                .addListener((obs, previousValue, currentValue) -> {
+                    if (currentValue != null) {
+                        lengthProperty.set(currentValue);
+                    }
+                });
         lengthProperty.addListener((ob, oldLength, newLength)
                 -> lengthField.getEditor().setText(String.valueOf(newLength)));
         control.addValidityConstraint(lengthField.validProperty());
