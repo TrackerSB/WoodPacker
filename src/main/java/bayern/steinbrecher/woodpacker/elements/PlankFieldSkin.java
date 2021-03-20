@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -116,6 +117,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         final Node plankIdField = createPlankIdField(control);
         final Node widthField = createLengthField(control, true);
         final Label separator = new Label("\u2a09");
+        separator.setTextOverrun(OverrunStyle.CLIP);
         final Node heightField = createLengthField(control, false);
 
         final HBox sizeRow = new HBox(widthField, separator, heightField);
