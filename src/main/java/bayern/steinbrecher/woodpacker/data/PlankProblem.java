@@ -44,7 +44,8 @@ import java.util.stream.Collectors;
  */
 public class PlankProblem implements Serializable {
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 92870523745L;
+    private static final long internalSerialVersion = 1L;
     /**
      * Sort {@link PlankSolutionRow} by descending area and ascending by the name of the pivot element ascending.
      */
@@ -57,7 +58,6 @@ public class PlankProblem implements Serializable {
         }
         return areaDifference;
     };
-    private static final long internalSerialVersion = 92870523745L;
 
     // Since internal serial version 1
     private transient /*final*/ ObservableMap<PlankSolutionCriterion, Double> criterionWeights;
