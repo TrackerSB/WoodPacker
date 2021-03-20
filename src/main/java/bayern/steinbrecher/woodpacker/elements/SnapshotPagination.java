@@ -52,7 +52,7 @@ public class SnapshotPagination extends Pagination {
                     final Parent currentPage = (Parent) currentPageObject;
                     final ObservableList<Node> currentPageChildren
                             = currentPage.getChildrenUnmodifiable();
-                    if (currentPageChildren.size() == 1) {
+                    if (currentPageChildren.size() == 1) { // NOPMD - The component to screenshot was ascertainable
                         snapshotCandidate = currentPageChildren.get(0);
                     } else {
                         LOGGER.log(Level.INFO, "It's unclear from which page content child to "
@@ -82,9 +82,10 @@ public class SnapshotPagination extends Pagination {
         }
         final int originalPageIndex = getCurrentPageIndex();
 
-        List<WritableImage> images = new ArrayList<>();
+        final List<WritableImage> images = new ArrayList<>();
+        final AtomicBoolean tookScreenshot = new AtomicBoolean();
         for (int i = 0; i < getPageCount(); i++) {
-            AtomicBoolean tookScreenshot = new AtomicBoolean(false);
+            tookScreenshot.set(false);
             final int nextIndexForSnapshot = i;
             Platform.runLater(() -> {
                 setCurrentPageIndex(nextIndexForSnapshot);

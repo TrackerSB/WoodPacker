@@ -27,8 +27,9 @@ import java.util.Set;
  * @since 0.1
  */
 @Test(groups = {"serialization"})
+@SuppressWarnings("PMD")
 public final class SerializationUtilityTest {
-    private static final String referenceFilePattern = "serialized%s%d.bin";
+    private static final String REFERENCE_FILE_PATTERN = "serialized%s%d.bin";
 
     @SuppressWarnings("unchecked")
     private <C extends Serializable> void checkSerializationForClass(
@@ -38,7 +39,7 @@ public final class SerializationUtilityTest {
 
         // Check given versions
         for (final long version : versions) {
-            final String referenceFileName = String.format(referenceFilePattern, typeDummy.getSimpleName(), version);
+            final String referenceFileName = String.format(REFERENCE_FILE_PATTERN, typeDummy.getSimpleName(), version);
             final Path referenceFilePath = Path.of(
                     SerializationUtilityTest.class.getResource(referenceFileName).toURI());
             final byte[] serializedObject = Files.readAllBytes(referenceFilePath);

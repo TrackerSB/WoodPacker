@@ -15,7 +15,7 @@ import java.util.Optional;
 public class BasePlank extends Plank {
     @Serial
     private static final long serialVersionUID = 871234122134L;
-    private static final long internalSerialVersion = 1L;
+    private static final long INTERNAL_SERIAL_VERSION = 1L;
 
     // Since internal serial version 1
     private /*final*/ PlankMaterial material;
@@ -81,6 +81,7 @@ public class BasePlank extends Plank {
     }
 
     @Serial
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
         final long inputSerialVersion = input.readLong();
 
@@ -92,7 +93,7 @@ public class BasePlank extends Plank {
 
     @Serial
     private void writeObject(final ObjectOutputStream output) throws IOException {
-        output.writeLong(internalSerialVersion);
+        output.writeLong(INTERNAL_SERIAL_VERSION);
 
         // Internal serial version 1
         output.writeObject(getMaterial());

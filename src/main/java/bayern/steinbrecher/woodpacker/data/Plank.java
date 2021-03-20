@@ -15,7 +15,7 @@ import java.util.Objects;
 public abstract class Plank implements Comparable<Plank>, Serializable {
     @Serial
     private static final long serialVersionUID = 2189072083954L;
-    private static final long internalSerialVersion = 1L;
+    private static final long INTERNAL_SERIAL_VERSION = 1L;
 
     // Since internal serialization version 1
     private /*final*/ String plankId;
@@ -100,6 +100,7 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
     }
 
     @Serial
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
         final long inputSerialVersion = input.readLong();
 
@@ -115,7 +116,7 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
 
     @Serial
     private void writeObject(final ObjectOutputStream output) throws IOException {
-        output.writeLong(internalSerialVersion);
+        output.writeLong(INTERNAL_SERIAL_VERSION);
 
         // Internal serial version 1
         output.writeUTF(getPlankId());

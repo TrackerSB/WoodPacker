@@ -89,7 +89,7 @@ public final class DrawActionGenerator {
                 }
             };
 
-            int maxDimension = Math.max(basePlank.getHeight(), basePlank.getWidth());
+            final int maxDimension = Math.max(basePlank.getHeight(), basePlank.getWidth());
 
             drawingActions = gc -> {
                 gc.beginPath();
@@ -194,7 +194,7 @@ public final class DrawActionGenerator {
                         gc.rotate(90);
 
                         // Move offset to next plank in solution row
-                        if (row.addHorizontal()) {
+                        if (row.isAddingHorizontally()) {
                             plankToRowXOffset += plank.getWidth();
                         } else {
                             plankToRowYOffset += plank.getHeight();
@@ -202,8 +202,8 @@ public final class DrawActionGenerator {
                     }
 
                     gc.setStroke(Color.RED);
-                    final double rowWidth = row.addHorizontal() ? row.getMaxLength() : row.getCurrentBreadth();
-                    final double rowHeight = row.addHorizontal() ? row.getCurrentBreadth() : row.getMaxLength();
+                    final double rowWidth = row.isAddingHorizontally() ? row.getMaxLength() : row.getCurrentBreadth();
+                    final double rowHeight = row.isAddingHorizontally() ? row.getCurrentBreadth() : row.getMaxLength();
                     gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
                 }
             };

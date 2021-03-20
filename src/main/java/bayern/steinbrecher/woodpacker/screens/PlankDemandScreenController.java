@@ -338,7 +338,7 @@ public class PlankDemandScreenController extends ScreenController {
             } catch (IOException ex) {
                 LOGGER.log(Level.SEVERE,
                         String.format("Could export plank problem to '%s'", exportFile.get().getAbsolutePath()));
-                final Alert exportFailedAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert exportFailedAlert = WoodPacker.getDialogGenerator()
                         .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));
                 DialogGenerator.showAndWait(exportFailedAlert);
             }
@@ -356,7 +356,7 @@ public class PlankDemandScreenController extends ScreenController {
             switchToPreviousScreen();
         } else {
             try {
-                final Alert unsavedChangesAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert unsavedChangesAlert = WoodPacker.getDialogGenerator()
                         .createInteractiveAlert(
                                 AlertType.CONFIRMATION, WoodPacker.getResource("unsavedChanges"),
                                 ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
@@ -440,7 +440,7 @@ public class PlankDemandScreenController extends ScreenController {
         } catch (FileNotFoundException ex) {
             LOGGER.log(Level.SEVERE,
                     String.format("Could not open '%s' for writing", savePath.getAbsolutePath()), ex);
-            final Alert writeAccessDeniedAlert = WoodPacker.DIALOG_GENERATOR
+            final Alert writeAccessDeniedAlert = WoodPacker.getDialogGenerator()
                     .createErrorAlert(WoodPacker.getResource("writeAccessDenied", savePath.getAbsolutePath()));
             DialogGenerator.showAndWait(writeAccessDeniedAlert);
         }

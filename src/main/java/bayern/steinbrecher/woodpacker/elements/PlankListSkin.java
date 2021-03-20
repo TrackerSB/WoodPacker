@@ -297,7 +297,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         clearAllPlanksButton.setOnAction(aevt -> {
             boolean clearAllConfirmed;
             try {
-                final Alert confirmClearAllAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert confirmClearAllAlert = WoodPacker.getDialogGenerator()
                         .createInteractiveAlert(AlertType.WARNING, "confirmClearAll", ButtonType.YES, ButtonType.NO);
                 final Optional<ButtonType> pressedButton = DialogGenerator.showAndWait(confirmClearAllAlert);
                 clearAllConfirmed = pressedButton.isPresent()

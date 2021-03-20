@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public class PlankProblem implements Serializable {
     @Serial
     private static final long serialVersionUID = 92870523745L;
-    private static final long internalSerialVersion = 1L;
+    private static final long INTERNAL_SERIAL_VERSION = 1L;
     /**
      * Sort {@link PlankSolutionRow} by descending area and ascending by the name of the pivot element ascending.
      */
@@ -145,12 +145,13 @@ public class PlankProblem implements Serializable {
     }
 
     private Optional<PlankSolutionRow> determineBestCandidate(
-            SortedSet<PlankVariationGroup> unplacedPlanks, Map<Point2D, RemainingBasePlank> remainingPartitions) {
+            final SortedSet<PlankVariationGroup> unplacedPlanks,
+            final Map<Point2D, RemainingBasePlank> remainingPartitions) {
         return remainingPartitions.entrySet()
                 .stream()
                 .flatMap(entry -> {
                     final RemainingBasePlank remaining = entry.getValue();
-                    List<PlankSolutionRow> candidates = new ArrayList<>();
+                    final List<PlankSolutionRow> candidates = new ArrayList<>();
                     if (remaining.isRestrictToVerticalCandidates() == null
                             || remaining.isRestrictToVerticalCandidates()) {
                         candidates.add(createCandidate(
@@ -169,14 +170,14 @@ public class PlankProblem implements Serializable {
                 .map(Pair::getKey);
     }
 
-    private void shrinkRemainingPartitions(Map<Point2D, RemainingBasePlank> remainingPartitions,
-                                           PlankSolutionRow rowToAdded) {
+    private void shrinkRemainingPartitions(final Map<Point2D, RemainingBasePlank> remainingPartitions,
+                                           final PlankSolutionRow rowToAdded) {
         final Point2D selectedOffset = rowToAdded.getStartOffset();
         final RemainingBasePlank selectedRemaining = remainingPartitions.remove(selectedOffset);
         final BasePlank selectedPartition = selectedRemaining.getBasePlank();
 
         // Split partition containing the row to add into remaining partitions
-        if (rowToAdded.addHorizontal()) {
+        if (rowToAdded.isAddingHorizontally()) {
             final Optional<BasePlank> remainingPartitionNotInRow
                     = selectedPartition.heightDecreased(rowToAdded.getCurrentBreadth());
             remainingPartitionNotInRow.ifPresent(
@@ -229,7 +230,7 @@ public class PlankProblem implements Serializable {
             final Map<Point2D, RemainingBasePlank> remainingPartitions = new ConcurrentHashMap<>();
             final Collection<PlankSolutionRow> currentSolutionRows = new ArrayList<>();
             final AtomicBoolean potentialForMorePlacements = new AtomicBoolean(true);
-            Runnable resetCurrentCuttingPlan = () -> {
+            final Runnable resetCurrentCuttingPlan = () -> {
                 currentSolutionRows.clear();
                 remainingPartitions.clear();
                 final Optional<BasePlank> emptyBasePlank = getBasePlank().widthDecreased(2 * getBasePlankOversize())
@@ -284,8 +285,8 @@ public class PlankProblem implements Serializable {
         proposedSolution.set(new Pair<>(cuttingPlans, ignoredPlanks));
     }
 
-    @SuppressWarnings("unchecked")
     @Serial
+    @SuppressWarnings({"unchecked", "PMD.AvoidLiteralsInIfCondition"})
     private void readObject(final ObjectInputStream input) throws IOException, ClassNotFoundException {
         initializeTransientMember();
         final long inputSerialVersion = input.readLong();
@@ -304,7 +305,7 @@ public class PlankProblem implements Serializable {
 
     @Serial
     private void writeObject(final ObjectOutputStream output) throws IOException {
-        output.writeLong(internalSerialVersion);
+        output.writeLong(INTERNAL_SERIAL_VERSION);
 
         // Internal serial version 1
         output.writeObject(new HashMap<>(criterionWeightsProperty()));

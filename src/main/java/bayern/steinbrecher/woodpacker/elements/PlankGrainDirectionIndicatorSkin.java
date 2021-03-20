@@ -99,6 +99,9 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
                         .handle(null);
             }
             case SECONDARY -> control.setValueUserDefined(false);
+            default -> {
+                // No-op
+            }
             }
         });
 

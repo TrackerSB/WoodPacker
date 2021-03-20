@@ -49,10 +49,8 @@ public final class ComparisonUtility {
                                 typeDummy.getName(), getterMethod.getName()), ex);
             }
         }
-        String failMessage;
-        if (failedComparisons.isEmpty()) {
-            failMessage = null;
-        } else {
+        String failMessage = null;
+        if (!failedComparisons.isEmpty()) {
             final StringJoiner joiner = new StringJoiner(
                     ", ", "Comparison for following getter methods failed:", "");
             for (final Method failedComparison : failedComparisons) {

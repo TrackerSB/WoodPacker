@@ -12,7 +12,7 @@ public class CuttingPlan {
     private final BasePlank basePlank;
     private final int oversize;
 
-    public CuttingPlan(final Collection<PlankSolutionRow> rows, BasePlank basePlank, int oversize) {
+    public CuttingPlan(final Collection<PlankSolutionRow> rows, final BasePlank basePlank, final int oversize) {
         this.rows = Collections.unmodifiableCollection(rows);
         this.basePlank = basePlank;
         this.oversize = oversize;

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class PlankSolutionRow {
     private final Point2D startOffset;
-    private final boolean addHorizontal;
+    private final boolean addingHorizontally;
     private final int maxLength;
     private final int maxBreadth;
     private final SortedSet<RequiredPlank> planks;
@@ -24,22 +24,22 @@ public class PlankSolutionRow {
     private int currentBreadth;
 
     /**
-     * @param startOffset   The position in the base plank space of the left upper corner
-     * @param addHorizontal The direction in which {@link Plank}s are added. {@code true} iff adding in X direction,
-     *                      {@code false} iff adding in Y direction.
-     * @param maxLength     The maximum space in the direction in which {@link Plank}s are added
-     * @param maxBreath     The maximum space orthogonal to the direction in which {@link Plank}s are added
+     * @param startOffset        The position in the base plank space of the left upper corner
+     * @param addingHorizontally The direction in which {@link Plank}s are added. {@code true} iff adding in X
+     *                           direction, {@code false} iff adding in Y direction.
+     * @param maxLength          The maximum space in the direction in which {@link Plank}s are added
+     * @param maxBreath          The maximum space orthogonal to the direction in which {@link Plank}s are added
      */
-    public PlankSolutionRow(final Point2D startOffset, final boolean addHorizontal, final int maxLength,
+    public PlankSolutionRow(final Point2D startOffset, final boolean addingHorizontally, final int maxLength,
                             final int maxBreath) {
         this.startOffset = startOffset;
-        this.addHorizontal = addHorizontal;
+        this.addingHorizontally = addingHorizontally;
         this.maxLength = maxLength;
         this.maxBreadth = maxBreath;
 
         // FIXME Is this additional sorting required?
         // If horizontal row sort by height descending; otherwise sort by width descending
-        final Function<Plank, Integer> compareMethod = addHorizontal() ? Plank::getHeight : Plank::getWidth;
+        final Function<Plank, Integer> compareMethod = isAddingHorizontally() ? Plank::getHeight : Plank::getWidth;
         final Comparator<Plank> descendingBreadthComparator = (pA, pB) -> {
             final int diff = compareMethod.apply(pB) - compareMethod.apply(pA);
             /* NOTE The IDs of the planks have to be considered since otherwise the sorted set of planks could not
@@ -51,7 +51,7 @@ public class PlankSolutionRow {
     }
 
     public PlankSolutionRow(final PlankSolutionRow toCopy) {
-        this(toCopy.getStartOffset(), toCopy.addHorizontal(), toCopy.getMaxLength(), toCopy.getMaxBreadth());
+        this(toCopy.getStartOffset(), toCopy.isAddingHorizontally(), toCopy.getMaxLength(), toCopy.getMaxBreadth());
         currentBreadth = toCopy.getCurrentBreadth();
         currentLength = toCopy.getCurrentLength();
         planks.addAll(toCopy.getPlanks());
@@ -61,8 +61,8 @@ public class PlankSolutionRow {
         return startOffset;
     }
 
-    public boolean addHorizontal() {
-        return addHorizontal;
+    public boolean isAddingHorizontally() {
+        return addingHorizontally;
     }
 
     public int getMaxLength() {
@@ -106,11 +106,11 @@ public class PlankSolutionRow {
     }
 
     private int getPlankLength(final Plank plank) {
-        return addHorizontal() ? plank.getWidth() : plank.getHeight();
+        return isAddingHorizontally() ? plank.getWidth() : plank.getHeight();
     }
 
     private int getPlankBreadth(final Plank plank) {
-        return addHorizontal() ? plank.getHeight() : plank.getWidth();
+        return isAddingHorizontally() ? plank.getHeight() : plank.getWidth();
     }
 
     public Set<Integer> getBreadths() {

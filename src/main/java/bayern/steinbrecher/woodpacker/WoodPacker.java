@@ -36,11 +36,11 @@ public class WoodPacker extends Application {
     private static final String DEFAULT_STYLESHEET_PATH = WoodPacker.class
             .getResource("styles.css")
             .toExternalForm();
-    public static /*final*/ DialogGenerator DIALOG_GENERATOR;
+    private static DialogGenerator dialogGenerator;
 
     @Override
     public void start(final Stage primaryStage) throws ScreenSwitchFailedException {
-        DIALOG_GENERATOR = new DialogGenerator(
+        dialogGenerator = new DialogGenerator(
                 primaryStage, Modality.APPLICATION_MODAL, StageStyle.UTILITY, DEFAULT_STYLESHEET_PATH);
 
         final ScreenManager screenManager = new ScreenManager(primaryStage);
@@ -60,7 +60,7 @@ public class WoodPacker extends Application {
         primaryStage.setOnCloseRequest(wevt -> {
             Alert confirmCloseAlert;
             try {
-                confirmCloseAlert = DIALOG_GENERATOR.createInteractiveAlert(
+                confirmCloseAlert = dialogGenerator.createInteractiveAlert(
                         AlertType.WARNING, getResource("confirmClose"), ButtonType.YES, ButtonType.NO);
             } catch (DialogCreationException ex) {
                 LOGGER.log(Level.WARNING, "Could not warn user graphically before closing the application. "
@@ -94,5 +94,13 @@ public class WoodPacker extends Application {
             resource = resourceKey;
         }
         return resource;
+    }
+
+    public static DialogGenerator getDialogGenerator() {
+        if (dialogGenerator == null) {
+            throw new IllegalStateException("The dialog generator is not initialized yet. This may be the case if the"
+                    + " JavaFX application start method was not called yet.");
+        }
+        return dialogGenerator;
     }
 }

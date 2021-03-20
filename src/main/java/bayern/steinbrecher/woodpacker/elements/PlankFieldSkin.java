@@ -47,10 +47,6 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
      */
     private Node createLengthField(final PlankField<T> control, final boolean forWidth) {
         final CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1000, 1);
-        // @formatter: off
-        // widthField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankWidth.png');"); // FIXME Icon not showing up
-        // heightField.setStyle("-fx-background-image: url('/bayern/steinbrecher/woodpacker/elements/plankHeight.png');"); // FIXME Icon not showing up
-        // @formatter: on
         lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
         final IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();

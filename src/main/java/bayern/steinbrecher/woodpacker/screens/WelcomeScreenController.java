@@ -45,7 +45,7 @@ public class WelcomeScreenController extends ScreenController {
                         .switchTo(new PlankDemandScreen(snapshot));
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.log(Level.SEVERE, "Could not import plank problem", ex);
-                final Alert importFailedAlert = WoodPacker.DIALOG_GENERATOR
+                final Alert importFailedAlert = WoodPacker.getDialogGenerator()
                         .createStacktraceAlert(ex, WoodPacker.getResource("importFailed"));
                 DialogGenerator.showAndWait(importFailedAlert);
             }
