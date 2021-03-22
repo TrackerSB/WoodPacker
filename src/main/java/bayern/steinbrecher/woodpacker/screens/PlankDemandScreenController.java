@@ -375,7 +375,8 @@ public class PlankDemandScreenController extends ScreenController {
             try {
                 try {
                     PDFGenerator.generateCuttingPlanDocument(
-                            cuttingPlanPages.snapshotContents(new SnapshotParameters()), file);
+                            cuttingPlanPages.snapshotContents(new SnapshotParameters()),
+                            plankProblem.getRequiredPlanks(), file);
                 } catch (FileNotFoundException ex) {
                     LOGGER.log(Level.SEVERE,
                             String.format("Could not open '%s' for writing", file.getAbsolutePath()), ex);
@@ -389,9 +390,10 @@ public class PlankDemandScreenController extends ScreenController {
                 }
             } catch (DialogCreationException exx) {
                 LOGGER.log(Level.WARNING, "Could not show exception to user", exx);
+            } finally {
+                getScreenManager()
+                        .hideOverlay();
             }
-            getScreenManager()
-                    .hideOverlay();
 
             if (file.exists()) {
                 try {

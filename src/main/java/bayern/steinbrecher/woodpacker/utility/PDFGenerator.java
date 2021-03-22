@@ -1,6 +1,8 @@
 package bayern.steinbrecher.woodpacker.utility;
 
 import bayern.steinbrecher.woodpacker.BuildConfig;
+import bayern.steinbrecher.woodpacker.WoodPacker;
+import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -9,6 +11,9 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.List;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.AreaBreakType;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
@@ -19,7 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Stefan Huber
@@ -29,6 +34,39 @@ public final class PDFGenerator {
 
     private PDFGenerator() {
         throw new UnsupportedOperationException("The construction of instances is prohibited");
+    }
+
+    /**
+     * @param tableContent Row major content where the first entry represents the headings.
+     */
+    @SuppressWarnings("unused")
+    private static Table generateTable(final Iterable<Iterable<String>> tableContent) {
+        final Iterator<Iterable<String>> tableRowIterator = tableContent.iterator();
+        if (tableRowIterator.hasNext()) {
+            throw new IllegalArgumentException(
+                    "The table content has to have at least a single row. This row contains the table headings");
+        }
+
+        final Table table = new Table(2);
+        final Iterable<String> headerRow = tableRowIterator.next();
+        for (final String headerCellContent : headerRow) {
+            table.addHeaderCell(headerCellContent);
+        }
+        tableRowIterator.forEachRemaining(row -> {
+            for (final String cellContent : row) {
+                table.addCell(cellContent);
+            }
+            table.startNewRow();
+        });
+        return table;
+    }
+
+    private static List generateList(final Iterable<?> listContent) {
+        List list = new List()
+                .setListSymbol("\u2022")
+                .setSymbolIndent(4);
+        listContent.forEach(item -> list.add(item.toString()));
+        return list;
     }
 
     private static Image generateCuttingPlanPage(final WritableImage snapshot) throws IOException {
@@ -65,12 +103,17 @@ public final class PDFGenerator {
     }
 
     public static void generateCuttingPlanDocument(
-            final Collection<WritableImage> cuttingPlanSnapshots, final File savePath) throws IOException {
+            final Iterable<WritableImage> cuttingPlanSnapshots, final Iterable<RequiredPlank> plankDemandList,
+            final File savePath) throws IOException {
         try (Document document = new Document(new PdfDocument(new PdfWriter(savePath)))) {
             final PdfDocument pdfDocument = document.getPdfDocument();
             final PdfDocumentInfo documentInfo = pdfDocument.getDocumentInfo();
             documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
             final PageSize pageSize = pdfDocument.getDefaultPageSize();
+
+            // Append plank demand list
+            document.add(new Paragraph(WoodPacker.getResource("demandList")));
+            document.add(generateList(plankDemandList));
 
             // Append cutting plans
             for (final WritableImage snapshot : cuttingPlanSnapshots) {
