@@ -412,8 +412,9 @@ public class PlankDemandScreenController extends ScreenController {
             final PdfDocument pdfDocument = document.getPdfDocument();
             final PdfDocumentInfo documentInfo = pdfDocument.getDocumentInfo();
             documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
-
             final PageSize pageSize = pdfDocument.getDefaultPageSize();
+
+            // Append cutting plans
             final List<WritableImage> contentSnapshots = cuttingPlanPages.snapshotContents(new SnapshotParameters());
             for (final WritableImage snapshot : contentSnapshots) {
                 final Image cuttingPlan;
