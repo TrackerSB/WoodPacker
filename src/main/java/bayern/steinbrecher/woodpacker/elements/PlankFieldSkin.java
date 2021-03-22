@@ -8,6 +8,7 @@ import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -50,12 +51,15 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
         final IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
+        final ChangeListener<Integer> onLengthValueChanged = (obs, previousValue, currentValue) -> {
+            if (currentValue != null) {
+                lengthProperty.set(currentValue);
+            }
+        };
         lengthField.valueProperty()
-                .addListener((obs, previousValue, currentValue) -> {
-                    if (currentValue != null) {
-                        lengthProperty.set(currentValue);
-                    }
-                });
+                .addListener(onLengthValueChanged);
+        // Ensure length property is initialized with initial spinner value
+        onLengthValueChanged.changed(null, null, lengthField.getValue());
         lengthProperty.addListener((ob, oldLength, newLength)
                 -> lengthField.getEditor().setText(String.valueOf(newLength)));
         control.addValidityConstraint(lengthField.validProperty());
