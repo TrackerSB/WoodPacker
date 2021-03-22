@@ -78,6 +78,7 @@ public class PlankProblem implements Serializable {
                 .addListener((obs, oldList, currentList) -> {
                     if (currentList != null) {
                         currentList.addListener((InvalidationListener) observable -> updateSolution());
+                        updateSolution(); // Ensure initial state
                     }
                 });
         basePlankProperty()
@@ -299,7 +300,6 @@ public class PlankProblem implements Serializable {
                     .addAll((HashSet<RequiredPlank>) input.readObject());
             setBasePlank((BasePlank) input.readObject());
             setBasePlankOversize(input.readInt());
-            updateSolution();
         }
     }
 
