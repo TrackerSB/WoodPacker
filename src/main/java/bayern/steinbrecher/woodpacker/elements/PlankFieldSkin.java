@@ -47,9 +47,11 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
      * @param forWidth {@code true} for width field; {@code false} for height field
      */
     private Node createLengthField(final PlankField<T> control, final boolean forWidth) {
-        final CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1000, 1);
+        final CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1, 1);
         lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
+        lengthField.getEditor()
+                .setText("");
         final IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
         final ChangeListener<Integer> onLengthValueChanged = (obs, previousValue, currentValue) -> {
             if (currentValue != null) {
