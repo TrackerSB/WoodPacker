@@ -1,8 +1,6 @@
 /* noinspection CssInvalidPseudoSelector */
 :invalid {
     -fx-border-color: red;
-    -fx-focus-color: red;
-    -fx-highlight-fill: red;
 }
 
 .screen {
