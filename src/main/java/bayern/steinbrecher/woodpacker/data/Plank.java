@@ -105,13 +105,12 @@ public abstract class Plank implements Comparable<Plank>, Serializable {
         final long inputSerialVersion = input.readLong();
 
         // Internal serial version 1
-        if (inputSerialVersion >= 1) {
-            plankId = input.readUTF();
-            width = input.readInt();
-            height = input.readInt();
-            grainDirection = (PlankGrainDirection) input.readObject();
-            comment = input.readUTF();
-        }
+        assert inputSerialVersion >= 1 : "The internal serial version must be at least 1";
+        plankId = input.readUTF();
+        width = input.readInt();
+        height = input.readInt();
+        grainDirection = (PlankGrainDirection) input.readObject();
+        comment = input.readUTF();
     }
 
     @Serial

@@ -293,14 +293,13 @@ public class PlankProblem implements Serializable {
         final long inputSerialVersion = input.readLong();
 
         // Internal serial version 1
-        if (inputSerialVersion >= 1) {
-            criterionWeightsProperty()
-                    .putAll((HashMap<PlankSolutionCriterion, Double>) input.readObject());
-            requiredPlanksProperty()
-                    .addAll((HashSet<RequiredPlank>) input.readObject());
-            setBasePlank((BasePlank) input.readObject());
-            setBasePlankOversize(input.readInt());
-        }
+        assert inputSerialVersion >= 1 : "The internal serial version must be at least 1";
+        criterionWeightsProperty()
+                .putAll((HashMap<PlankSolutionCriterion, Double>) input.readObject());
+        requiredPlanksProperty()
+                .addAll((HashSet<RequiredPlank>) input.readObject());
+        setBasePlank((BasePlank) input.readObject());
+        setBasePlankOversize(input.readInt());
     }
 
     @Serial

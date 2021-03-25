@@ -70,9 +70,8 @@ public class RequiredPlank extends Plank {
         final long inputSerialVersion = input.readLong();
 
         // Internal serial version 1
-        if (inputSerialVersion >= 1) {
-            setPlacedInSolution(input.readBoolean());
-        }
+        assert inputSerialVersion >= 1 : "The internal serial version must be at least 1";
+        setPlacedInSolution(input.readBoolean());
     }
 
     @Serial
