@@ -402,6 +402,9 @@ public class PlankProblem implements Serializable {
     }
 
     public void setCuttingWidth(final int cuttingWidth) {
+        if (cuttingWidth < 0) {
+            throw new IllegalArgumentException("The cutting width has to be non-negative");
+        }
         cuttingWidthProperty().set(cuttingWidth);
     }
 
