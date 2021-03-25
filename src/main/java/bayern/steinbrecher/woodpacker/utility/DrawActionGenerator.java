@@ -6,6 +6,7 @@ import bayern.steinbrecher.woodpacker.data.CuttingPlan;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
+import bayern.steinbrecher.woodpacker.internal.CompileSettings;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
@@ -201,19 +202,29 @@ public final class DrawActionGenerator {
                         }
                     }
 
-                    gc.save();
-                    gc.setLineDashes(0);
-                    gc.setStroke(Color.BLUE);
-                    final double rowWidth = row.isAddingHorizontally() ? row.getCurrentLength() : row.getCurrentBreadth();
-                    final double rowHeight = row.isAddingHorizontally() ? row.getCurrentBreadth() : row.getCurrentLength();
-                    gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
+                    if (CompileSettings.isGraphicalDebugEnabled()) {
+                        gc.save();
+                        gc.setLineDashes(0);
+                        gc.setStroke(Color.BLUE);
+                        final double rowWidth = row.isAddingHorizontally()
+                                ? row.getCurrentLength()
+                                : row.getCurrentBreadth();
+                        final double rowHeight = row.isAddingHorizontally()
+                                ? row.getCurrentBreadth()
+                                : row.getCurrentLength();
+                        gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
 
-                    gc.setLineDashes(20, 20);
-                    gc.setStroke(Color.RED);
-                    final double rowFullWidth = row.isAddingHorizontally() ? row.getMaxLength() : row.getCurrentBreadth();
-                    final double rowFullHeight = row.isAddingHorizontally() ? row.getCurrentBreadth() : row.getMaxLength();
-                    gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowFullWidth, rowFullHeight);
-                    gc.restore();
+                        gc.setLineDashes(20, 20);
+                        gc.setStroke(Color.RED);
+                        final double rowFullWidth = row.isAddingHorizontally()
+                                ? row.getMaxLength()
+                                : row.getCurrentBreadth();
+                        final double rowFullHeight = row.isAddingHorizontally()
+                                ? row.getCurrentBreadth() : row.getMaxLength();
+                        gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(),
+                                rowFullWidth, rowFullHeight);
+                        gc.restore();
+                    }
                 }
             };
         }
