@@ -196,9 +196,9 @@ public final class DrawActionGenerator {
 
                         // Move offset to next plank in solution row
                         if (row.isAddingHorizontally()) {
-                            plankToRowXOffset += plank.getWidth() + cuttingPlan.getCuttingWidth();
+                            plankToRowXOffset += plank.getWidth() + row.getCuttingWidth();
                         } else {
-                            plankToRowYOffset += plank.getHeight() + cuttingPlan.getCuttingWidth();
+                            plankToRowYOffset += plank.getHeight() + row.getCuttingWidth();
                         }
                     }
 

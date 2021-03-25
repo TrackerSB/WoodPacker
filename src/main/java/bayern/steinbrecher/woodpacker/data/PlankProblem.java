@@ -278,16 +278,14 @@ public class PlankProblem implements Serializable {
                         potentialForMorePlacements.set(false);
                     } else {
                         cuttingPlans.add(new CuttingPlan(
-                                new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize(),
-                                getCuttingWidth()));
+                                new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize()));
                         resetCurrentCuttingPlan.run();
                     }
                 }
             }
             if (!currentSolutionRows.isEmpty()) {
                 cuttingPlans.add(new CuttingPlan(
-                        new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize(),
-                        getCuttingWidth()));
+                        new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize()));
             }
 
             ignoredPlanks = unplacedPlanks.stream()
