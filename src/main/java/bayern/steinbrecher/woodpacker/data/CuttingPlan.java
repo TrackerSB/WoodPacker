@@ -11,11 +11,14 @@ public class CuttingPlan {
     private final Collection<PlankSolutionRow> rows;
     private final BasePlank basePlank;
     private final int oversize;
+    private final int cuttingWidth;
 
-    public CuttingPlan(final Collection<PlankSolutionRow> rows, final BasePlank basePlank, final int oversize) {
+    public CuttingPlan(final Collection<PlankSolutionRow> rows, final BasePlank basePlank, final int oversize,
+                       int cuttingWidth) {
         this.rows = Collections.unmodifiableCollection(rows);
         this.basePlank = basePlank;
         this.oversize = oversize;
+        this.cuttingWidth = cuttingWidth;
     }
 
     public Collection<PlankSolutionRow> getRows() {
@@ -28,5 +31,9 @@ public class CuttingPlan {
 
     public int getOversize() {
         return oversize;
+    }
+
+    public int getCuttingWidth() {
+        return cuttingWidth;
     }
 }

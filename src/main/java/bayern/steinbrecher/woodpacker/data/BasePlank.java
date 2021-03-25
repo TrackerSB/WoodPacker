@@ -33,13 +33,8 @@ public class BasePlank extends Plank {
     }
 
     public Optional<BasePlank> heightDecreased(final int decreaseBy) {
-        if (decreaseBy > getHeight()) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Cannot decrease planks height by %d since its height is %d", decreaseBy, getHeight()));
-        }
         Optional<BasePlank> resizedPlank;
-        if (decreaseBy == getHeight()) {
+        if (decreaseBy >= getHeight()) {
             resizedPlank = Optional.empty();
         } else {
             resizedPlank = Optional.of(
@@ -50,13 +45,8 @@ public class BasePlank extends Plank {
     }
 
     public Optional<BasePlank> widthDecreased(final int decreaseBy) {
-        if (decreaseBy > getWidth()) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Cannot decrease planks width by %d since its height is %d", decreaseBy, getHeight()));
-        }
         Optional<BasePlank> resizedPlank;
-        if (decreaseBy == getWidth()) {
+        if (decreaseBy >= getWidth()) {
             resizedPlank = Optional.empty();
         } else {
             resizedPlank = Optional.of(

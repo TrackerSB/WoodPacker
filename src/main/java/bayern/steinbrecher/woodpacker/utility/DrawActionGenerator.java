@@ -195,16 +195,25 @@ public final class DrawActionGenerator {
 
                         // Move offset to next plank in solution row
                         if (row.isAddingHorizontally()) {
-                            plankToRowXOffset += plank.getWidth();
+                            plankToRowXOffset += plank.getWidth() + cuttingPlan.getCuttingWidth();
                         } else {
-                            plankToRowYOffset += plank.getHeight();
+                            plankToRowYOffset += plank.getHeight() + cuttingPlan.getCuttingWidth();
                         }
                     }
 
-                    gc.setStroke(Color.RED);
-                    final double rowWidth = row.isAddingHorizontally() ? row.getMaxLength() : row.getCurrentBreadth();
-                    final double rowHeight = row.isAddingHorizontally() ? row.getCurrentBreadth() : row.getMaxLength();
+                    gc.save();
+                    gc.setLineDashes(0);
+                    gc.setStroke(Color.BLUE);
+                    final double rowWidth = row.isAddingHorizontally() ? row.getCurrentLength() : row.getCurrentBreadth();
+                    final double rowHeight = row.isAddingHorizontally() ? row.getCurrentBreadth() : row.getCurrentLength();
                     gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowWidth, rowHeight);
+
+                    gc.setLineDashes(20, 20);
+                    gc.setStroke(Color.RED);
+                    final double rowFullWidth = row.isAddingHorizontally() ? row.getMaxLength() : row.getCurrentBreadth();
+                    final double rowFullHeight = row.isAddingHorizontally() ? row.getCurrentBreadth() : row.getMaxLength();
+                    gc.strokeRect(rowToBasePlankOffset.getX(), rowToBasePlankOffset.getY(), rowFullWidth, rowFullHeight);
+                    gc.restore();
                 }
             };
         }

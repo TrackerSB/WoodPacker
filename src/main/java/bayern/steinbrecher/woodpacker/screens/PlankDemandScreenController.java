@@ -72,6 +72,8 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private CheckedIntegerSpinner oversizeSpinner;
     @FXML
+    private CheckedIntegerSpinner cuttingWidthSpinner;
+    @FXML
     private VBox criteriaPane;
     private final PlankProblem plankProblem = new PlankProblem();
     private final ReadOnlyBooleanWrapper plankProblemValid = new ReadOnlyBooleanWrapper();
@@ -179,6 +181,14 @@ public class PlankDemandScreenController extends ScreenController {
         plankProblem.basePlankOversizeProperty()
                 .addListener((obs, previousOversize, currentOversize)
                         -> oversizeSpinner.getValueFactory().setValue(currentOversize.intValue()));
+
+        // Sync cutting width <--> plank problem
+        cuttingWidthSpinner.valueProperty()
+                .addListener((obs, previousCuttingWidth, currentCuttingWidth)
+                        -> plankProblem.setCuttingWidth(Objects.requireNonNullElse(currentCuttingWidth, 0)));
+        plankProblem.cuttingWidthProperty()
+                .addListener((obs, previousCuttingWidth, currentCuttingWidth)
+                        -> cuttingWidthSpinner.getValueFactory().setValue(currentCuttingWidth.intValue()));
     }
 
     private void initializeCriteriaPane() {
@@ -307,6 +317,7 @@ public class PlankDemandScreenController extends ScreenController {
         plankProblem.criterionWeightsProperty()
                 .putAll(setup.criterionWeightsProperty());
         plankProblem.setBasePlankOversize(setup.getBasePlankOversize());
+        plankProblem.setCuttingWidth(setup.getCuttingWidth());
         plankProblemSaved.set(true);
     }
 

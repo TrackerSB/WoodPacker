@@ -85,6 +85,13 @@ since: 0.1
                                                amountToStepBy="1"
                                                editable="true"
                                                promptText="%oversize"/>
+                        <Text text="%cuttingWidth"/>
+                        <CheckedIntegerSpinner fx:id="cuttingWidthSpinner"
+                                               min="0"
+                                               initialValue="3"
+                                               amountToStepBy="1"
+                                               editable="true"
+                                               promptText="%cuttingWidth"/>
                     </VBox>
                     <VBox fx:id="criteriaPane"
                           alignment="TOP_CENTER">

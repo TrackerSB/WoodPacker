@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public class PlankProblem implements Serializable {
     @Serial
     private static final long serialVersionUID = 92870523745L;
-    private static final long INTERNAL_SERIAL_VERSION = 1L;
+    private static final long INTERNAL_SERIAL_VERSION = 2L;
     /**
      * Sort {@link PlankSolutionRow} by descending area and ascending by the name of the pivot element ascending.
      */
@@ -71,6 +71,9 @@ public class PlankProblem implements Serializable {
     private transient /*final*/ ReadOnlyObjectWrapper<Pair<Collection<CuttingPlan>, Set<RequiredPlank>>>
             proposedSolution;
 
+    // Since internal serial version 2
+    private transient /*final*/ IntegerProperty cuttingWidth;
+
     public PlankProblem() {
         initializeTransientMember();
 
@@ -87,6 +90,8 @@ public class PlankProblem implements Serializable {
                 .addListener((InvalidationListener) observable -> updateSolution());
         basePlankOversizeProperty()
                 .addListener(observable -> updateSolution());
+        cuttingWidthProperty()
+                .addListener(observable -> updateSolution());
         updateSolution(); // Ensure initial state
     }
 
@@ -96,6 +101,7 @@ public class PlankProblem implements Serializable {
         basePlank = new SimpleObjectProperty<>(null);
         basePlankOversize = new SimpleIntegerProperty(0);
         proposedSolution = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
+        cuttingWidth = new SimpleIntegerProperty(0);
     }
 
     private double determineCandidateQuality(final PlankSolutionRow candidate) {
@@ -119,7 +125,7 @@ public class PlankProblem implements Serializable {
             maxBreadth = availablePlank.getWidth();
         }
         final PlankSolutionRow finalCandidate
-                = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, maxBreadth);
+                = new PlankSolutionRow(basePlankOffset, horizontal, maxLength, maxBreadth, getCuttingWidth());
         double finalQuality = determineCandidateQuality(finalCandidate);
         for (final PlankVariationGroup group : plankVariations) {
             final Optional<Pair<RequiredPlank, Double>> optBestVariant = group.getVariations()
@@ -171,41 +177,45 @@ public class PlankProblem implements Serializable {
                 .map(Pair::getKey);
     }
 
-    private void shrinkRemainingPartitions(final Map<Point2D, RemainingBasePlank> remainingPartitions,
-                                           final PlankSolutionRow rowToAdded) {
-        final Point2D selectedOffset = rowToAdded.getStartOffset();
+    private void shrinkRemainingPartitions(
+            final Map<Point2D, RemainingBasePlank> remainingPartitions, final PlankSolutionRow rowToAdd) {
+        final Point2D selectedOffset = rowToAdd.getStartOffset();
         final RemainingBasePlank selectedRemaining = remainingPartitions.remove(selectedOffset);
         final BasePlank selectedPartition = selectedRemaining.getBasePlank();
 
         // Split partition containing the row to add into remaining partitions
-        if (rowToAdded.isAddingHorizontally()) {
-            final Optional<BasePlank> remainingPartitionNotInRow
-                    = selectedPartition.heightDecreased(rowToAdded.getCurrentBreadth());
+        final int inRowOffset = rowToAdd.getCurrentLength() + getCuttingWidth();
+        final int notInRowOffset = rowToAdd.getCurrentBreadth() + getCuttingWidth();
+
+        if (rowToAdd.isAddingHorizontally()) {
+            final Optional<BasePlank> remainingPartitionNotInRow = selectedPartition.heightDecreased(notInRowOffset);
             remainingPartitionNotInRow.ifPresent(
                     bp -> remainingPartitions.put(
-                            selectedOffset.add(0, rowToAdded.getCurrentBreadth()),
+                            selectedOffset.add(0, notInRowOffset),
                             new RemainingBasePlank(null, bp)));
-            final Optional<BasePlank> remainingPartitionInRow = selectedPartition.heightDecreased(
-                    remainingPartitionNotInRow.map(Plank::getHeight).orElse(0))
-                    .flatMap(bp -> bp.widthDecreased(rowToAdded.getCurrentLength()));
-            remainingPartitionInRow.ifPresent(
-                    bp -> remainingPartitions.put(
-                            selectedOffset.add(rowToAdded.getCurrentLength(), 0),
-                            new RemainingBasePlank(true, bp)));
+
+            selectedPartition.widthDecreased(inRowOffset)
+                    .ifPresent(bp -> remainingPartitions.put(
+                            selectedOffset.add(inRowOffset, 0),
+                            new RemainingBasePlank(true,
+                                    new BasePlank(bp.getPlankId(), bp.getWidth(), rowToAdd.getCurrentBreadth(),
+                                            bp.getGrainDirection(), bp.getMaterial()))
+                    ));
         } else {
             final Optional<BasePlank> remainingPartitionNotInRow
-                    = selectedPartition.widthDecreased(rowToAdded.getCurrentBreadth());
+                    = selectedPartition.widthDecreased(notInRowOffset);
             remainingPartitionNotInRow.ifPresent(
                     bp -> remainingPartitions.put(
-                            selectedOffset.add(rowToAdded.getCurrentBreadth(), 0),
+                            selectedOffset.add(notInRowOffset, 0),
                             new RemainingBasePlank(null, bp)));
-            final Optional<BasePlank> remainingPartitionInRow = selectedPartition.widthDecreased(
-                    remainingPartitionNotInRow.map(Plank::getWidth).orElse(0))
-                    .flatMap(bp -> bp.heightDecreased(rowToAdded.getCurrentLength()));
-            remainingPartitionInRow.ifPresent(
-                    bp -> remainingPartitions.put(
-                            selectedOffset.add(0, rowToAdded.getCurrentLength()),
-                            new RemainingBasePlank(false, bp)));
+
+            selectedPartition.heightDecreased(inRowOffset)
+                    .ifPresent(bp -> remainingPartitions.put(
+                            selectedOffset.add(0, inRowOffset),
+                            new RemainingBasePlank(false,
+                                    new BasePlank(bp.getPlankId(), rowToAdd.getCurrentBreadth(), bp.getHeight(),
+                                            bp.getGrainDirection(), bp.getMaterial()))
+                    ));
         }
     }
 
@@ -268,14 +278,16 @@ public class PlankProblem implements Serializable {
                         potentialForMorePlacements.set(false);
                     } else {
                         cuttingPlans.add(new CuttingPlan(
-                                new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize()));
+                                new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize(),
+                                getCuttingWidth()));
                         resetCurrentCuttingPlan.run();
                     }
                 }
             }
             if (!currentSolutionRows.isEmpty()) {
                 cuttingPlans.add(new CuttingPlan(
-                        new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize()));
+                        new ArrayList<>(currentSolutionRows), getBasePlank(), getBasePlankOversize(),
+                        getCuttingWidth()));
             }
 
             ignoredPlanks = unplacedPlanks.stream()
@@ -300,6 +312,13 @@ public class PlankProblem implements Serializable {
                 .addAll((HashSet<RequiredPlank>) input.readObject());
         setBasePlank((BasePlank) input.readObject());
         setBasePlankOversize(input.readInt());
+
+        // Internal serial version 2
+        if (inputSerialVersion >= 2) {
+            setCuttingWidth(input.readInt());
+        } else {
+            setCuttingWidth(0);
+        }
     }
 
     @Serial
@@ -311,6 +330,9 @@ public class PlankProblem implements Serializable {
         output.writeObject(new HashSet<>(getRequiredPlanks()));
         output.writeObject(getBasePlank());
         output.writeInt(getBasePlankOversize());
+
+        // Internal serial version 2
+        output.writeInt(getCuttingWidth());
     }
 
     public ObservableMap<PlankSolutionCriterion, Double> criterionWeightsProperty() {
@@ -371,6 +393,18 @@ public class PlankProblem implements Serializable {
 
     public Pair<Collection<CuttingPlan>, Set<RequiredPlank>> getProposedSolution() {
         return proposedSolutionProperty().get();
+    }
+
+    public IntegerProperty cuttingWidthProperty() {
+        return cuttingWidth;
+    }
+
+    public int getCuttingWidth() {
+        return cuttingWidthProperty().get();
+    }
+
+    public void setCuttingWidth(final int cuttingWidth) {
+        cuttingWidthProperty().set(cuttingWidth);
     }
 
     private static class RemainingBasePlank {
