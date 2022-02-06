@@ -1,7 +1,7 @@
 package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.javaUtility.DialogCreationException;
-import bayern.steinbrecher.javaUtility.DialogGenerator;
+import bayern.steinbrecher.javaUtility.DialogFactory;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
@@ -297,9 +297,9 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         clearAllPlanksButton.setOnAction(aevt -> {
             boolean clearAllConfirmed;
             try {
-                final Alert confirmClearAllAlert = WoodPacker.getDialogGenerator()
+                final Alert confirmClearAllAlert = WoodPacker.getDialogFactory()
                         .createInteractiveAlert(AlertType.WARNING, "confirmClearAll", ButtonType.YES, ButtonType.NO);
-                final Optional<ButtonType> pressedButton = DialogGenerator.showAndWait(confirmClearAllAlert);
+                final Optional<ButtonType> pressedButton = DialogFactory.showAndWait(confirmClearAllAlert);
                 clearAllConfirmed = pressedButton.isPresent()
                         && pressedButton.get() == ButtonType.YES;
             } catch (DialogCreationException ex) {

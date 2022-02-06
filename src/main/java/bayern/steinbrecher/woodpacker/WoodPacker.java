@@ -1,7 +1,8 @@
 package bayern.steinbrecher.woodpacker;
 
 import bayern.steinbrecher.javaUtility.DialogCreationException;
-import bayern.steinbrecher.javaUtility.DialogGenerator;
+import bayern.steinbrecher.javaUtility.DialogFactory;
+import bayern.steinbrecher.javaUtility.StageFactory;
 import bayern.steinbrecher.screenswitcher.ScreenManager;
 import bayern.steinbrecher.screenswitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
@@ -36,12 +37,13 @@ public class WoodPacker extends Application {
     private static final String DEFAULT_STYLESHEET_PATH = WoodPacker.class
             .getResource("styles.css")
             .toExternalForm();
-    private static DialogGenerator dialogGenerator;
+    private static DialogFactory dialogFactory;
 
     @Override
     public void start(final Stage primaryStage) throws ScreenSwitchFailedException {
-        dialogGenerator = new DialogGenerator(
-                primaryStage, Modality.APPLICATION_MODAL, StageStyle.UTILITY, DEFAULT_STYLESHEET_PATH);
+        // FIXME Use default icon for dialogs
+        dialogFactory = new DialogFactory(new StageFactory(Modality.APPLICATION_MODAL, StageStyle.UTILITY, null,
+                DEFAULT_STYLESHEET_PATH, primaryStage));
 
         final ScreenManager screenManager = new ScreenManager(primaryStage);
         primaryStage.getScene()
@@ -60,7 +62,7 @@ public class WoodPacker extends Application {
         primaryStage.setOnCloseRequest(wevt -> {
             Alert confirmCloseAlert;
             try {
-                confirmCloseAlert = dialogGenerator.createInteractiveAlert(
+                confirmCloseAlert = dialogFactory.createInteractiveAlert(
                         AlertType.WARNING, getResource("confirmClose"), ButtonType.YES, ButtonType.NO);
             } catch (DialogCreationException ex) {
                 LOGGER.log(Level.WARNING, "Could not warn user graphically before closing the application. "
@@ -72,7 +74,7 @@ public class WoodPacker extends Application {
             if (confirmCloseAlert == null) {
                 closeApplication = true;
             } else {
-                final Optional<ButtonType> userResponse = DialogGenerator.showAndWait(confirmCloseAlert);
+                final Optional<ButtonType> userResponse = DialogFactory.showAndWait(confirmCloseAlert);
                 closeApplication = userResponse.isPresent()
                         && userResponse.get() == ButtonType.YES;
             }
@@ -96,11 +98,11 @@ public class WoodPacker extends Application {
         return resource;
     }
 
-    public static DialogGenerator getDialogGenerator() {
-        if (dialogGenerator == null) {
+    public static DialogFactory getDialogFactory() {
+        if (dialogFactory == null) {
             throw new IllegalStateException("The dialog generator is not initialized yet. This may be the case if the"
                     + " JavaFX application start method was not called yet.");
         }
-        return dialogGenerator;
+        return dialogFactory;
     }
 }

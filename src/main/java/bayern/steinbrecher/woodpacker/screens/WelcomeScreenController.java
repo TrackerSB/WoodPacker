@@ -1,7 +1,7 @@
 package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.javaUtility.DialogCreationException;
-import bayern.steinbrecher.javaUtility.DialogGenerator;
+import bayern.steinbrecher.javaUtility.DialogFactory;
 import bayern.steinbrecher.screenswitcher.ScreenController;
 import bayern.steinbrecher.screenswitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.WoodPacker;
@@ -45,9 +45,9 @@ public class WelcomeScreenController extends ScreenController {
                         .switchTo(new PlankDemandScreen(snapshot));
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.log(Level.SEVERE, "Could not import plank problem", ex);
-                final Alert importFailedAlert = WoodPacker.getDialogGenerator()
+                final Alert importFailedAlert = WoodPacker.getDialogFactory()
                         .createStacktraceAlert(ex, WoodPacker.getResource("importFailed"));
-                DialogGenerator.showAndWait(importFailedAlert);
+                DialogFactory.showAndWait(importFailedAlert);
             }
         }
     }

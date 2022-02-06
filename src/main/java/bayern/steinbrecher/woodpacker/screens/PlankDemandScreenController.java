@@ -2,7 +2,7 @@ package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
 import bayern.steinbrecher.javaUtility.DialogCreationException;
-import bayern.steinbrecher.javaUtility.DialogGenerator;
+import bayern.steinbrecher.javaUtility.DialogFactory;
 import bayern.steinbrecher.screenswitcher.ScreenController;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
@@ -32,6 +32,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 
@@ -175,6 +176,8 @@ public class PlankDemandScreenController extends ScreenController {
 
     private void initializeSettingsPane() {
         // Sync oversize <--> plank problem
+        oversizeSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0, 1));
         oversizeSpinner.valueProperty()
                 .addListener((obs, previousOversize, currentOversize)
                         -> plankProblem.setBasePlankOversize(Objects.requireNonNullElse(currentOversize, 0)));
@@ -183,6 +186,8 @@ public class PlankDemandScreenController extends ScreenController {
                         -> oversizeSpinner.getValueFactory().setValue(currentOversize.intValue()));
 
         // Sync cutting width <--> plank problem
+        cuttingWidthSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 3, 1));
         cuttingWidthSpinner.valueProperty()
                 .addListener((obs, previousCuttingWidth, currentCuttingWidth)
                         -> plankProblem.setCuttingWidth(Objects.requireNonNullElse(currentCuttingWidth, 0)));
@@ -334,9 +339,9 @@ public class PlankDemandScreenController extends ScreenController {
             } catch (IOException ex) {
                 LOGGER.log(Level.SEVERE,
                         String.format("Could export plank problem to '%s'", exportFile.get().getAbsolutePath()));
-                final Alert exportFailedAlert = WoodPacker.getDialogGenerator()
+                final Alert exportFailedAlert = WoodPacker.getDialogFactory()
                         .createStacktraceAlert(ex, WoodPacker.getResource("exportFailed"));
-                DialogGenerator.showAndWait(exportFailedAlert);
+                DialogFactory.showAndWait(exportFailedAlert);
             }
             plankProblemSaved.set(true);
             exportSucceeded = true;
@@ -352,11 +357,11 @@ public class PlankDemandScreenController extends ScreenController {
             switchToPreviousScreen();
         } else {
             try {
-                final Alert unsavedChangesAlert = WoodPacker.getDialogGenerator()
+                final Alert unsavedChangesAlert = WoodPacker.getDialogFactory()
                         .createInteractiveAlert(
                                 AlertType.CONFIRMATION, WoodPacker.getResource("unsavedChanges"),
                                 ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-                final Optional<ButtonType> userResponse = DialogGenerator.showAndWait(unsavedChangesAlert);
+                final Optional<ButtonType> userResponse = DialogFactory.showAndWait(unsavedChangesAlert);
                 if (userResponse.isPresent()) {
                     final ButtonType buttonType = userResponse.get();
                     if (buttonType == ButtonType.YES) {
@@ -391,13 +396,13 @@ public class PlankDemandScreenController extends ScreenController {
                 } catch (FileNotFoundException ex) {
                     LOGGER.log(Level.SEVERE,
                             String.format("Could not open '%s' for writing", file.getAbsolutePath()), ex);
-                    final Alert writeAccessDeniedAlert = WoodPacker.getDialogGenerator()
+                    final Alert writeAccessDeniedAlert = WoodPacker.getDialogFactory()
                             .createErrorAlert(WoodPacker.getResource("writeAccessDenied", file.getAbsolutePath()));
-                    DialogGenerator.showAndWait(writeAccessDeniedAlert);
+                    DialogFactory.showAndWait(writeAccessDeniedAlert);
                 } catch (IOException ex) {
-                    final Alert stacktraceAlert = WoodPacker.getDialogGenerator()
+                    final Alert stacktraceAlert = WoodPacker.getDialogFactory()
                             .createStacktraceAlert(ex);
-                    DialogGenerator.showAndWait(stacktraceAlert);
+                    DialogFactory.showAndWait(stacktraceAlert);
                 }
             } catch (DialogCreationException exx) {
                 LOGGER.log(Level.WARNING, "Could not show exception to user", exx);

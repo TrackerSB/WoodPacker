@@ -3,8 +3,8 @@ plugins {
     id 'distribution'
     id 'java'
 
-    id 'com.github.gmazzo.buildconfig' version "2.0.2"
-    id 'org.openjfx.javafxplugin' version '0.0.8' // NOTE 0.0.9 may not work with the current Gradle version
+    id 'com.github.gmazzo.buildconfig' version "3.0.3"
+    id 'org.openjfx.javafxplugin' version '0.0.11'
 }
 
 group 'bayern.steinbrecher'
@@ -17,23 +17,23 @@ repositories {
     }
 }
 
-sourceCompatibility = 15
-targetCompatibility = 15
+sourceCompatibility = 17
+targetCompatibility = 17
 
 test {
     useTestNG()
 }
 
 dependencies {
-    implementation "bayern.steinbrecher:CheckedElements:0.12-rc.3-SNAPSHOT"
-    implementation "bayern.steinbrecher:JavaUtility:0.18-rc.4-SNAPSHOT"
-    implementation "bayern.steinbrecher:ScreenSwitcher:0.2.2-rc.3-SNAPSHOT"
-    implementation "com.itextpdf:kernel:7.1.14"
-    implementation "com.itextpdf:io:7.1.14"
-    implementation "com.itextpdf:layout:7.1.14"
-    implementation 'org.jetbrains:annotations:20.1.0'
+    implementation "bayern.steinbrecher:CheckedElements:0.13-rc.10-SNAPSHOT"
+    implementation "bayern.steinbrecher:JavaUtility:0.18"
+    implementation 'bayern.steinbrecher:ScreenSwitcher:0.2.4'
+    implementation 'com.itextpdf:kernel:7.1.17'
+    implementation 'com.itextpdf:io:7.1.17'
+    implementation 'com.itextpdf:layout:7.1.17'
+    implementation 'org.jetbrains:annotations:22.0.0'
 
-    implementation "org.testng:testng:7.3.0" // FIXME Using testImplementation does not work
+    implementation 'org.testng:testng:7.5' // FIXME Using testImplementation does not work
 }
 
 run {

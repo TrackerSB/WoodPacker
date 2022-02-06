@@ -80,16 +80,10 @@ since: 0.1
                               textAlignment="CENTER"/>
                         <Text text="%oversize"/>
                         <CheckedIntegerSpinner fx:id="oversizeSpinner"
-                                               min="0"
-                                               initialValue="0"
-                                               amountToStepBy="1"
                                                editable="true"
                                                promptText="%oversize"/>
                         <Text text="%cuttingWidth"/>
                         <CheckedIntegerSpinner fx:id="cuttingWidthSpinner"
-                                               min="0"
-                                               initialValue="3"
-                                               amountToStepBy="1"
                                                editable="true"
                                                promptText="%cuttingWidth"/>
                     </VBox>

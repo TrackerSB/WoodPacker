@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -47,7 +48,8 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
      * @param forWidth {@code true} for width field; {@code false} for height field
      */
     private Node createLengthField(final PlankField<T> control, final boolean forWidth) {
-        final CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner(1, Integer.MAX_VALUE, 1, 1);
+        final CheckedIntegerSpinner lengthField = new CheckedIntegerSpinner();
+        lengthField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1, 1));
         lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
         lengthField.getEditor()
