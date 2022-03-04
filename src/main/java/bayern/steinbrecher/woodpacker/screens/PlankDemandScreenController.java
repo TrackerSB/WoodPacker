@@ -201,7 +201,7 @@ public class PlankDemandScreenController extends ScreenController {
             final Slider weightControl = new Slider(0, 10, plankProblem.getCriterionWeight(criterion)); // NOPMD
             weightControl.setShowTickLabels(true);
             weightControl.setShowTickMarks(true);
-            weightControl.setSnapToTicks(true);
+            weightControl.setSnapToTicks(false);
             weightControl.setMinorTickCount(4);
             weightControl.setMajorTickUnit(5);
 
