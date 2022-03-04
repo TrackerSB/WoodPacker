@@ -96,7 +96,7 @@ public final class SerializationUtilityTest {
         final PlankProblem PLANK_PROBLEM_REFERENCE_V1 = new PlankProblem();
         PLANK_PROBLEM_REFERENCE_V1.setBasePlank(
                 new BasePlank("BasePlank reference", 86, 42, PlankGrainDirection.IRRELEVANT, PlankMaterial.OAK));
-        PLANK_PROBLEM_REFERENCE_V1.setCriterionWeight(PlankSolutionCriterion.BREATH_DIFFERENCES, 1);
+        PLANK_PROBLEM_REFERENCE_V1.setCriterionWeight(PlankSolutionCriterion.BREADTH_DIFFERENCES, 1);
         PLANK_PROBLEM_REFERENCE_V1.setCriterionWeight(PlankSolutionCriterion.NUM_PLANKS, 2);
         PLANK_PROBLEM_REFERENCE_V1.setCriterionWeight(PlankSolutionCriterion.ROW_SPACE_WASTE, 3);
         PLANK_PROBLEM_REFERENCE_V1.setRequiredPlanks(FXCollections.observableSet(
@@ -106,7 +106,7 @@ public final class SerializationUtilityTest {
         final PlankProblem PLANK_PROBLEM_REFERENCE_V2 = new PlankProblem();
         PLANK_PROBLEM_REFERENCE_V2.setBasePlank(new BasePlank(
                 "BasePlank reference", 86, 42, PlankGrainDirection.IRRELEVANT, PlankMaterial.OAK));
-        PLANK_PROBLEM_REFERENCE_V2.setCriterionWeight(PlankSolutionCriterion.BREATH_DIFFERENCES, 1);
+        PLANK_PROBLEM_REFERENCE_V2.setCriterionWeight(PlankSolutionCriterion.BREADTH_DIFFERENCES, 1);
         PLANK_PROBLEM_REFERENCE_V2.setCriterionWeight(PlankSolutionCriterion.NUM_PLANKS, 2);
         PLANK_PROBLEM_REFERENCE_V2.setCriterionWeight(PlankSolutionCriterion.ROW_SPACE_WASTE, 3);
         PLANK_PROBLEM_REFERENCE_V2.setRequiredPlanks(FXCollections.observableSet(

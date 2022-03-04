@@ -5,7 +5,7 @@ package bayern.steinbrecher.woodpacker.data;
  * @since 0.1
  */
 public enum PlankSolutionCriterion {
-    BREATH_DIFFERENCES("breadthDifferences") {
+    BREADTH_DIFFERENCES("breadthDifferences") {
         /**
          * The less the breadths of the planks differs the better. Having exactly one breadth is perfect.
          */
