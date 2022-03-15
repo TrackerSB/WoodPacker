@@ -65,10 +65,15 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         if (autoConnection != null) {
             final Runnable updateAutoValue = () -> {
                 if (control.isInAutoMode()) {
-                    control.setValue(
-                            autoConnection.getPlankHeight() > autoConnection.getPlankWidth()
-                                    ? PlankGrainDirection.VERTICAL
-                                    : PlankGrainDirection.HORIZONTAL);
+                    PlankGrainDirection direction;
+                    if (autoConnection.getPlankHeight() == autoConnection.getPlankWidth()) {
+                        direction = PlankGrainDirection.IRRELEVANT;
+                    } else if (autoConnection.getPlankHeight() > autoConnection.getPlankWidth()) {
+                        direction = PlankGrainDirection.VERTICAL;
+                    } else {
+                        direction = PlankGrainDirection.HORIZONTAL;
+                    }
+                    control.setValue(direction);
                 }
             };
             control.inAutoModeProperty()
@@ -92,16 +97,16 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         final StackPane indicatorNode = new StackPane(indicatorButton, autoModeOverlay);
         indicatorNode.setOnMouseClicked(mevt -> {
             switch (mevt.getButton()) {
-            case PRIMARY -> {
-                control.setValueUserDefined(true);
-                // indicatorButton.fireEvent(mevt); // FIXME This event does not reach the underlying button
-                indicatorButton.getOnAction()
-                        .handle(null);
-            }
-            case SECONDARY -> control.setValueUserDefined(false);
-            default -> {
-                // No-op
-            }
+                case PRIMARY -> {
+                    control.setValueUserDefined(true);
+                    // indicatorButton.fireEvent(mevt); // FIXME This event does not reach the underlying button
+                    indicatorButton.getOnAction()
+                            .handle(null);
+                }
+                case SECONDARY -> control.setValueUserDefined(false);
+                default -> {
+                    // No-op
+                }
             }
         });
 
