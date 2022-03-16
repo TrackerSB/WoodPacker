@@ -32,6 +32,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
     private final StringProperty comment = new SimpleStringProperty("");
     private final SetProperty<EdgeBand> edgeBands = new SimpleSetProperty<>(FXCollections.observableSet());
+    private final IntegerProperty edgeBandThickness = new SimpleIntegerProperty();
     private final CheckableControlBase<PlankField<T>> rBase = new CheckableControlBase<>(this);
     private final Class<T> genericRuntimeType;
 
@@ -70,7 +71,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
             createdPlank = (T) new RequiredPlank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(),
-                    getComment(), getEdgeBands());
+                    getComment(), getEdgeBands(), getEdgeBandThickness());
         } else if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
             createdPlank = (T) new BasePlank(
@@ -182,6 +183,18 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     public void setEdgeBands(final Set<EdgeBand> edgeBands) {
         edgeBandsProperty().get().clear();
         edgeBandsProperty().get().addAll(edgeBands);
+    }
+
+    public IntegerProperty edgeBandThicknessProperty() {
+        return edgeBandThickness;
+    }
+
+    public int getEdgeBandThickness() {
+        return edgeBandThicknessProperty().get();
+    }
+
+    public void setEdgeBandThickness(int edgeBandThickness) {
+        edgeBandThicknessProperty().set(edgeBandThickness);
     }
 
     @Override

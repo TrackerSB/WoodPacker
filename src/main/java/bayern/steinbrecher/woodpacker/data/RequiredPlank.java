@@ -1,8 +1,10 @@
 package bayern.steinbrecher.woodpacker.data;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 
@@ -30,6 +32,7 @@ public class RequiredPlank extends Plank {
 
     // Since internal serial version 2
     private transient /*final*/ SetProperty<EdgeBand> edgeBands;
+    private transient /*final*/ IntegerProperty edgeBandThickness;
 
     public RequiredPlank(final String plankId, final int width, final int height,
                          final PlankGrainDirection grainDirection) {
@@ -39,16 +42,18 @@ public class RequiredPlank extends Plank {
 
     public RequiredPlank(final String plankId, final int width, final int height,
                          final PlankGrainDirection grainDirection, final String comment,
-                         final Set<EdgeBand> edgeBands) {
+                         final Set<EdgeBand> edgeBands, final int edgeBandThickness) {
         super(plankId, width, height, grainDirection, comment);
         initializeTransientMember();
-        this.edgeBands.get().clear();
-        this.edgeBands.get().addAll(edgeBands);
+
+        setEdgeBands(edgeBands);
+        setEdgeBandThickness(edgeBandThickness);
     }
 
     private void initializeTransientMember() {
         placedInSolution = new SimpleBooleanProperty(false);
         edgeBands = new SimpleSetProperty<>(FXCollections.observableSet());
+        edgeBandThickness = new SimpleIntegerProperty();
     }
 
     public RequiredPlank rotated() {
@@ -69,7 +74,7 @@ public class RequiredPlank extends Plank {
                 )
                 .collect(Collectors.toSet());
         return new RequiredPlank(getPlankId(), getHeight(), getWidth(), rotatedGrainDirection, getComment(),
-                rotatedEdgeBands);
+                rotatedEdgeBands, getEdgeBandThickness());
     }
 
     public int getArea() {
@@ -100,8 +105,8 @@ public class RequiredPlank extends Plank {
 
         // Internal serial version 2
         if (inputSerialVersion >= 2) {
-            edgeBandsProperty()
-                    .addAll((HashSet<EdgeBand>) input.readObject());
+            setEdgeBands((HashSet<EdgeBand>) input.readObject());
+            setEdgeBandThickness(input.readInt());
         } else {
             edgeBandsProperty().clear();
         }
@@ -116,6 +121,7 @@ public class RequiredPlank extends Plank {
 
         // Internal serial version 2
         output.writeObject(new HashSet<>(getEdgeBands()));
+        output.writeInt(getEdgeBandThickness());
     }
 
     public BooleanProperty placedInSolutionProperty() {
@@ -141,5 +147,17 @@ public class RequiredPlank extends Plank {
     public void setEdgeBands(final Set<EdgeBand> edgeBands) {
         edgeBandsProperty().clear();
         edgeBandsProperty().addAll(edgeBands);
+    }
+
+    public IntegerProperty edgeBandThicknessProperty() {
+        return edgeBandThickness;
+    }
+
+    public int getEdgeBandThickness() {
+        return edgeBandThicknessProperty().get();
+    }
+
+    public void setEdgeBandThickness(int edgeBandThickness) {
+        edgeBandThicknessProperty().set(edgeBandThickness);
     }
 }

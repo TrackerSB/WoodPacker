@@ -174,8 +174,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                     setContextMenu(null);
                 } else {
                     setText(item.toString());
-                    if (item instanceof RequiredPlank) {
-                        final RequiredPlank requiredPlank = (RequiredPlank) item;
+                    if (item instanceof RequiredPlank requiredPlank) {
                         textFillProperty()
                                 .bind(new When(requiredPlank.placedInSolutionProperty())
                                         .then(Color.BLACK)
@@ -195,11 +194,12 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                                 plankField.setPlankHeight(item.getHeight());
                                 plankField.setPlankWidth(item.getWidth());
                                 plankField.setGrainDirection(item.getGrainDirection());
-                                if (item instanceof BasePlank) {
-                                    plankField.setSelectedMaterial(((BasePlank) item).getMaterial());
+                                if (item instanceof BasePlank basePlank) {
+                                    plankField.setSelectedMaterial(basePlank.getMaterial());
                                 }
-                                if (item instanceof RequiredPlank) {
-                                    plankField.setEdgeBands(((RequiredPlank) item).getEdgeBands());
+                                if (item instanceof RequiredPlank requiredPlank) {
+                                    plankField.setEdgeBands(requiredPlank.getEdgeBands());
+                                    plankField.setEdgeBandThickness(requiredPlank.getEdgeBandThickness());
                                 }
                             }
                     );

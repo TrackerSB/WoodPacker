@@ -116,10 +116,12 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         return materialSelection;
     }
 
-    private Node createEdgeBandSelector(final PlankField<T> control){
+    private Node createEdgeBandSelector(final PlankField<T> control) {
         var selector = new EdgeBandSelector();
         control.edgeBandsProperty()
-                        .bindBidirectional(selector.selectedProperty());
+                .bindBidirectional(selector.selectedProperty());
+        control.edgeBandThicknessProperty()
+                .bindBidirectional(selector.thicknessProperty());
 
         control.addValidityConstraint(selector.validProperty());
         return selector;
