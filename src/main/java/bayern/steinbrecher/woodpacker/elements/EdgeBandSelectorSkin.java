@@ -5,6 +5,7 @@ import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.EdgeBand;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.SetChangeListener;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.SkinBase;
@@ -20,13 +21,37 @@ import javafx.scene.shape.Line;
 public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
     private static final int EDGE_BAND_LENGTH = 30;
 
-    private ToggleButton createEdgeBandButton(final EdgeBand edgeBand) {
+    private ToggleButton createEdgeBandButton(final EdgeBandSelector control, final EdgeBand edgeBand) {
         var edgeBandSelectedButton = new ToggleButton();
         var edgeBandLine = switch (edgeBand) {
             case LEFT, RIGHT -> new Line(0, 0, 0, EDGE_BAND_LENGTH);
             case UPPER, LOWER -> new Line(0, 0, EDGE_BAND_LENGTH, 0);
         };
         edgeBandSelectedButton.setGraphic(edgeBandLine);
+
+        edgeBandSelectedButton.selectedProperty()
+                .addListener((obs, wasSelected, isSelected) -> {
+                    if (isSelected) {
+                        control.selectedProperty()
+                                .add(edgeBand);
+                    } else {
+                        control.selectedProperty()
+                                .remove(edgeBand);
+                    }
+                });
+        control.selectedProperty().addListener((SetChangeListener<? super EdgeBand>) change -> {
+            if (change.wasAdded()) {
+                if (change.getElementAdded() == edgeBand) {
+                    edgeBandSelectedButton.setSelected(true);
+                }
+            }
+            if (change.wasRemoved()) {
+                if (change.getElementRemoved() == edgeBand) {
+                    edgeBandSelectedButton.setSelected(false);
+                }
+            }
+        });
+
         GridPane.setHalignment(edgeBandSelectedButton, HPos.CENTER);
         GridPane.setValignment(edgeBandSelectedButton, VPos.CENTER);
         return edgeBandSelectedButton;
@@ -63,10 +88,10 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
     protected EdgeBandSelectorSkin(EdgeBandSelector control) {
         super(control);
 
-        ToggleButton leftButton = createEdgeBandButton(EdgeBand.LEFT);
-        ToggleButton upperButton = createEdgeBandButton(EdgeBand.UPPER);
-        ToggleButton rightButton = createEdgeBandButton(EdgeBand.RIGHT);
-        ToggleButton lowerButton = createEdgeBandButton(EdgeBand.LOWER);
+        ToggleButton leftButton = createEdgeBandButton(control, EdgeBand.LEFT);
+        ToggleButton upperButton = createEdgeBandButton(control, EdgeBand.UPPER);
+        ToggleButton rightButton = createEdgeBandButton(control, EdgeBand.RIGHT);
+        ToggleButton lowerButton = createEdgeBandButton(control, EdgeBand.LOWER);
 
         BooleanBinding anyEdgeSelected = leftButton.selectedProperty()
                 .or(upperButton.selectedProperty())

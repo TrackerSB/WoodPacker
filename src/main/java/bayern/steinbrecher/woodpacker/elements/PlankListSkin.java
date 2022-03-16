@@ -103,6 +103,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                     });
             planksView.setItems(filterableItems);
             currentSet.addListener((SetChangeListener<T>) change -> {
+                // FIXME Add should FOLLOW remove
                 if (change.wasAdded() && !planksView.getItems().contains(change.getElementAdded())) {
                     planksView.getItems()
                             .add(change.getElementAdded());
@@ -197,6 +198,9 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                                 if (item instanceof BasePlank) {
                                     plankField.setSelectedMaterial(((BasePlank) item).getMaterial());
                                 }
+                                if (item instanceof RequiredPlank) {
+                                    plankField.setEdgeBands(((RequiredPlank) item).getEdgeBands());
+                                }
                             }
                     );
                     final MenuItem deletePlankItem = createPlankViewContextItem(
@@ -245,7 +249,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         return newPlankField;
     }
 
-    private Node createUpdatePlankViewControl(final PlankList<T> control, final PlankField<T> plankField){
+    private Node createUpdatePlankViewControl(final PlankList<T> control, final PlankField<T> plankField) {
         final Image addPlankImage = new Image(getClass().getResource("add.png").toExternalForm());
         final String addPlankLabel = WoodPacker.getResource("add");
         final Image replacePlankImage = new Image(getClass().getResource("replace.png").toExternalForm());

@@ -3,15 +3,19 @@ package bayern.steinbrecher.woodpacker.elements;
 import bayern.steinbrecher.checkedElements.CheckableControlBase;
 import bayern.steinbrecher.checkedElements.CheckedControl;
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
-import javafx.beans.property.BooleanProperty;
+import bayern.steinbrecher.woodpacker.data.EdgeBand;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ObservableBooleanValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+
+import java.util.Set;
 
 /**
  * @author Stefan Huber
@@ -19,10 +23,7 @@ import javafx.scene.control.Skin;
  */
 public class EdgeBandSelector extends Control implements CheckedControl {
     private final CheckedControl ccBase = new CheckableControlBase<>(this);
-    private final BooleanProperty leftSelected = new SimpleBooleanProperty();
-    private final BooleanProperty upperSelected = new SimpleBooleanProperty();
-    private final BooleanProperty rightSelected = new SimpleBooleanProperty();
-    private final BooleanProperty lowerSelected = new SimpleBooleanProperty();
+    private final SetProperty<EdgeBand> selected = new SimpleSetProperty<>(FXCollections.observableSet());
     private final IntegerProperty thickness = new SimpleIntegerProperty(1);
 
     public EdgeBandSelector() {
@@ -59,52 +60,17 @@ public class EdgeBandSelector extends Control implements CheckedControl {
         return ccBase.checkedProperty();
     }
 
-    public BooleanProperty leftSelectedProperty() {
-        return leftSelected;
+    public SetProperty<EdgeBand> selectedProperty() {
+        return selected;
     }
 
-    public boolean isLeftSelected() {
-        return leftSelectedProperty().get();
+    public Set<EdgeBand> getSelected() {
+        return selectedProperty().get();
     }
 
-    public void setLeftSelected(boolean selected) {
-        leftSelectedProperty().set(selected);
-    }
-
-    public BooleanProperty upperSelectedProperty() {
-        return upperSelected;
-    }
-
-    public boolean isUpperSelected() {
-        return upperSelectedProperty().get();
-    }
-
-    public void setUpperSelected(boolean selected) {
-        upperSelectedProperty().set(selected);
-    }
-
-    public BooleanProperty rightSelectedProperty() {
-        return rightSelected;
-    }
-
-    public boolean isRightSelected() {
-        return rightSelectedProperty().get();
-    }
-
-    public void setRightSelected(boolean selected) {
-        rightSelectedProperty().set(selected);
-    }
-
-    public BooleanProperty lowerSelectedProperty() {
-        return lowerSelected;
-    }
-
-    public boolean isLowerSelected() {
-        return lowerSelectedProperty().get();
-    }
-
-    public void setLowerSelected(boolean selected) {
-        lowerSelectedProperty().set(selected);
+    public void setSelected(Set<EdgeBand> selected) {
+        selectedProperty().clear();
+        selectedProperty().addAll(selected);
     }
 
     public IntegerProperty thicknessProperty() {

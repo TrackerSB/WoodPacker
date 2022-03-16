@@ -116,6 +116,15 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         return materialSelection;
     }
 
+    private Node createEdgeBandSelector(final PlankField<T> control){
+        var selector = new EdgeBandSelector();
+        control.edgeBandsProperty()
+                        .bindBidirectional(selector.selectedProperty());
+
+        control.addValidityConstraint(selector.validProperty());
+        return selector;
+    }
+
     protected PlankFieldSkin(final PlankField<T> control, final Class<T> genericRuntimeType) {
         super(control);
 
@@ -145,8 +154,7 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
                     .add(materialSelection);
         }
         if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
-            final var edgeBandsSelection = new EdgeBandSelector();
-            control.addValidityConstraint(edgeBandsSelection.validProperty());
+            final var edgeBandsSelection = createEdgeBandSelector(control);
             propertyRow.getChildren()
                     .add(edgeBandsSelection);
         }
