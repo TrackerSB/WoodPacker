@@ -18,7 +18,7 @@ import javafx.scene.control.Skin;
  * @since 0.1
  */
 public class EdgeBandSelector extends Control implements CheckedControl {
-    private CheckedControl ccBase = new CheckableControlBase<>(this);
+    private final CheckedControl ccBase = new CheckableControlBase<>(this);
     private final BooleanProperty leftSelected = new SimpleBooleanProperty();
     private final BooleanProperty upperSelected = new SimpleBooleanProperty();
     private final BooleanProperty rightSelected = new SimpleBooleanProperty();
