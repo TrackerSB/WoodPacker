@@ -7,6 +7,7 @@ import bayern.steinbrecher.woodpacker.WoodPacker;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
+import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -142,6 +143,12 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
             final Node materialSelection = createMaterialSelection(control);
             propertyRow.getChildren()
                     .add(materialSelection);
+        }
+        if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
+            final var edgeBandsSelection = new EdgeBandSelector();
+            control.addValidityConstraint(edgeBandsSelection.validProperty());
+            propertyRow.getChildren()
+                    .add(edgeBandsSelection);
         }
 
         final VBox content = new VBox(plankIdField, sizeRow, propertyRow);

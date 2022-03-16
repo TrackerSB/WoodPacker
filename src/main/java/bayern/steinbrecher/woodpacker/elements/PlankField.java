@@ -4,24 +4,20 @@ import bayern.steinbrecher.checkedElements.CheckableControlBase;
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
 import bayern.steinbrecher.checkedElements.report.Reportable;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
+import bayern.steinbrecher.woodpacker.data.EdgeBand;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.NamedArg;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableBooleanValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+
+import java.util.Set;
 
 /**
  * @author Stefan Huber
@@ -35,6 +31,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
     private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
     private final StringProperty comment = new SimpleStringProperty("");
+    private final SetProperty<EdgeBand> edgeBands = new SimpleSetProperty<>(FXCollections.observableSet());
     private final CheckableControlBase<PlankField<T>> rBase = new CheckableControlBase<>(this);
     private final Class<T> genericRuntimeType;
 
@@ -73,7 +70,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
             createdPlank = (T) new RequiredPlank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(),
-                    getComment());
+                    getComment(), getEdgeBands());
         } else if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
             createdPlank = (T) new BasePlank(
@@ -172,6 +169,19 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     public void setComment(final String comment) {
         commentProperty().set(comment);
+    }
+
+    public SetProperty<EdgeBand> edgeBandsProperty() {
+        return edgeBands;
+    }
+
+    public Set<EdgeBand> getEdgeBands() {
+        return edgeBandsProperty().get();
+    }
+
+    public void setEdgeBands(final Set<EdgeBand> edgeBands) {
+        edgeBandsProperty().get().clear();
+        edgeBandsProperty().get().addAll(edgeBands);
     }
 
     @Override
