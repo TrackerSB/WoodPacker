@@ -68,14 +68,13 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
         ToggleButton rightButton = createEdgeBandButton(EdgeBand.RIGHT);
         ToggleButton lowerButton = createEdgeBandButton(EdgeBand.LOWER);
 
-        BooleanBinding noEdgeSelected = leftButton.selectedProperty()
+        BooleanBinding anyEdgeSelected = leftButton.selectedProperty()
                 .or(upperButton.selectedProperty())
                 .or(rightButton.selectedProperty())
-                .or(lowerButton.selectedProperty())
-                .not();
+                .or(lowerButton.selectedProperty());
 
         CheckedIntegerSpinner thicknessSpinner = createThicknessSpinner(control);
-        thicknessSpinner.checkedProperty().bind(noEdgeSelected.not());
+        thicknessSpinner.checkedProperty().bind(anyEdgeSelected);
 
         var holder = new GridPane();
         holder.add(upperButton, 1, 0);
@@ -83,6 +82,6 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
         holder.add(lowerButton, 1, 2);
         getChildren()
                 .add(holder);
-        control.addValidityConstraint(noEdgeSelected.or(thicknessSpinner.validProperty()));
+        control.addValidityConstraint(anyEdgeSelected.not().or(thicknessSpinner.validProperty()));
     }
 }
