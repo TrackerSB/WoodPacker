@@ -3,8 +3,9 @@ package bayern.steinbrecher.woodpacker.utility;
 import bayern.steinbrecher.javaUtility.CompareUtility;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.CuttingPlan;
-import bayern.steinbrecher.woodpacker.data.Plank;
+import bayern.steinbrecher.woodpacker.data.EdgeBand;
 import bayern.steinbrecher.woodpacker.data.PlankSolutionRow;
+import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import bayern.steinbrecher.woodpacker.internal.CompileSettings;
 import javafx.geometry.Point2D;
@@ -38,6 +39,7 @@ public final class DrawActionGenerator {
      * The percentage of the width which a label of a required plank is allowed to take.
      */
     private static final double MAX_LABEL_SIZE_FACTOR = 0.75;
+    private static final double EDGE_BAND_INSET_FACTOR = 0.04;
 
     private DrawActionGenerator() {
         throw new UnsupportedOperationException("Construction of instances is prohibited");
@@ -136,7 +138,7 @@ public final class DrawActionGenerator {
                     final Point2D rowToBasePlankOffset = row.getStartOffset();
                     double plankToRowXOffset = 0;
                     double plankToRowYOffset = 0;
-                    for (final Plank plank : row.getPlanks()) {
+                    for (final RequiredPlank plank : row.getPlanks()) {
                         // Draw plank shape
                         final double plankXPos = rowToBasePlankOffset.getX() + plankToRowXOffset;
                         final double plankYPos = rowToBasePlankOffset.getY() + plankToRowYOffset;
@@ -149,6 +151,24 @@ public final class DrawActionGenerator {
                         gc.setStroke(Color.BLACK);
                         gc.stroke();
                         gc.closePath();
+
+                        // Indicate edge bands
+                        gc.setStroke(Color.GRAY);
+                        final double edgeBandInset = Math.min(plank.getHeight(), plank.getWidth())
+                                * EDGE_BAND_INSET_FACTOR;
+                        final double minXPos = plankXPos + edgeBandInset;
+                        final double maxXPos = (plankXPos + plank.getWidth()) - edgeBandInset;
+                        final double minYPos = plankYPos + edgeBandInset;
+                        final double maxYPos = (plankYPos + plank.getHeight()) - edgeBandInset;
+                        for (EdgeBand edgeBand : plank.getEdgeBands()) {
+                            switch (edgeBand) {
+                                case LEFT -> gc.strokeLine(minXPos, minYPos, minXPos, maxYPos);
+                                case UPPER -> gc.strokeLine(minXPos, minYPos, maxXPos, minYPos);
+                                case RIGHT -> gc.strokeLine(maxXPos, minYPos, maxXPos, maxYPos);
+                                case LOWER -> gc.strokeLine(minXPos, maxYPos, maxXPos, maxYPos);
+                            }
+                        }
+                        gc.setStroke(Color.BLACK);
 
                         final boolean drawLabelVertical = plank.getHeight() > plank.getWidth();
                         // Size in text direction
@@ -184,13 +204,12 @@ public final class DrawActionGenerator {
                         gc.setTextBaseline(VPos.TOP);
                         gc.fillText(String.valueOf(plank.getWidth()),
                                 plankXPos + plank.getWidth() / 2d,
-                                plankYPos,
+                                plankYPos + edgeBandInset,
                                 plank.getWidth());
                         gc.rotate(-90);
-                        //noinspection SuspiciousNameCombination
                         gc.fillText(String.valueOf(plank.getHeight()),
                                 -plankYPos - plank.getHeight() / 2d,
-                                plankXPos,
+                                plankXPos + edgeBandInset,
                                 plank.getHeight());
                         gc.rotate(90);
 
