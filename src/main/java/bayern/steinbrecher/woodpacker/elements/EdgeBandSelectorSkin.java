@@ -22,8 +22,8 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
     private static final int EDGE_BAND_LENGTH = 30;
 
     private ToggleButton createEdgeBandButton(final EdgeBandSelector control, final EdgeBand edgeBand) {
-        var edgeBandSelectedButton = new ToggleButton();
-        var edgeBandLine = switch (edgeBand) {
+        final var edgeBandSelectedButton = new ToggleButton();
+        final var edgeBandLine = switch (edgeBand) {
             case LEFT, RIGHT -> new Line(0, 0, 0, EDGE_BAND_LENGTH);
             case UPPER, LOWER -> new Line(0, 0, EDGE_BAND_LENGTH, 0);
         };
@@ -40,15 +40,11 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
                     }
                 });
         control.selectedProperty().addListener((SetChangeListener<? super EdgeBand>) change -> {
-            if (change.wasAdded()) {
-                if (change.getElementAdded() == edgeBand) {
-                    edgeBandSelectedButton.setSelected(true);
-                }
+            if (change.wasAdded() && change.getElementAdded() == edgeBand) {
+                edgeBandSelectedButton.setSelected(true);
             }
-            if (change.wasRemoved()) {
-                if (change.getElementRemoved() == edgeBand) {
-                    edgeBandSelectedButton.setSelected(false);
-                }
+            if (change.wasRemoved() && change.getElementRemoved() == edgeBand) {
+                edgeBandSelectedButton.setSelected(false);
             }
         });
 
@@ -58,7 +54,7 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
     }
 
     private CheckedIntegerSpinner createThicknessSpinner(final EdgeBandSelector control) {
-        CheckedIntegerSpinner thicknessSpinner = new CheckedIntegerSpinner();
+        final CheckedIntegerSpinner thicknessSpinner = new CheckedIntegerSpinner();
         thicknessSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1, 1));
         thicknessSpinner.setPromptText(WoodPacker.getResource("thickness"));
@@ -67,7 +63,7 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
                 .setText("");
         thicknessSpinner.setMaxWidth(2 * EDGE_BAND_LENGTH);
 
-        ChangeListener<Integer> thicknessChangedListener = (obs, previousThickness, currentThickness) -> {
+        final ChangeListener<Integer> thicknessChangedListener = (obs, previousThickness, currentThickness) -> {
             control.setThickness(currentThickness);
         };
         thicknessSpinner.valueProperty()
@@ -85,23 +81,23 @@ public class EdgeBandSelectorSkin extends SkinBase<EdgeBandSelector> {
         return thicknessSpinner;
     }
 
-    protected EdgeBandSelectorSkin(EdgeBandSelector control) {
+    protected EdgeBandSelectorSkin(final EdgeBandSelector control) {
         super(control);
 
-        ToggleButton leftButton = createEdgeBandButton(control, EdgeBand.LEFT);
-        ToggleButton upperButton = createEdgeBandButton(control, EdgeBand.UPPER);
-        ToggleButton rightButton = createEdgeBandButton(control, EdgeBand.RIGHT);
-        ToggleButton lowerButton = createEdgeBandButton(control, EdgeBand.LOWER);
+        final ToggleButton leftButton = createEdgeBandButton(control, EdgeBand.LEFT);
+        final ToggleButton upperButton = createEdgeBandButton(control, EdgeBand.UPPER);
+        final ToggleButton rightButton = createEdgeBandButton(control, EdgeBand.RIGHT);
+        final ToggleButton lowerButton = createEdgeBandButton(control, EdgeBand.LOWER);
 
-        BooleanBinding anyEdgeSelected = leftButton.selectedProperty()
+        final BooleanBinding anyEdgeSelected = leftButton.selectedProperty()
                 .or(upperButton.selectedProperty())
                 .or(rightButton.selectedProperty())
                 .or(lowerButton.selectedProperty());
 
-        CheckedIntegerSpinner thicknessSpinner = createThicknessSpinner(control);
+        final CheckedIntegerSpinner thicknessSpinner = createThicknessSpinner(control);
         thicknessSpinner.checkedProperty().bind(anyEdgeSelected);
 
-        var holder = new GridPane();
+        final var holder = new GridPane();
         holder.add(upperButton, 1, 0);
         holder.addRow(1, leftButton, thicknessSpinner, rightButton);
         holder.add(lowerButton, 1, 2);

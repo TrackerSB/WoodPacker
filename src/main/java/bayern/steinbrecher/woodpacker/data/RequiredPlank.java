@@ -162,7 +162,7 @@ public class RequiredPlank extends Plank {
         return edgeBandThicknessProperty().get();
     }
 
-    public void setEdgeBandThickness(int edgeBandThickness) {
+    public void setEdgeBandThickness(final int edgeBandThickness) {
         edgeBandThicknessProperty().set(edgeBandThickness);
     }
 }

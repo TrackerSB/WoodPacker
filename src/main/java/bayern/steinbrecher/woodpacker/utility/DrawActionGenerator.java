@@ -157,10 +157,10 @@ public final class DrawActionGenerator {
                         final double edgeBandInset = Math.min(plank.getHeight(), plank.getWidth())
                                 * EDGE_BAND_INSET_FACTOR;
                         final double minXPos = plankXPos + edgeBandInset;
-                        final double maxXPos = (plankXPos + plank.getWidth()) - edgeBandInset;
+                        final double maxXPos = plankXPos + plank.getWidth() - edgeBandInset;
                         final double minYPos = plankYPos + edgeBandInset;
-                        final double maxYPos = (plankYPos + plank.getHeight()) - edgeBandInset;
-                        for (EdgeBand edgeBand : plank.getEdgeBands()) {
+                        final double maxYPos = plankYPos + plank.getHeight() - edgeBandInset;
+                        for (final EdgeBand edgeBand : plank.getEdgeBands()) {
                             switch (edgeBand) {
                                 case LEFT -> gc.strokeLine(minXPos, minYPos, minXPos, maxYPos);
                                 case UPPER -> gc.strokeLine(minXPos, minYPos, maxXPos, minYPos);

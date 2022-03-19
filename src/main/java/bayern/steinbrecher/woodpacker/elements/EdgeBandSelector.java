@@ -26,10 +26,6 @@ public class EdgeBandSelector extends Control implements CheckedControl {
     private final SetProperty<EdgeBand> selected = new SimpleSetProperty<>(FXCollections.observableSet());
     private final IntegerProperty thickness = new SimpleIntegerProperty(1);
 
-    public EdgeBandSelector() {
-        super();
-    }
-
     @Override
     protected Skin<?> createDefaultSkin() {
         return new EdgeBandSelectorSkin(this);
@@ -41,7 +37,7 @@ public class EdgeBandSelector extends Control implements CheckedControl {
     }
 
     @Override
-    public boolean addValidityConstraint(ObservableBooleanValue constraint) {
+    public boolean addValidityConstraint(final ObservableBooleanValue constraint) {
         return ccBase.addValidityConstraint(constraint);
     }
 
@@ -51,7 +47,7 @@ public class EdgeBandSelector extends Control implements CheckedControl {
     }
 
     @Override
-    public boolean addReport(ReportEntry report) {
+    public boolean addReport(final ReportEntry report) {
         return ccBase.addReport(report);
     }
 
@@ -68,7 +64,7 @@ public class EdgeBandSelector extends Control implements CheckedControl {
         return selectedProperty().get();
     }
 
-    public void setSelected(Set<EdgeBand> selected) {
+    public void setSelected(final Set<EdgeBand> selected) {
         selectedProperty().clear();
         selectedProperty().addAll(selected);
     }
@@ -81,7 +77,7 @@ public class EdgeBandSelector extends Control implements CheckedControl {
         return thicknessProperty().get();
     }
 
-    public void setThickness(int thickness) {
+    public void setThickness(final int thickness) {
         thicknessProperty().set(thickness);
     }
 }
