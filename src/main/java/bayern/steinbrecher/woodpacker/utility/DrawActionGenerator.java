@@ -19,8 +19,6 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A utility for generating drawing actions that can be used with {@link ScaledCanvas}. The colors used by any draw
