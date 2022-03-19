@@ -21,6 +21,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * @author Stefan Huber
+ * @since 0.1
+ */
 public class SnapshotPagination extends Pagination {
     private static final Logger LOGGER = Logger.getLogger(SnapshotPagination.class.getName());
     private static final Field CURRENT_PAGE_CONTENT_FIELD;

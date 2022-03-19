@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.utility;
 
 import bayern.steinbrecher.woodpacker.data.BasePlank;
+import bayern.steinbrecher.woodpacker.data.EdgeBand;
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.PlankProblem;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.Set;
 
 /**
  * @author Stefan Huber
@@ -85,9 +87,15 @@ public final class SerializationUtilityTest {
 
     @Test
     public void checkSerializationForRequiredPlanks() throws URISyntaxException, IOException, ClassNotFoundException {
+        final RequiredPlank REQUIRED_PLANK_V1 = new RequiredPlank(
+                "RequiredPlank reference", 17, 18, PlankGrainDirection.VERTICAL, "some required plank");
+        final RequiredPlank REQUIRED_PLANK_V2 = new RequiredPlank(
+                "RequiredPlank reference", 17, 18, PlankGrainDirection.VERTICAL, "some required plank",
+                Set.of(EdgeBand.LEFT, EdgeBand.RIGHT, EdgeBand.UPPER), 2);
+
         checkSerializationForClass(Map.of(
-                1L, new RequiredPlank(
-                        "RequiredPlank reference", 17, 18, PlankGrainDirection.VERTICAL, "some required plank")
+                1L, REQUIRED_PLANK_V1,
+                2L, REQUIRED_PLANK_V2
         ), RequiredPlank.class);
     }
 
