@@ -31,8 +31,6 @@ import java.util.logging.Logger;
  * @since 0.1
  */
 public final class DrawActionGenerator {
-    private static final Logger LOGGER = Logger.getLogger(DrawActionGenerator.class.getName());
-
     // Base planks drawing action configuration
     private static final int MIN_NUM_GRAIN_INDICATION_STEPS = 10;
     private static final int MAX_NUM_GRAIN_INDICATION_STEPS = 50;
@@ -165,13 +163,11 @@ public final class DrawActionGenerator {
                         final double minYPos = plankYPos + edgeBandInset;
                         final double maxYPos = plankYPos + plank.getHeight() - edgeBandInset;
                         for (final EdgeBand edgeBand : plank.getEdgeBands()) {
-                            switch (edgeBand) {
+                            switch (edgeBand) { // NOPMD - 2022-03-19: false-positive SwitchStmtsShouldHaveDefault
                                 case LEFT -> gc.strokeLine(minXPos, minYPos, minXPos, maxYPos);
                                 case UPPER -> gc.strokeLine(minXPos, minYPos, maxXPos, minYPos);
                                 case RIGHT -> gc.strokeLine(maxXPos, minYPos, maxXPos, maxYPos);
                                 case LOWER -> gc.strokeLine(minXPos, maxYPos, maxXPos, maxYPos);
-                                default -> LOGGER.log(Level.WARNING,
-                                        String.format("Drawing edge band of type %s is not supported", edgeBand));
                             }
                         }
                         gc.setStroke(Color.BLACK);
