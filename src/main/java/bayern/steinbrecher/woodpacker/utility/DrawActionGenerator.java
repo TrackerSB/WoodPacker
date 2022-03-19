@@ -33,6 +33,7 @@ public final class DrawActionGenerator {
     private static final int MIN_NUM_GRAIN_INDICATION_STEPS = 10;
     private static final int MAX_NUM_GRAIN_INDICATION_STEPS = 50;
     private static final int PREFERRED_GRAIN_INDICATION_STEP_SIZE = 30;
+    public static final Color BASE_PLANK_COLOR = Color.BURLYWOOD;
 
     // Required planks drawing action configuration
     /**
@@ -40,6 +41,7 @@ public final class DrawActionGenerator {
      */
     private static final double MAX_LABEL_SIZE_FACTOR = 0.75;
     private static final double EDGE_BAND_INSET_FACTOR = 0.04;
+    public static final Color REQUIRED_PLANK_COLOR = Color.BURLYWOOD;
 
     private DrawActionGenerator() {
         throw new UnsupportedOperationException("Construction of instances is prohibited");
@@ -97,7 +99,7 @@ public final class DrawActionGenerator {
             drawingActions = gc -> {
                 gc.beginPath();
                 gc.rect(0, 0, basePlank.getWidth(), basePlank.getHeight());
-                gc.setFill(Color.BURLYWOOD);
+                gc.setFill(BASE_PLANK_COLOR);
                 gc.fill();
                 gc.setLineWidth(Math.max(1, maxDimension / 500d));
                 gc.setStroke(Color.BLACK);
@@ -145,7 +147,7 @@ public final class DrawActionGenerator {
 
                         gc.beginPath();
                         gc.rect(plankXPos, plankYPos, plank.getWidth(), plank.getHeight());
-                        gc.setFill(Color.BURLYWOOD);
+                        gc.setFill(REQUIRED_PLANK_COLOR);
                         gc.fill();
                         // NOTE 2021-03-08: Stroke width is set by #forBasePlank(...)
                         gc.setStroke(Color.BLACK);

@@ -16,7 +16,10 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.AreaBreakType;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -25,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 /**
  * @author Stefan Huber
@@ -69,29 +73,55 @@ public final class PDFGenerator {
         return list;
     }
 
-    private static Image generateCuttingPlanPage(final WritableImage snapshot) throws IOException {
-        final BufferedImage bufferedSnapshot = SwingFXUtils.fromFXImage(snapshot, null);
-        final boolean rotateVertical = bufferedSnapshot.getWidth() > bufferedSnapshot.getHeight();
-        BufferedImage monochromeSnapshot;
-        if (rotateVertical) {
-            monochromeSnapshot = new BufferedImage(
-                    bufferedSnapshot.getHeight(), bufferedSnapshot.getWidth(), BufferedImage.TYPE_BYTE_BINARY);
-        } else {
-            monochromeSnapshot = new BufferedImage(
-                    bufferedSnapshot.getWidth(), bufferedSnapshot.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+    private static Image generateCuttingPlanPage(final WritableImage cuttingPlan) throws IOException {
+        // Remove wood colored background
+        final PixelReader pixelReader = cuttingPlan.getPixelReader();
+        final PixelWriter pixelWriter = cuttingPlan.getPixelWriter();
+        for (int x = 0; x < cuttingPlan.getWidth(); x++) {
+            for (int y = 0; y < cuttingPlan.getHeight(); y++) {
+                final Color pixelColor = pixelReader.getColor(x, y);
+                if (pixelColor.equals(DrawActionGenerator.BASE_PLANK_COLOR)
+                        || pixelColor.equals(DrawActionGenerator.REQUIRED_PLANK_COLOR)) {
+                    pixelWriter.setColor(x, y, Color.WHITE);
+                }
+            }
         }
-        final Graphics2D monochromeSnapshotGraphics = monochromeSnapshot.createGraphics();
+
+        final boolean rotateVertical = cuttingPlan.getWidth() > cuttingPlan.getHeight();
+
+        // Create output AWT image with modifying properties (including grayscale and eventual rotation)
+        final var modifiedCuttingPlan = ((Supplier<BufferedImage>) () -> {
+            if (rotateVertical) {
+                return new BufferedImage((int) cuttingPlan.getHeight(), (int) cuttingPlan.getWidth(),
+                        BufferedImage.TYPE_USHORT_GRAY);
+            }
+            return new BufferedImage((int) cuttingPlan.getWidth(), (int) cuttingPlan.getHeight(),
+                    BufferedImage.TYPE_USHORT_GRAY);
+        }).get();
+
+        final Graphics2D modifiedCuttingPlanDrawer = modifiedCuttingPlan.createGraphics();
         if (rotateVertical) {
             // Move origin to right upper corner
-            monochromeSnapshotGraphics.translate(
-                    monochromeSnapshot.getWidth() / 2d, monochromeSnapshot.getHeight() / 2d);
-            monochromeSnapshotGraphics.rotate(Math.PI / 2);
-            monochromeSnapshotGraphics.translate(
-                    -monochromeSnapshot.getHeight() / 2d, -monochromeSnapshot.getWidth() / 2d);
+            modifiedCuttingPlanDrawer.translate(
+                    modifiedCuttingPlan.getWidth() / 2d, modifiedCuttingPlan.getHeight() / 2d);
+
+            // Rotate context by 90°
+            modifiedCuttingPlanDrawer.rotate(Math.PI / 2d);
+
+            // Move origin back to center
+            modifiedCuttingPlanDrawer.translate(
+                    -modifiedCuttingPlan.getHeight() / 2d, -modifiedCuttingPlan.getWidth() / 2d);
         }
-        monochromeSnapshotGraphics.drawImage(bufferedSnapshot, 0, 0, null);
+
+        // Convert JavaFX image to AWT image
+        final BufferedImage bufferedCuttingPlan = SwingFXUtils.fromFXImage(cuttingPlan, null);
+
+        // Apply cutting plan to modifying output AWT image
+        modifiedCuttingPlanDrawer.drawImage(bufferedCuttingPlan, 0, 0, null);
+
+        // Convert AWT image to PDF image
         final ByteArrayOutputStream snapshotByteStream = new ByteArrayOutputStream();
-        ImageIO.write(monochromeSnapshot, "png", snapshotByteStream);
+        ImageIO.write(modifiedCuttingPlan, "png", snapshotByteStream);
         return new Image(ImageDataFactory.create(snapshotByteStream.toByteArray()));
     }
 
