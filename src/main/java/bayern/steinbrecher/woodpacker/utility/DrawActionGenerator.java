@@ -182,7 +182,7 @@ public final class DrawActionGenerator {
                         final double maxLabelLength = MAX_LABEL_SIZE_FACTOR * availableLength;
                         final double maxLabelHeight = MAX_LABEL_SIZE_FACTOR * availableHeight;
                         final double labelFontSize = Math.min(
-                                cuttingPlan.getBasePlank().getHeight() / 20d,
+                                cuttingPlan.getBasePlank().getHeight() / 15d,
                                 maxLabelHeight);
                         gc.setFont(Font.font(labelFontSize));
                         final double labelXOffset = plankXPos + (plank.getWidth() / 2d);
