@@ -19,6 +19,8 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A utility for generating drawing actions that can be used with {@link ScaledCanvas}. The colors used by any draw
@@ -29,6 +31,8 @@ import java.util.function.Consumer;
  * @since 0.1
  */
 public final class DrawActionGenerator {
+    private static final Logger LOGGER = Logger.getLogger(DrawActionGenerator.class.getName());
+
     // Base planks drawing action configuration
     private static final int MIN_NUM_GRAIN_INDICATION_STEPS = 10;
     private static final int MAX_NUM_GRAIN_INDICATION_STEPS = 50;
@@ -166,6 +170,8 @@ public final class DrawActionGenerator {
                                 case UPPER -> gc.strokeLine(minXPos, minYPos, maxXPos, minYPos);
                                 case RIGHT -> gc.strokeLine(maxXPos, minYPos, maxXPos, maxYPos);
                                 case LOWER -> gc.strokeLine(minXPos, maxYPos, maxXPos, maxYPos);
+                                default -> LOGGER.log(Level.WARNING,
+                                        String.format("Drawing edge band of type %s is not supported", edgeBand));
                             }
                         }
                         gc.setStroke(Color.BLACK);

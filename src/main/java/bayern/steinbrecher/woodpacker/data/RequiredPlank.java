@@ -51,8 +51,8 @@ public class RequiredPlank extends Plank {
         super(plankId, width, height, grainDirection, comment);
         initializeTransientMember();
 
-        setEdgeBands(edgeBands);
-        setEdgeBandThickness(edgeBandThickness);
+        this.edgeBands.addAll(edgeBands);
+        this.edgeBandThickness.set(edgeBandThickness);
     }
 
     private void initializeTransientMember() {
