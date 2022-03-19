@@ -16,9 +16,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -89,10 +90,10 @@ public final class SerializationUtilityTest {
     @Test
     public void checkSerializationForRequiredPlanks() throws URISyntaxException, IOException, ClassNotFoundException {
         final RequiredPlank REQUIRED_PLANK_V1 = new RequiredPlank(
-                "RequiredPlank reference", 17, 18, PlankGrainDirection.VERTICAL, "some required plank", new HashSet<>());
+                "RequiredPlank reference", 17, 18, PlankGrainDirection.VERTICAL, "some required plank");
         final RequiredPlank REQUIRED_PLANK_V2 = new RequiredPlank(
                 "RequiredPlank reference", 17, 18, PlankGrainDirection.VERTICAL, "some required plank",
-                Set.of(EdgeBand.LEFT, EdgeBand.RIGHT, EdgeBand.UPPER));
+                Set.of(EdgeBand.LEFT, EdgeBand.RIGHT, EdgeBand.UPPER), 2);
 
         checkSerializationForClass(Map.of(
                 1L, REQUIRED_PLANK_V1,
@@ -109,8 +110,8 @@ public final class SerializationUtilityTest {
         PLANK_PROBLEM_REFERENCE_V1.setCriterionWeight(PlankSolutionCriterion.NUM_PLANKS, 2);
         PLANK_PROBLEM_REFERENCE_V1.setCriterionWeight(PlankSolutionCriterion.ROW_SPACE_WASTE, 3);
         PLANK_PROBLEM_REFERENCE_V1.setRequiredPlanks(FXCollections.observableSet(
-                new RequiredPlank("first", 11, 12, PlankGrainDirection.VERTICAL, "first comment", new HashSet<>()),
-                new RequiredPlank("second", 14, 13, PlankGrainDirection.HORIZONTAL, "second comment", new HashSet<>())));
+                new RequiredPlank("first", 11, 12, PlankGrainDirection.VERTICAL, "first comment"),
+                new RequiredPlank("second", 14, 13, PlankGrainDirection.HORIZONTAL, "second comment")));
 
         final PlankProblem PLANK_PROBLEM_REFERENCE_V2 = new PlankProblem();
         PLANK_PROBLEM_REFERENCE_V2.setBasePlank(new BasePlank(
@@ -119,8 +120,8 @@ public final class SerializationUtilityTest {
         PLANK_PROBLEM_REFERENCE_V2.setCriterionWeight(PlankSolutionCriterion.NUM_PLANKS, 2);
         PLANK_PROBLEM_REFERENCE_V2.setCriterionWeight(PlankSolutionCriterion.ROW_SPACE_WASTE, 3);
         PLANK_PROBLEM_REFERENCE_V2.setRequiredPlanks(FXCollections.observableSet(
-                new RequiredPlank("first", 11, 12, PlankGrainDirection.VERTICAL, "first comment", new HashSet<>()),
-                new RequiredPlank("second", 14, 13, PlankGrainDirection.HORIZONTAL, "second comment", new HashSet<>())));
+                new RequiredPlank("first", 11, 12, PlankGrainDirection.VERTICAL, "first comment"),
+                new RequiredPlank("second", 14, 13, PlankGrainDirection.HORIZONTAL, "second comment")));
         PLANK_PROBLEM_REFERENCE_V2.setCuttingWidth(3);
 
         checkSerializationForClass(Map.of(

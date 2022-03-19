@@ -41,6 +41,11 @@ public class RequiredPlank extends Plank {
     }
 
     public RequiredPlank(final String plankId, final int width, final int height,
+                         final PlankGrainDirection grainDirection, final String comment) {
+        this(plankId, width, height, grainDirection, comment, Set.of(), 0);
+    }
+
+    public RequiredPlank(final String plankId, final int width, final int height,
                          final PlankGrainDirection grainDirection, final String comment,
                          final Set<EdgeBand> edgeBands, final int edgeBandThickness) {
         super(plankId, width, height, grainDirection, comment);
