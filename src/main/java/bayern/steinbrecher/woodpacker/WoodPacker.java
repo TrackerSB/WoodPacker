@@ -17,10 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.Window;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.ResourceBundle;
