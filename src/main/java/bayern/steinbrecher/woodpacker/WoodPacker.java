@@ -6,16 +6,21 @@ import bayern.steinbrecher.javaUtility.StageFactory;
 import bayern.steinbrecher.screenswitcher.ScreenManager;
 import bayern.steinbrecher.screenswitcher.ScreenSwitchFailedException;
 import bayern.steinbrecher.woodpacker.screens.WelcomeScreen;
+import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -38,12 +43,19 @@ public class WoodPacker extends Application {
             .getResource("styles.css")
             .toExternalForm();
     private static DialogFactory dialogFactory;
+    private static PredefinedFileChooser cuttingPlanChooser;
+    private static PredefinedFileChooser plankProblemChooser;
+
 
     @Override
     public void start(final Stage primaryStage) throws ScreenSwitchFailedException {
         // FIXME Use default icon for dialogs
         dialogFactory = new DialogFactory(new StageFactory(Modality.APPLICATION_MODAL, StageStyle.UTILITY, null,
                 DEFAULT_STYLESHEET_PATH, primaryStage));
+        cuttingPlanChooser = new PredefinedFileChooser(primaryStage,
+                new FileChooser.ExtensionFilter(WoodPacker.getResource("cuttingPlan"), "*.pdf"));
+        plankProblemChooser = new PredefinedFileChooser(primaryStage,
+                new FileChooser.ExtensionFilter(BuildConfig.APP_NAME, "*.wp"));
 
         final ScreenManager screenManager = new ScreenManager(primaryStage);
         primaryStage.getScene()
@@ -100,9 +112,25 @@ public class WoodPacker extends Application {
 
     public static DialogFactory getDialogFactory() {
         if (dialogFactory == null) {
-            throw new IllegalStateException("The dialog generator is not initialized yet. This may be the case if the"
-                    + " JavaFX application start method was not called yet.");
+            throw new IllegalStateException("The dialog generator is not initialized yet. This may be the case if the "
+                    + "JavaFX application start method was not called yet.");
         }
         return dialogFactory;
+    }
+
+    public static PredefinedFileChooser getCuttingPlanChooser() {
+        if (cuttingPlanChooser == null) {
+            throw new IllegalStateException("The cutting plan chooser is not initialized yet. This may be the case if "
+                    + "the JavaFX application start method was not called yet.");
+        }
+        return cuttingPlanChooser;
+    }
+
+    public static PredefinedFileChooser getPlankProblemChooser() {
+        if (plankProblemChooser == null) {
+            throw new IllegalStateException("The plank problem chooser is not initialized yet. This may be the case if "
+                    + "the JavaFX application start method was not called yet.");
+        }
+        return plankProblemChooser;
     }
 }
