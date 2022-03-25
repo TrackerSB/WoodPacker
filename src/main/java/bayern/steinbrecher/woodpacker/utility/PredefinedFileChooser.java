@@ -1,5 +1,6 @@
 package bayern.steinbrecher.woodpacker.utility;
 
+import bayern.steinbrecher.woodpacker.BuildConfig;
 import bayern.steinbrecher.woodpacker.WoodPacker;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -18,7 +19,7 @@ public enum PredefinedFileChooser {
             new ExtensionFilter(WoodPacker.getResource("cuttingPlan"), "*.pdf")
     ),
     PLANK_PROBLEM(
-            new ExtensionFilter("WoodPacker", "*.wp")
+            new ExtensionFilter(BuildConfig.APP_NAME, "*.wp")
     );
 
     private final FileChooser chooser = new FileChooser();
