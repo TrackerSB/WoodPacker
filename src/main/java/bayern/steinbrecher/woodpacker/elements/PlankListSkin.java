@@ -36,6 +36,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -187,25 +188,33 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
 
                     setGraphic(generateItemGraphic(item));
 
+                    final Runnable setupEditing = () -> {
+                        plankField.setPlankId(item.getPlankId());
+                        plankField.setComment(item.getComment());
+                        plankField.setPlankHeight(item.getHeight());
+                        plankField.setPlankWidth(item.getWidth());
+                        plankField.setGrainDirection(item.getGrainDirection());
+                        if (item instanceof BasePlank basePlank) {
+                            plankField.setSelectedMaterial(basePlank.getMaterial());
+                        }
+                        if (item instanceof RequiredPlank requiredPlank) {
+                            plankField.setEdgeBands(requiredPlank.getEdgeBands());
+                            plankField.setEdgeBandThickness(requiredPlank.getEdgeBandThickness());
+                        }
+                    };
+
                     final MenuItem editPlankItem = createPlankViewContextItem(
-                            "edit.png", "edit", evt -> {
-                                plankField.setPlankId(item.getPlankId());
-                                plankField.setComment(item.getComment());
-                                plankField.setPlankHeight(item.getHeight());
-                                plankField.setPlankWidth(item.getWidth());
-                                plankField.setGrainDirection(item.getGrainDirection());
-                                if (item instanceof BasePlank basePlank) {
-                                    plankField.setSelectedMaterial(basePlank.getMaterial());
-                                }
-                                if (item instanceof RequiredPlank requiredPlank) {
-                                    plankField.setEdgeBands(requiredPlank.getEdgeBands());
-                                    plankField.setEdgeBandThickness(requiredPlank.getEdgeBandThickness());
-                                }
-                            }
-                    );
+                            "edit.png", "edit", evt -> setupEditing.run());
                     final MenuItem deletePlankItem = createPlankViewContextItem(
                             "trash.png", "delete", evt -> control.getPlanks().remove(item));
                     setContextMenu(new ContextMenu(editPlankItem, deletePlankItem));
+
+                    setOnMouseClicked(evt -> {
+                        if (evt.getButton() == MouseButton.PRIMARY
+                                && evt.getClickCount() >= 2) { // NOPMD - Filter for double clicks
+                            setupEditing.run();
+                        }
+                    });
                 }
             }
         });
