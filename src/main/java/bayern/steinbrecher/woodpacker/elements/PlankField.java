@@ -10,12 +10,14 @@ import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.NamedArg;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SetProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
@@ -38,6 +40,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final IntegerProperty plankWidth = new SimpleIntegerProperty();
     private final IntegerProperty plankHeight = new SimpleIntegerProperty();
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
+    private final BooleanProperty inAutoGrainDirectionMode = new SimpleBooleanProperty();
     private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
     private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
     private final StringProperty comment = new SimpleStringProperty("");
@@ -148,6 +151,18 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     public void setGrainDirection(final PlankGrainDirection direction) {
         grainDirectionProperty().set(direction);
+    }
+
+    public BooleanProperty inAutoGrainDirectionModeProperty() {
+        return inAutoGrainDirectionMode;
+    }
+
+    public boolean isInAutoGrainDirectionMode() {
+        return inAutoGrainDirectionModeProperty().get();
+    }
+
+    public void setInAutoGrainDirectionMode(final boolean inAutoGrainDirectionMode) {
+        inAutoGrainDirectionModeProperty().set(inAutoGrainDirectionMode);
     }
 
     public ReadOnlyObjectProperty<PlankMaterial> materialProperty() {
