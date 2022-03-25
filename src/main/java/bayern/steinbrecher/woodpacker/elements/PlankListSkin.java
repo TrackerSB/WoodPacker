@@ -19,11 +19,24 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -175,7 +188,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
 
                     setGraphic(generateItemGraphic(item));
 
-                    final Runnable copyItemValuesToPlankField = () -> {
+                    final Runnable setupEditing = () -> {
                         plankField.setPlankId(item.getPlankId());
                         plankField.setComment(item.getComment());
                         plankField.setPlankHeight(item.getHeight());
@@ -191,14 +204,15 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                     };
 
                     final MenuItem editPlankItem = createPlankViewContextItem(
-                            "edit.png", "edit", evt -> copyItemValuesToPlankField.run());
+                            "edit.png", "edit", evt -> setupEditing.run());
                     final MenuItem deletePlankItem = createPlankViewContextItem(
                             "trash.png", "delete", evt -> control.getPlanks().remove(item));
                     setContextMenu(new ContextMenu(editPlankItem, deletePlankItem));
 
                     setOnMouseClicked(evt -> {
-                        if (evt.getClickCount() >= 2) {
-                            copyItemValuesToPlankField.run();
+                        if (evt.getButton() == MouseButton.PRIMARY
+                                && evt.getClickCount() >= 2) { // NOPMD - Filter for double clicks
+                            setupEditing.run();
                         }
                     });
                 }
