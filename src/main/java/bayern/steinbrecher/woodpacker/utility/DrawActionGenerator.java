@@ -129,10 +129,10 @@ public final class DrawActionGenerator {
         return drawingActions;
     }
 
-    private static double drawEdgeBands(final GraphicsContext gc, final RequiredPlank plank, final double plankXPos,
-                                        final double plankYPos) {
-        gc.save();
-        gc.setStroke(Color.GRAY);
+    private static double drawEdgeBands(final GraphicsContext context, final RequiredPlank plank,
+                                        final double plankXPos, final double plankYPos) {
+        context.save();
+        context.setStroke(Color.GRAY);
         final double edgeBandInset = Math.min(plank.getHeight(), plank.getWidth())
                 * EDGE_BAND_INSET_FACTOR;
         final double minXPos = plankXPos + edgeBandInset;
@@ -141,43 +141,43 @@ public final class DrawActionGenerator {
         final double maxYPos = plankYPos + plank.getHeight() - edgeBandInset;
         for (final EdgeBand edgeBand : plank.getEdgeBands()) {
             switch (edgeBand) { // NOPMD - 2022-03-19: false-positive SwitchStmtsShouldHaveDefault
-                case LEFT -> gc.strokeLine(minXPos, minYPos, minXPos, maxYPos);
-                case UPPER -> gc.strokeLine(minXPos, minYPos, maxXPos, minYPos);
-                case RIGHT -> gc.strokeLine(maxXPos, minYPos, maxXPos, maxYPos);
-                case LOWER -> gc.strokeLine(minXPos, maxYPos, maxXPos, maxYPos);
+                case LEFT -> context.strokeLine(minXPos, minYPos, minXPos, maxYPos);
+                case UPPER -> context.strokeLine(minXPos, minYPos, maxXPos, minYPos);
+                case RIGHT -> context.strokeLine(maxXPos, minYPos, maxXPos, maxYPos);
+                case LOWER -> context.strokeLine(minXPos, maxYPos, maxXPos, maxYPos);
             }
         }
-        gc.restore();
+        context.restore();
         return edgeBandInset;
     }
 
     private static PlankLabelInfo drawPlankLabel(
-            final CuttingPlan cuttingPlan, final GraphicsContext gc, final RequiredPlank plank,
+            final CuttingPlan cuttingPlan, final GraphicsContext context, final RequiredPlank plank,
             final double plankXPos, final double plankYPos) {
         final boolean drawLabelVertical = plank.getHeight() > plank.getWidth();
         final double maxPossibleLabelLength = drawLabelVertical ? plank.getHeight() : plank.getWidth();
         final double maxPossibleLabelHeight = drawLabelVertical ? plank.getWidth() : plank.getHeight();
 
-        gc.save();
-        gc.setTextBaseline(VPos.CENTER);
-        gc.setFill(Color.BLACK);
+        context.save();
+        context.setTextBaseline(VPos.CENTER);
+        context.setFill(Color.BLACK);
         final double maxLabelLength = MAX_LABEL_SIZE_FACTOR * maxPossibleLabelLength;
         final double maxLabelHeight = MAX_LABEL_SIZE_FACTOR * maxPossibleLabelHeight;
         final double labelFontSize = Math.min(
                 LABEL_SIZE_FACTOR * cuttingPlan.getBasePlank().getHeight(),
                 maxLabelHeight);
         final Font labelFont = Font.font(labelFontSize);
-        gc.setFont(labelFont);
+        context.setFont(labelFont);
         final double labelXOffset = plankXPos + (plank.getWidth() / 2d);
         final double labelYOffset = plankYPos + (plank.getHeight() / 2d);
         if (drawLabelVertical) {
-            gc.translate(labelXOffset, labelYOffset);
-            gc.rotate(-90);
-            gc.fillText(plank.getPlankId(), 0, 0, maxLabelLength);
+            context.translate(labelXOffset, labelYOffset);
+            context.rotate(-90);
+            context.fillText(plank.getPlankId(), 0, 0, maxLabelLength);
         } else {
-            gc.fillText(plank.getPlankId(), labelXOffset, labelYOffset, maxLabelLength);
+            context.fillText(plank.getPlankId(), labelXOffset, labelYOffset, maxLabelLength);
         }
-        gc.restore();
+        context.restore();
 
         return new PlankLabelInfo(plank.getPlankId(), labelFont, maxLabelHeight, maxLabelLength, drawLabelVertical);
     }
@@ -206,7 +206,8 @@ public final class DrawActionGenerator {
         return horizLabelTooHigh && vertLabelTooHigh;
     }
 
-    private static void drawDimensioningLabels(final GraphicsContext gc, final RequiredPlank plank,
+    @SuppressWarnings("PMD.LongVariable")
+    private static void drawDimensioningLabels(final GraphicsContext context, final RequiredPlank plank,
                                                final double plankXPos, final double plankYPos,
                                                final double edgeBandInset, final PlankLabelInfo plankLabelInfo) {
         // Estimate size of plank label
@@ -240,20 +241,20 @@ public final class DrawActionGenerator {
             dimLabelFontSize *= 0.9;
         }
 
-        gc.save();
-        gc.setFont(Font.font(dimLabelFontSize));
-        gc.setTextBaseline(VPos.TOP);
-        gc.setFill(Color.BLACK);
-        gc.fillText(horizDimLabelText,
+        context.save();
+        context.setFont(Font.font(dimLabelFontSize));
+        context.setTextBaseline(VPos.TOP);
+        context.setFill(Color.BLACK);
+        context.fillText(horizDimLabelText,
                 plankXPos + plank.getWidth() / 2d,
                 plankYPos + edgeBandInset,
                 plank.getWidth());
-        gc.rotate(-90);
-        gc.fillText(vertDimLabelText,
+        context.rotate(-90);
+        context.fillText(vertDimLabelText,
                 -plankYPos - plank.getHeight() / 2d,
                 plankXPos + edgeBandInset,
                 plank.getHeight());
-        gc.restore();
+        context.restore();
     }
 
     public static Consumer<GraphicsContext> forCuttingPlan(final CuttingPlan cuttingPlan) {
