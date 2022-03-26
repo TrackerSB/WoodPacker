@@ -102,7 +102,7 @@ public final class PDFGenerator {
                 new Paragraph(String.valueOf(problem.getBasePlankOversize()))
         ));
 
-        Collection<String> criteriaList = new ArrayList<>();
+        final Collection<String> criteriaList = new ArrayList<>();
         for (final PlankSolutionCriterion criterion : PlankSolutionCriterion.values()) {
             final String criterionName = WoodPacker.getResource(criterion.getResourceKey());
             final double criterionWeight = problem.getCriterionWeight(criterion);
