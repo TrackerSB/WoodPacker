@@ -388,8 +388,7 @@ public class PlankDemandScreenController extends ScreenController {
             try {
                 try {
                     PDFGenerator.generateCuttingPlanDocument(
-                            cuttingPlanPages.snapshotContents(new SnapshotParameters()),
-                            plankProblem.getRequiredPlanks(), file);
+                            cuttingPlanPages.snapshotContents(new SnapshotParameters()), plankProblem, file);
                 } catch (FileNotFoundException ex) {
                     LOGGER.log(Level.SEVERE,
                             String.format("Could not open '%s' for writing", file.getAbsolutePath()), ex);
