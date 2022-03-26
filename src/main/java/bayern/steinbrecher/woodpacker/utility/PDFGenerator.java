@@ -180,9 +180,9 @@ public final class PDFGenerator {
             throws IOException {
         try (Document document = new Document(new PdfDocument(new PdfWriter(savePath)))) {
             final PdfDocument pdfDocument = document.getPdfDocument();
+            pdfDocument.setDefaultPageSize(PageSize.A4);
             final PdfDocumentInfo documentInfo = pdfDocument.getDocumentInfo();
             documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
-            final PageSize pageSize = pdfDocument.getDefaultPageSize();
 
             document.add(generateExtendedInfo(problem));
 
@@ -190,7 +190,7 @@ public final class PDFGenerator {
             for (final WritableImage snapshot : cuttingPlanSnapshots) {
                 document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
                 final Image cuttingPlan = generateCuttingPlanPage(snapshot);
-                scaleAndCenterOnPage(cuttingPlan, pageSize);
+                scaleAndCenterOnPage(cuttingPlan, pdfDocument.getDefaultPageSize());
                 document.add(cuttingPlan);
             }
         }
