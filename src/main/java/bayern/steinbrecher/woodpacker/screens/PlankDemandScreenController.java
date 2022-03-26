@@ -16,7 +16,6 @@ import bayern.steinbrecher.woodpacker.elements.ScaledCanvas;
 import bayern.steinbrecher.woodpacker.elements.SnapshotPagination;
 import bayern.steinbrecher.woodpacker.utility.DrawActionGenerator;
 import bayern.steinbrecher.woodpacker.utility.PDFGenerator;
-import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import bayern.steinbrecher.woodpacker.utility.SerializationUtility;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
@@ -330,8 +329,7 @@ public class PlankDemandScreenController extends ScreenController {
     @FXML
     private boolean askUserExportPlankProblem() throws DialogCreationException {
         boolean exportSucceeded = false;
-        final Optional<File> exportFile = PredefinedFileChooser.PLANK_PROBLEM
-                .askForSavePath(requiredPlanksView.getScene().getWindow());
+        final Optional<File> exportFile = WoodPacker.getPlankProblemChooser().askForSavePath();
         if (exportFile.isPresent()) {
             try {
                 final byte[] serializedSnapshot = SerializationUtility.serialize(plankProblem);
@@ -383,8 +381,7 @@ public class PlankDemandScreenController extends ScreenController {
     @SuppressWarnings("unused")
     @FXML
     private void exportPreview() {
-        final Optional<File> savePath = PredefinedFileChooser.CUTTING_PLAN
-                .askForSavePath(requiredPlanksView.getScene().getWindow());
+        final Optional<File> savePath = WoodPacker.getCuttingPlanChooser().askForSavePath();
         savePath.ifPresent(file -> new Thread(() -> {
             getScreenManager()
                     .showOverlay(WoodPacker.getResource("creatingCuttingPlanDocument"));
