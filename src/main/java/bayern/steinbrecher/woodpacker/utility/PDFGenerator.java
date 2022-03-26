@@ -2,7 +2,8 @@ package bayern.steinbrecher.woodpacker.utility;
 
 import bayern.steinbrecher.woodpacker.BuildConfig;
 import bayern.steinbrecher.woodpacker.WoodPacker;
-import bayern.steinbrecher.woodpacker.data.RequiredPlank;
+import bayern.steinbrecher.woodpacker.data.PlankProblem;
+import bayern.steinbrecher.woodpacker.data.PlankSolutionCriterion;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -10,6 +11,7 @@ import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
+import com.itextpdf.layout.element.BlockElement;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.element.Paragraph;
@@ -27,6 +29,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Supplier;
 
@@ -40,24 +45,36 @@ public final class PDFGenerator {
         throw new UnsupportedOperationException("The construction of instances is prohibited");
     }
 
+    private static List generateList(final Iterable<?> listContent) {
+        List list = new List()
+                .setListSymbol("\u2022")
+                .setSymbolIndent(4);
+        listContent.forEach(item -> list.add(item.toString()));
+        return list;
+    }
+
     /**
-     * @param tableContent Row major content where the first entry represents the headings.
+     * @param cellEntries Row major content where the first entry represents the headings.
      */
-    @SuppressWarnings("unused")
-    private static Table generateTable(final Iterable<Iterable<String>> tableContent) {
-        final Iterator<Iterable<String>> tableRowIterator = tableContent.iterator();
-        if (tableRowIterator.hasNext()) {
-            throw new IllegalArgumentException(
-                    "The table content has to have at least a single row. This row contains the table headings");
+    private static Table generateTable(final Collection<Collection<BlockElement<?>>> cellEntries) {
+        final int numColumns = cellEntries.stream()
+                .max(Comparator.comparingInt(Collection::size))
+                .map(Collection::size)
+                .orElse(0);
+        if (numColumns <= 0) {
+            throw new IllegalArgumentException("The table content has to have at least a single non empty row. "
+                    + "This row contains the table headings");
         }
 
-        final Table table = new Table(2);
-        final Iterable<String> headerRow = tableRowIterator.next();
-        for (final String headerCellContent : headerRow) {
+        final Iterator<Collection<BlockElement<?>>> tableRowIterator = cellEntries.iterator();
+
+        final Table table = new Table(numColumns);
+        final Iterable<BlockElement<?>> headerRow = tableRowIterator.next();
+        for (final BlockElement<?> headerCellContent : headerRow) {
             table.addHeaderCell(headerCellContent);
         }
         tableRowIterator.forEachRemaining(row -> {
-            for (final String cellContent : row) {
+            for (final BlockElement<?> cellContent : row) {
                 table.addCell(cellContent);
             }
             table.startNewRow();
@@ -65,12 +82,38 @@ public final class PDFGenerator {
         return table;
     }
 
-    private static List generateList(final Iterable<?> listContent) {
-        List list = new List()
-                .setListSymbol("\u2022")
-                .setSymbolIndent(4);
-        listContent.forEach(item -> list.add(item.toString()));
-        return list;
+    private static Table generateExtendedInfo(final PlankProblem problem) {
+        final Collection<Collection<BlockElement<?>>> cellEntries = new ArrayList<>();
+
+        cellEntries.add(java.util.List.of(
+                new Paragraph(WoodPacker.getResource("basePlank")),
+                new Paragraph(problem.getBasePlank().toString())
+        ));
+        cellEntries.add(java.util.List.of(
+                new Paragraph(WoodPacker.getResource("demandList")),
+                generateList(problem.getRequiredPlanks())
+        ));
+        cellEntries.add(java.util.List.of(
+                new Paragraph(WoodPacker.getResource("cuttingWidth")),
+                new Paragraph(String.valueOf(problem.getCuttingWidth()))
+        ));
+        cellEntries.add(java.util.List.of(
+                new Paragraph(WoodPacker.getResource("oversize")),
+                new Paragraph(String.valueOf(problem.getBasePlankOversize()))
+        ));
+
+        final Collection<String> criteriaList = new ArrayList<>();
+        for (final PlankSolutionCriterion criterion : PlankSolutionCriterion.values()) {
+            final String criterionName = WoodPacker.getResource(criterion.getResourceKey());
+            final double criterionWeight = problem.getCriterionWeight(criterion);
+            criteriaList.add(String.format("%s: %f", criterionName, criterionWeight));
+        }
+        cellEntries.add(java.util.List.of(
+                new Paragraph(WoodPacker.getResource("optimizationCriteria")),
+                generateList(criteriaList)
+        ));
+
+        return generateTable(cellEntries);
     }
 
     private static Image generateCuttingPlanPage(final WritableImage cuttingPlan) throws IOException {
@@ -133,23 +176,21 @@ public final class PDFGenerator {
     }
 
     public static void generateCuttingPlanDocument(
-            final Iterable<WritableImage> cuttingPlanSnapshots, final Iterable<RequiredPlank> plankDemandList,
-            final File savePath) throws IOException {
+            final Iterable<WritableImage> cuttingPlanSnapshots, final PlankProblem problem, final File savePath)
+            throws IOException {
         try (Document document = new Document(new PdfDocument(new PdfWriter(savePath)))) {
             final PdfDocument pdfDocument = document.getPdfDocument();
+            pdfDocument.setDefaultPageSize(PageSize.A4);
             final PdfDocumentInfo documentInfo = pdfDocument.getDocumentInfo();
             documentInfo.setCreator(BuildConfig.APP_NAME + " " + BuildConfig.APP_VERSION);
-            final PageSize pageSize = pdfDocument.getDefaultPageSize();
 
-            // Append plank demand list
-            document.add(new Paragraph(WoodPacker.getResource("demandList")));
-            document.add(generateList(plankDemandList));
+            document.add(generateExtendedInfo(problem));
 
             // Append cutting plans
             for (final WritableImage snapshot : cuttingPlanSnapshots) {
                 document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
                 final Image cuttingPlan = generateCuttingPlanPage(snapshot);
-                scaleAndCenterOnPage(cuttingPlan, pageSize);
+                scaleAndCenterOnPage(cuttingPlan, pdfDocument.getDefaultPageSize());
                 document.add(cuttingPlan);
             }
         }
