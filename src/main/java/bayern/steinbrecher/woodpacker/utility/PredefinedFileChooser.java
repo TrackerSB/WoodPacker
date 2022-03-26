@@ -1,7 +1,5 @@
 package bayern.steinbrecher.woodpacker.utility;
 
-import bayern.steinbrecher.woodpacker.BuildConfig;
-import bayern.steinbrecher.woodpacker.WoodPacker;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
