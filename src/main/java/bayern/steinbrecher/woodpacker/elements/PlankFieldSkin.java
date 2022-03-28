@@ -8,7 +8,7 @@ import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
@@ -22,6 +22,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.Optional;
+
 /**
  * @author Stefan Huber
  * @since 0.1
@@ -33,6 +35,8 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         plankIdField.setPromptText(WoodPacker.getResource("identifier"));
         plankIdField.textProperty()
                 .bindBidirectional(control.plankIdProperty());
+        plankIdField.checkedProperty()
+                .bind(control.checkedProperty());
         control.addValidityConstraint(plankIdField.validProperty());
 
         final String externalIconPath = getClass()
@@ -55,18 +59,20 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         lengthField.setEditable(true);
         lengthField.getEditor()
                 .setText("");
-        final IntegerProperty lengthProperty = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
-        final ChangeListener<Integer> onLengthValueChanged = (obs, previousValue, currentValue) -> {
-            if (currentValue != null) {
-                lengthProperty.set(currentValue);
-            }
-        };
+
+        final ObjectProperty<Optional<Integer>> lengthProperty
+                = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
+        final ChangeListener<Integer> onLengthValueChanged
+                = (obs, previousValue, currentValue) -> lengthProperty.set(Optional.ofNullable(currentValue));
         lengthField.valueProperty()
                 .addListener(onLengthValueChanged);
         // Ensure length property is initialized with initial spinner value
         onLengthValueChanged.changed(null, null, lengthField.getValue());
         lengthProperty.addListener((ob, oldLength, newLength)
-                -> lengthField.getEditor().setText(String.valueOf(newLength)));
+                -> lengthField.getEditor().setText(newLength.map(String::valueOf).orElse("")));
+
+        lengthField.checkedProperty()
+                .bind(control.checkedProperty());
         control.addValidityConstraint(lengthField.validProperty());
 
         final String externalIconPath = getClass()

@@ -66,9 +66,11 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
             final Runnable updateAutoValue = () -> {
                 if (control.isInAutoMode()) {
                     PlankGrainDirection direction;
-                    if (autoConnection.getPlankHeight() == autoConnection.getPlankWidth()) {
+                    if(autoConnection.getPlankHeight().isEmpty() || autoConnection.getPlankWidth().isEmpty()){
                         direction = PlankGrainDirection.IRRELEVANT;
-                    } else if (autoConnection.getPlankHeight() > autoConnection.getPlankWidth()) {
+                    }else if (autoConnection.getPlankHeight().get().equals(autoConnection.getPlankWidth().get())) {
+                        direction = PlankGrainDirection.IRRELEVANT;
+                    } else if (autoConnection.getPlankHeight().get() > autoConnection.getPlankWidth().get()) {
                         direction = PlankGrainDirection.VERTICAL;
                     } else {
                         direction = PlankGrainDirection.HORIZONTAL;
