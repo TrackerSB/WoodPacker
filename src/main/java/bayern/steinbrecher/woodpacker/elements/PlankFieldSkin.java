@@ -57,19 +57,27 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
         lengthField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1, 1));
         lengthField.setPromptText(WoodPacker.getResource(forWidth ? "width" : "height"));
         lengthField.setEditable(true);
-        lengthField.getEditor()
-                .setText("");
+        final TextField editor = lengthField.getEditor();
+        editor.setText("");
 
         final ObjectProperty<Optional<Integer>> lengthProperty
                 = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
-        final ChangeListener<Integer> onLengthValueChanged
-                = (obs, previousValue, currentValue) -> lengthProperty.set(Optional.ofNullable(currentValue));
-        lengthField.valueProperty()
+        final ChangeListener<String> onLengthValueChanged
+                = (obs, previousValue, currentValue) -> {
+            Integer currentIntValue;
+            try {
+                currentIntValue = Integer.parseInt(currentValue);
+            } catch (NumberFormatException ex) {
+                currentIntValue = null;
+            }
+            lengthProperty.set(Optional.ofNullable(currentIntValue));
+        };
+        editor.textProperty()
                 .addListener(onLengthValueChanged);
-        // Ensure length property is initialized with initial spinner value
-        onLengthValueChanged.changed(null, null, lengthField.getValue());
         lengthProperty.addListener((ob, oldLength, newLength)
-                -> lengthField.getEditor().setText(newLength.map(String::valueOf).orElse("")));
+                -> editor.setText(newLength.map(String::valueOf).orElse("")));
+        // Ensure length property is initialized with initial spinner value
+        onLengthValueChanged.changed(null, null, editor.getText());
 
         lengthField.checkedProperty()
                 .bind(control.checkedProperty());
