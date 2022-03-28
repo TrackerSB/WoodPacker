@@ -193,6 +193,7 @@ public class PlankDemandScreenController extends ScreenController {
         plankProblem.cuttingWidthProperty()
                 .addListener((obs, previousCuttingWidth, currentCuttingWidth)
                         -> cuttingWidthSpinner.getValueFactory().setValue(currentCuttingWidth.intValue()));
+        plankProblem.setCuttingWidth(cuttingWidthSpinner.getValue()); // Ensure initial state
     }
 
     private void initializeCriteriaPane() {
