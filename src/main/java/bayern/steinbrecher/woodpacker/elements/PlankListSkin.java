@@ -7,6 +7,7 @@ import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.Plank;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -286,10 +287,14 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         });
         ButtonBar.setButtonData(updatePlankViewButton, ButtonData.APPLY);
 
-        final ChangeListener<Boolean> onValidityChanged = (obs, wasValid, isValid) -> updatePlankViewButton.setDisable(!isValid);
-        plankField.validProperty()
-                .addListener(onValidityChanged);
-        onValidityChanged.changed(null, null, plankField.isValid()); // Ensure initial state
+        final ChangeListener<Boolean> onConfirmationAllowedChanged
+                = (obs, wasValid, isValid) -> updatePlankViewButton.setDisable(!isValid);
+        final BooleanBinding confirmationAllowed
+                = plankField.validProperty()
+                .and(plankField.checkedProperty());
+        confirmationAllowed
+                .addListener(onConfirmationAllowedChanged);
+        onConfirmationAllowedChanged.changed(null, null, confirmationAllowed.get()); // Ensure initial state
 
         return updatePlankViewButton;
     }

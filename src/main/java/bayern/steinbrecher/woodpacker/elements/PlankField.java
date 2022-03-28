@@ -1,8 +1,8 @@
 package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.checkedElements.CheckableControlBase;
+import bayern.steinbrecher.checkedElements.CheckedControl;
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
-import bayern.steinbrecher.checkedElements.report.Reportable;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.EdgeBand;
 import bayern.steinbrecher.woodpacker.data.Plank;
@@ -10,6 +10,7 @@ import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.NamedArg;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -35,7 +36,7 @@ import java.util.Set;
  * @author Stefan Huber
  * @since 0.1
  */
-public class PlankField<T extends Plank> extends Control implements Reportable {
+public class PlankField<T extends Plank> extends Control implements CheckedControl {
     private final StringProperty plankId = new SimpleStringProperty("");
     private final IntegerProperty plankWidth = new SimpleIntegerProperty();
     private final IntegerProperty plankHeight = new SimpleIntegerProperty();
@@ -63,6 +64,14 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
                     String.format("%s does not support %s as generic type", PlankField.class.getCanonicalName(),
                             genericRuntimeType.getCanonicalName()));
         }
+
+        final BooleanExpression allFieldsEmpty
+                = plankIdProperty().isEmpty()
+                // FIXME Recognize whether width and height fields are empty
+                .and(inAutoGrainDirectionModeProperty())
+                .and(commentProperty().isEmpty())
+                .and(edgeBandsProperty().emptyProperty());
+        rBase.checkedProperty().bind(allFieldsEmpty.not());
     }
 
     /**
@@ -100,7 +109,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     public void reset() {
         setPlankId("");
         // FIXME Remove width and height field contents
-        // FIXME Re-enable grain direction auto mode
+        setInAutoGrainDirectionMode(true);
         setSelectedMaterial(PlankMaterial.UNDEFINED);
         setComment("");
     }
@@ -220,6 +229,16 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     public void setEdgeBandThickness(final int edgeBandThickness) {
         edgeBandThicknessProperty().set(edgeBandThickness);
+    }
+
+    @Override
+    public ReadOnlyBooleanProperty checkedProperty() {
+        return rBase.checkedProperty();
+    }
+
+    @Override
+    public boolean isChecked() {
+        return checkedProperty().get();
     }
 
     @Override
