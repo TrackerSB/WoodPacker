@@ -11,11 +11,11 @@ import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SetProperty;
@@ -49,6 +49,7 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
     private final StringProperty comment = new SimpleStringProperty("");
     private final SetProperty<EdgeBand> edgeBands = new SimpleSetProperty<>(FXCollections.observableSet());
     private final IntegerProperty edgeBandThickness = new SimpleIntegerProperty();
+    private final ReadOnlyBooleanWrapper allFieldsEmpty = new ReadOnlyBooleanWrapper();
     private final CheckableControlBase<PlankField<T>> rBase = new CheckableControlBase<>(this);
     private final Class<T> genericRuntimeType;
 
@@ -67,14 +68,14 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
                             genericRuntimeType.getCanonicalName()));
         }
 
-        final BooleanExpression allFieldsEmpty
-                = plankIdProperty().isEmpty()
-                .and(Bindings.createBooleanBinding(() -> getPlankWidth().isEmpty(), plankWidthProperty()))
-                .and(Bindings.createBooleanBinding(() -> getPlankHeight().isEmpty(), plankHeightProperty()))
-                .and(inAutoGrainDirectionModeProperty())
-                .and(commentProperty().isEmpty())
-                .and(edgeBandsProperty().emptyProperty());
-        rBase.checkedProperty().bind(allFieldsEmpty.not());
+        allFieldsEmpty.bind(
+                plankIdProperty().isEmpty()
+                        .and(Bindings.createBooleanBinding(() -> getPlankWidth().isEmpty(), plankWidthProperty()))
+                        .and(Bindings.createBooleanBinding(() -> getPlankHeight().isEmpty(), plankHeightProperty()))
+                        .and(inAutoGrainDirectionModeProperty())
+                        .and(commentProperty().isEmpty())
+                        .and(edgeBandsProperty().emptyProperty())
+        );
     }
 
     /**
@@ -92,7 +93,7 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
     }
 
     public T createPlank() {
-        if(getPlankWidth().isEmpty() || getPlankHeight().isEmpty()){
+        if (getPlankWidth().isEmpty() || getPlankHeight().isEmpty()) {
             throw new IllegalStateException("Cannot create plank since either height or width is not set");
         }
 
@@ -237,6 +238,14 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
 
     public void setEdgeBandThickness(final int edgeBandThickness) {
         edgeBandThicknessProperty().set(edgeBandThickness);
+    }
+
+    public ReadOnlyBooleanProperty allFieldsEmptyProperty() {
+        return allFieldsEmpty.getReadOnlyProperty();
+    }
+
+    public boolean isAllFieldsEmpty() {
+        return allFieldsEmptyProperty().get();
     }
 
     @Override
