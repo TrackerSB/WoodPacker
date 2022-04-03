@@ -291,7 +291,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                 = (obs, wasValid, isValid) -> updatePlankViewButton.setDisable(!isValid);
         final BooleanBinding confirmationAllowed
                 = plankField.validProperty()
-                .and(plankField.checkedProperty());
+                .and(plankField.allFieldsEmptyProperty().not());
         confirmationAllowed
                 .addListener(onConfirmationAllowedChanged);
         onConfirmationAllowedChanged.changed(null, null, confirmationAllowed.get()); // Ensure initial state

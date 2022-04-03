@@ -76,6 +76,8 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
                         .and(commentProperty().isEmpty())
                         .and(edgeBandsProperty().emptyProperty())
         );
+        rBase.checkedProperty()
+                .bind(allFieldsEmptyProperty().not());
     }
 
     /**
