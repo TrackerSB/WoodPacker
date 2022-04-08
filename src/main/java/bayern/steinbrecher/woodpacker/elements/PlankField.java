@@ -69,15 +69,15 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
         }
 
         allFieldsEmpty.bind(
-                plankIdProperty().isEmpty()
-                        .and(Bindings.createBooleanBinding(() -> getPlankWidth().isEmpty(), plankWidthProperty()))
-                        .and(Bindings.createBooleanBinding(() -> getPlankHeight().isEmpty(), plankHeightProperty()))
-                        .and(inAutoGrainDirectionModeProperty())
-                        .and(commentProperty().isEmpty())
-                        .and(edgeBandsProperty().emptyProperty())
+                plankId.isEmpty()
+                        .and(Bindings.createBooleanBinding(() -> plankWidth.get().isEmpty(), plankWidth))
+                        .and(Bindings.createBooleanBinding(() -> plankHeight.get().isEmpty(), plankHeight))
+                        .and(inAutoGrainDirectionMode)
+                        .and(comment.isEmpty())
+                        .and(edgeBands.emptyProperty())
         );
         rBase.checkedProperty()
-                .bind(allFieldsEmptyProperty().not());
+                .bind(allFieldsEmpty.not());
     }
 
     /**

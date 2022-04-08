@@ -287,14 +287,13 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
         });
         ButtonBar.setButtonData(updatePlankViewButton, ButtonData.APPLY);
 
-        final ChangeListener<Boolean> onConfirmationAllowedChanged
+        final ChangeListener<Boolean> onAddAllowedChanged
                 = (obs, wasValid, isValid) -> updatePlankViewButton.setDisable(!isValid);
-        final BooleanBinding confirmationAllowed
+        final BooleanBinding addAllowed
                 = plankField.validProperty()
                 .and(plankField.allFieldsEmptyProperty().not());
-        confirmationAllowed
-                .addListener(onConfirmationAllowedChanged);
-        onConfirmationAllowedChanged.changed(null, null, confirmationAllowed.get()); // Ensure initial state
+        addAllowed.addListener(onAddAllowedChanged);
+        onAddAllowedChanged.changed(null, null, addAllowed.get()); // Ensure initial state
 
         return updatePlankViewButton;
     }

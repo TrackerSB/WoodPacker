@@ -64,13 +64,13 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
                 = forWidth ? control.plankWidthProperty() : control.plankHeightProperty();
         final ChangeListener<String> onLengthValueChanged
                 = (obs, previousValue, currentValue) -> {
-            Integer currentIntValue;
+            Optional<Integer> currentIntValue;
             try {
-                currentIntValue = Integer.parseInt(currentValue);
+                currentIntValue = Optional.of(Integer.parseInt(currentValue));
             } catch (NumberFormatException ex) {
-                currentIntValue = null;
+                currentIntValue = Optional.empty();
             }
-            lengthProperty.set(Optional.ofNullable(currentIntValue));
+            lengthProperty.set(currentIntValue);
         };
         editor.textProperty()
                 .addListener(onLengthValueChanged);
