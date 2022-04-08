@@ -1,8 +1,8 @@
 package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.checkedElements.CheckableControlBase;
+import bayern.steinbrecher.checkedElements.CheckedControl;
 import bayern.steinbrecher.checkedElements.report.ReportEntry;
-import bayern.steinbrecher.checkedElements.report.Reportable;
 import bayern.steinbrecher.woodpacker.data.BasePlank;
 import bayern.steinbrecher.woodpacker.data.EdgeBand;
 import bayern.steinbrecher.woodpacker.data.Plank;
@@ -10,10 +10,12 @@ import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
 import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.NamedArg;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SetProperty;
@@ -29,16 +31,17 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
  * @author Stefan Huber
  * @since 0.1
  */
-public class PlankField<T extends Plank> extends Control implements Reportable {
+public class PlankField<T extends Plank> extends Control implements CheckedControl {
     private final StringProperty plankId = new SimpleStringProperty("");
-    private final IntegerProperty plankWidth = new SimpleIntegerProperty();
-    private final IntegerProperty plankHeight = new SimpleIntegerProperty();
+    private final ObjectProperty<Optional<Integer>> plankWidth = new SimpleObjectProperty<>(Optional.empty());
+    private final ObjectProperty<Optional<Integer>> plankHeight = new SimpleObjectProperty<>(Optional.empty());
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
     private final BooleanProperty inAutoGrainDirectionMode = new SimpleBooleanProperty();
     private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
@@ -46,6 +49,7 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     private final StringProperty comment = new SimpleStringProperty("");
     private final SetProperty<EdgeBand> edgeBands = new SimpleSetProperty<>(FXCollections.observableSet());
     private final IntegerProperty edgeBandThickness = new SimpleIntegerProperty();
+    private final ReadOnlyBooleanWrapper allFieldsEmpty = new ReadOnlyBooleanWrapper();
     private final CheckableControlBase<PlankField<T>> rBase = new CheckableControlBase<>(this);
     private final Class<T> genericRuntimeType;
 
@@ -63,6 +67,17 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
                     String.format("%s does not support %s as generic type", PlankField.class.getCanonicalName(),
                             genericRuntimeType.getCanonicalName()));
         }
+
+        allFieldsEmpty.bind(
+                plankId.isEmpty()
+                        .and(Bindings.createBooleanBinding(() -> plankWidth.get().isEmpty(), plankWidth))
+                        .and(Bindings.createBooleanBinding(() -> plankHeight.get().isEmpty(), plankHeight))
+                        .and(inAutoGrainDirectionMode)
+                        .and(comment.isEmpty())
+                        .and(edgeBands.emptyProperty())
+        );
+        rBase.checkedProperty()
+                .bind(allFieldsEmpty.not());
     }
 
     /**
@@ -80,15 +95,19 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
     }
 
     public T createPlank() {
+        if (getPlankWidth().isEmpty() || getPlankHeight().isEmpty()) {
+            throw new IllegalStateException("Cannot create plank since either height or width is not set");
+        }
+
         T createdPlank;
         if (RequiredPlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
-            createdPlank = (T) new RequiredPlank(getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(),
-                    getComment(), getEdgeBands(), getEdgeBandThickness());
+            createdPlank = (T) new RequiredPlank(getPlankId(), getPlankWidth().get(), getPlankHeight().get(),
+                    getGrainDirection(), getComment(), getEdgeBands(), getEdgeBandThickness());
         } else if (BasePlank.class.isAssignableFrom(genericRuntimeType)) {
             //noinspection unchecked
             createdPlank = (T) new BasePlank(
-                    getPlankId(), getPlankWidth(), getPlankHeight(), getGrainDirection(), getMaterial(),
+                    getPlankId(), getPlankWidth().get(), getPlankHeight().get(), getGrainDirection(), getMaterial(),
                     getComment());
         } else {
             throw new UnsupportedOperationException(
@@ -99,8 +118,9 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     public void reset() {
         setPlankId("");
-        // FIXME Remove width and height field contents
-        // FIXME Re-enable grain direction auto mode
+        setPlankHeight(null);
+        setPlankWidth(null);
+        setInAutoGrainDirectionMode(true);
         setSelectedMaterial(PlankMaterial.UNDEFINED);
         setComment("");
     }
@@ -117,28 +137,28 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
         plankIdProperty().set(plankId);
     }
 
-    public IntegerProperty plankWidthProperty() {
+    public ObjectProperty<Optional<Integer>> plankWidthProperty() {
         return plankWidth;
     }
 
-    public int getPlankWidth() {
+    public Optional<Integer> getPlankWidth() {
         return plankWidthProperty().get();
     }
 
-    public void setPlankWidth(final int plankWidth) {
-        plankWidthProperty().set(plankWidth);
+    public void setPlankWidth(final Integer plankWidth) {
+        plankWidthProperty().set(Optional.ofNullable(plankWidth));
     }
 
-    public IntegerProperty plankHeightProperty() {
+    public ObjectProperty<Optional<Integer>> plankHeightProperty() {
         return plankHeight;
     }
 
-    public int getPlankHeight() {
+    public Optional<Integer> getPlankHeight() {
         return plankHeightProperty().get();
     }
 
-    public void setPlankHeight(final int plankHeight) {
-        plankHeightProperty().set(plankHeight);
+    public void setPlankHeight(final Integer plankHeight) {
+        plankHeightProperty().set(Optional.ofNullable(plankHeight));
     }
 
     public ObjectProperty<PlankGrainDirection> grainDirectionProperty() {
@@ -220,6 +240,24 @@ public class PlankField<T extends Plank> extends Control implements Reportable {
 
     public void setEdgeBandThickness(final int edgeBandThickness) {
         edgeBandThicknessProperty().set(edgeBandThickness);
+    }
+
+    public ReadOnlyBooleanProperty allFieldsEmptyProperty() {
+        return allFieldsEmpty.getReadOnlyProperty();
+    }
+
+    public boolean isAllFieldsEmpty() {
+        return allFieldsEmptyProperty().get();
+    }
+
+    @Override
+    public ReadOnlyBooleanProperty checkedProperty() {
+        return rBase.checkedProperty();
+    }
+
+    @Override
+    public boolean isChecked() {
+        return checkedProperty().get();
     }
 
     @Override

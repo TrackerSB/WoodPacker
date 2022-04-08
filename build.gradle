@@ -36,20 +36,23 @@ dependencies {
     implementation 'org.testng:testng:7.5' // FIXME Using testImplementation does not work
 }
 
-run {
-    main = "$moduleName/bayern.steinbrecher.woodpacker.WoodPacker"
-    jvmArgs = [
-            /* 2021-03-07:  Required for determining the pagination child that contains the current page content in
+application {
+    applicationDefaultJvmArgs = [
+            /* 2021-03-07: Required for determining the pagination child that contains the current page content in
              * SnapshotPagination
              */
-            "--add-opens", "javafx.controls/javafx.scene.control.skin=$moduleName"
+            '--add-opens', "javafx.controls/javafx.scene.control.skin=$moduleName" as String
     ]
+}
+
+run {
+    main = "$moduleName/bayern.steinbrecher.woodpacker.WoodPacker"
 }
 
 distributions {
     main {
         contents {
-            from("${projectDir}/licenses") {into "bin/licenses"}
+            from("${projectDir}/licenses") { into "bin/licenses" }
         }
     }
 }
