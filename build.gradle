@@ -1,3 +1,5 @@
+import java.time.LocalDate
+
 plugins {
     id 'application'
     id 'distribution'
@@ -5,10 +7,12 @@ plugins {
 
     id 'com.github.gmazzo.buildconfig' version "3.0.3"
     id 'org.openjfx.javafxplugin' version '0.0.11'
+    id "org.panteleyev.jpackageplugin" version "1.3.1"
+    id "org.moditect.gradleplugin" version "1.0.0-rc3" // FIXME Creates circular dependency with buildconfig
 }
 
 group 'bayern.steinbrecher'
-version '0.1-SNAPSHOT'
+version '0.1'
 
 repositories {
     mavenCentral()
@@ -34,6 +38,16 @@ dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
 
     implementation 'org.testng:testng:7.5' // FIXME Using testImplementation does not work
+}
+
+javafx {
+    version = "$sourceCompatibility"
+    modules = [
+            "javafx.controls",
+            "javafx.fxml",
+            "javafx.graphics",
+            "javafx.swing"
+    ]
 }
 
 application {
@@ -65,12 +79,30 @@ buildConfig {
     packageName("bayern.steinbrecher.woodpacker")
 }
 
-javafx {
-    version = "$sourceCompatibility"
-    modules = [
-            "javafx.controls",
-            "javafx.fxml",
-            "javafx.graphics",
-            "javafx.swing"
-    ]
+tasks.register("copyInstallerDeps", Copy) {
+    from(configurations.runtimeClasspath)
+    into("$buildDir/installer/files")
+}
+
+tasks.register("copyInstallerJars", Copy) {
+    from(tasks.jar)
+    into("$buildDir/installer/files")
+}
+
+tasks.jpackage {
+    dependsOn("build", "copyInstallerDeps", "copyInstallerJars")
+
+    appName = "\"${project.name}\""
+    appVersion = "\"${project.version}\""
+    vendor = "StoneSoft"
+    copyright = "Copyright (c) ${LocalDate.now().getYear()} $vendor"
+    module = "$run.main"
+    modulePaths = file("$buildDir/installer/files").listFiles() as List<String>
+    destination = "$buildDir/installer"
+
+    windows {
+        icon = "imageTemplates/logo.ico"
+        winDirChooser = true
+        winMenu = true
+    }
 }
