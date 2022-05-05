@@ -390,6 +390,8 @@ public class PlankDemandScreenController extends ScreenController {
                 try {
                     PDFGenerator.generateCuttingPlanDocument(
                             cuttingPlanPages.snapshotContents(new SnapshotParameters()), plankProblem, file);
+                    Desktop.getDesktop()
+                            .open(file);
                 } catch (FileNotFoundException ex) {
                     LOGGER.log(Level.SEVERE,
                             String.format("Could not open '%s' for writing", file.getAbsolutePath()), ex);
@@ -397,6 +399,7 @@ public class PlankDemandScreenController extends ScreenController {
                             .createErrorAlert(WoodPacker.getResource("writeAccessDenied", file.getAbsolutePath()));
                     DialogFactory.showAndWait(writeAccessDeniedAlert);
                 } catch (IOException ex) {
+                    LOGGER.log(Level.SEVERE, "Could not open exported cutting plan to user", ex);
                     final Alert stacktraceAlert = WoodPacker.getDialogFactory()
                             .createStacktraceAlert(ex);
                     DialogFactory.showAndWait(stacktraceAlert);
@@ -406,15 +409,6 @@ public class PlankDemandScreenController extends ScreenController {
             } finally {
                 getScreenManager()
                         .hideOverlay();
-            }
-
-            if (file.exists()) {
-                try {
-                    Desktop.getDesktop()
-                            .open(file);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Could not open exported cutting plan to user", ex);
-                }
             }
         }).start());
     }
