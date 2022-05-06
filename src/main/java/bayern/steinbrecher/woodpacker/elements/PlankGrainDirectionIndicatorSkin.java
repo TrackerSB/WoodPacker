@@ -105,15 +105,7 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
                     indicatorButton.getOnAction()
                             .handle(null);
                 }
-                case SECONDARY -> {
-                    control.enableAutoMode();
-                    /* If the currently shown grain direction does not match with the automatically determined grain
-                     * direction a PlankField may send another signal notifying this indicator about the change and thus
-                     * disable the auto mode again. So the duplicated call ensures that the auto mode is re-enabled if
-                     * required.
-                     */
-                    control.enableAutoMode();
-                }
+                case SECONDARY -> control.enableAutoMode();
                 default -> {
                     // No-op
                 }
