@@ -107,9 +107,10 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
                 }
                 case SECONDARY -> {
                     control.enableAutoMode();
-                    /* Do not leave auto mode if the grain direction PlankField changed due to an update triggered by
-                     * the auto grain direction overlay. This may be the situation if the explicitly set grain direction
-                     * does not match the auto grain direction.
+                    /* If the currently shown grain direction does not match with the automatically determined grain
+                     * direction a PlankField may send another signal notifying this indicator about the change and thus
+                     * disable the auto mode again. So the duplicated call ensures that the auto mode is re-enabled if
+                     * required.
                      */
                     control.enableAutoMode();
                 }
