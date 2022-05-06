@@ -11,7 +11,6 @@ import bayern.steinbrecher.woodpacker.data.PlankMaterial;
 import bayern.steinbrecher.woodpacker.data.RequiredPlank;
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -19,7 +18,6 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SetProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
@@ -43,7 +41,6 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
     private final ObjectProperty<Optional<Integer>> plankWidth = new SimpleObjectProperty<>(Optional.empty());
     private final ObjectProperty<Optional<Integer>> plankHeight = new SimpleObjectProperty<>(Optional.empty());
     private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
-    private final BooleanProperty inAutoGrainDirectionMode = new SimpleBooleanProperty();
     private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
     private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
     private final StringProperty comment = new SimpleStringProperty("");
@@ -72,7 +69,6 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
                 plankId.isEmpty()
                         .and(Bindings.createBooleanBinding(() -> plankWidth.get().isEmpty(), plankWidth))
                         .and(Bindings.createBooleanBinding(() -> plankHeight.get().isEmpty(), plankHeight))
-                        .and(inAutoGrainDirectionMode)
                         .and(comment.isEmpty())
                         .and(edgeBands.emptyProperty())
         );
@@ -120,7 +116,6 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
         setPlankId("");
         setPlankHeight(null);
         setPlankWidth(null);
-        setInAutoGrainDirectionMode(true);
         setSelectedMaterial(PlankMaterial.UNDEFINED);
         setComment("");
     }
@@ -171,18 +166,6 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
 
     public void setGrainDirection(final PlankGrainDirection direction) {
         grainDirectionProperty().set(direction);
-    }
-
-    public BooleanProperty inAutoGrainDirectionModeProperty() {
-        return inAutoGrainDirectionMode;
-    }
-
-    public boolean isInAutoGrainDirectionMode() {
-        return inAutoGrainDirectionModeProperty().get();
-    }
-
-    public void setInAutoGrainDirectionMode(final boolean inAutoGrainDirectionMode) {
-        inAutoGrainDirectionModeProperty().set(inAutoGrainDirectionMode);
     }
 
     public ReadOnlyObjectProperty<PlankMaterial> materialProperty() {
