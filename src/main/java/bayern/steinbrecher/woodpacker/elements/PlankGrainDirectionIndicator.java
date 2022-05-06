@@ -25,10 +25,6 @@ public class PlankGrainDirectionIndicator extends Control {
     public PlankGrainDirectionIndicator(final PlankField<?> autoConnection) {
         super();
         this.autoConnection = autoConnection;
-        if (autoConnection != null) {
-            autoConnection.grainDirectionProperty()
-                    .bindBidirectional(value);
-        }
         enableAutoMode();
     }
 
