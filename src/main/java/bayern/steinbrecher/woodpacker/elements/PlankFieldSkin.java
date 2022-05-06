@@ -23,7 +23,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Stefan Huber
