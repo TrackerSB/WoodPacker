@@ -19,3 +19,7 @@
 .to-previous-screen {
     -fx-graphic: url("return.png");
 }
+
+.dialog-pane .content {
+    -fx-wrap-text: true;
+}
