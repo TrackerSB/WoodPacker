@@ -59,7 +59,7 @@ public class PlankGrainDirectionIndicator extends Control {
     }
 
     // WARNING 2022-05-03: Only skins of this element are supposed to call this method
-    void enableAutoMode() {
+    final void enableAutoMode() {
         inAutoMode.setValue(autoConnection != null);
 
         /* If the currently shown grain direction does not match with the automatically determined grain
