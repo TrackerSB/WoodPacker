@@ -310,7 +310,8 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
             boolean clearAllConfirmed;
             try {
                 final Alert confirmClearAllAlert = WoodPacker.getDialogFactory()
-                        .createInteractiveAlert(AlertType.WARNING, "confirmClearAll", ButtonType.YES, ButtonType.NO);
+                        .createInteractiveAlert(AlertType.WARNING,
+                                WoodPacker.getResource("confirmClearAll"), ButtonType.YES, ButtonType.NO);
                 final Optional<ButtonType> pressedButton = DialogFactory.showAndWait(confirmClearAllAlert);
                 clearAllConfirmed = pressedButton.isPresent()
                         && pressedButton.get() == ButtonType.YES;
