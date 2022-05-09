@@ -190,9 +190,6 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                     setGraphic(generateItemGraphic(item));
 
                     final Runnable setupEditing = () -> {
-                        // WARN 2022-03-25: Has to be set before changing height and width
-                        plankField.setInAutoGrainDirectionMode(false);
-
                         plankField.setPlankId(item.getPlankId());
                         plankField.setComment(item.getComment());
                         plankField.setPlankHeight(item.getHeight());

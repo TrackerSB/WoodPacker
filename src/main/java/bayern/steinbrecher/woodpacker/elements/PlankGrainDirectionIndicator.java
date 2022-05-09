@@ -1,12 +1,10 @@
 package bayern.steinbrecher.woodpacker.elements;
 
 import bayern.steinbrecher.woodpacker.data.PlankGrainDirection;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
@@ -15,9 +13,8 @@ import javafx.scene.control.Skin;
  * @since 0.1
  */
 public class PlankGrainDirectionIndicator extends Control {
-    private final ObjectProperty<PlankGrainDirection> value
-            = new SimpleObjectProperty<>(PlankGrainDirection.IRRELEVANT);
-    private final BooleanProperty valueUserDefined = new SimpleBooleanProperty(false);
+    private final ReadOnlyObjectWrapper<PlankGrainDirection> value
+            = new ReadOnlyObjectWrapper<>(PlankGrainDirection.IRRELEVANT);
     private final ReadOnlyBooleanWrapper inAutoMode = new ReadOnlyBooleanWrapper();
     private final PlankField<?> autoConnection;
 
@@ -28,30 +25,12 @@ public class PlankGrainDirectionIndicator extends Control {
     public PlankGrainDirectionIndicator(final PlankField<?> autoConnection) {
         super();
         this.autoConnection = autoConnection;
-        if (autoConnection == null) {
-            inAutoMode.set(false);
-        } else {
-            inAutoMode.bind(valueUserDefinedProperty().not());
-        }
+        enableAutoMode();
     }
 
     @Override
     protected Skin<PlankGrainDirectionIndicator> createDefaultSkin() {
-        return new PlankGrainDirectionIndicatorSkin(this);
-    }
-
-    public BooleanProperty valueUserDefinedProperty() {
-        return valueUserDefined;
-    }
-
-    public boolean isValueUserDefined() {
-        return valueUserDefinedProperty()
-                .get();
-    }
-
-    public void setValueUserDefined(final boolean valueUserDefined) {
-        valueUserDefinedProperty()
-                .set(valueUserDefined);
+        return new PlankGrainDirectionIndicatorSkin(this, autoConnection);
     }
 
     public ReadOnlyBooleanProperty inAutoModeProperty() {
@@ -63,8 +42,11 @@ public class PlankGrainDirectionIndicator extends Control {
                 .get();
     }
 
-    public ObjectProperty<PlankGrainDirection> valueProperty() {
-        return value;
+    /* NOTE 2022-05-05: It has to be ensured to not bypass the corresponding setter (i.e. to update the auto mode
+     * property)
+     */
+    public ReadOnlyObjectProperty<PlankGrainDirection> valueProperty() {
+        return value.getReadOnlyProperty();
     }
 
     public PlankGrainDirection getValue() {
@@ -72,10 +54,32 @@ public class PlankGrainDirectionIndicator extends Control {
     }
 
     public void setValue(final PlankGrainDirection direction) {
-        valueProperty().set(direction);
+        inAutoMode.set(false);
+        value.set(direction);
     }
 
-    public PlankField<?> getAutoConnection() {
-        return autoConnection;
+    // WARNING 2022-05-03: Only skins of this element are supposed to call this method
+    final void enableAutoMode() {
+        inAutoMode.setValue(autoConnection != null);
+
+        /* If the currently shown grain direction does not match with the automatically determined grain
+         * direction a PlankField may send another signal notifying this indicator about the change and thus
+         * disable the auto mode again. So the duplicated call ensures that the auto mode is re-enabled if
+         * required.
+         */
+        inAutoMode.setValue(autoConnection != null);
+    }
+
+    // WARNING 2022-05-03: Only skins of this element are supposed to call this method
+    void setAutoValue(final PlankGrainDirection direction) {
+        assert isInAutoMode() : "This method must only be used if the indicator is in auto mode";
+        value.set(direction);
+
+        /* If the currently shown grain direction does not match with the automatically determined grain
+         * direction a PlankField may send another signal notifying this indicator about the change and thus
+         * disable the auto mode again. So the duplicated call ensures that the auto mode is re-enabled if
+         * required.
+         */
+        enableAutoMode();
     }
 }

@@ -162,14 +162,11 @@ public class PlankFieldSkin<T extends Plank> extends SkinBase<PlankField<T>> {
 
         final PlankGrainDirectionIndicator indicatorNode = new PlankGrainDirectionIndicator(control);
         control.grainDirectionProperty()
-                .bindBidirectional(indicatorNode.valueProperty());
-        control.inAutoGrainDirectionModeProperty()
-                .addListener((obs, wasInAutoMode, isInAutoMode)
-                        -> indicatorNode.setValueUserDefined(!isInAutoMode));
-        indicatorNode.valueUserDefinedProperty()
-                .addListener((obs, wasUserDefined, isUserDefined)
-                        -> control.setInAutoGrainDirectionMode(!isUserDefined));
-        control.setInAutoGrainDirectionMode(indicatorNode.isInAutoMode()); // Ensure init state
+                .addListener(
+                        (obs, previousGrainDir, currentGrainDir) -> indicatorNode.setValue(currentGrainDir));
+        indicatorNode.valueProperty()
+                .addListener(
+                        (obs, previousGrainDir, currentGrainDir) -> control.setGrainDirection(currentGrainDir));
 
         propertyRow.getChildren()
                 .add(indicatorNode);

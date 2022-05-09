@@ -47,7 +47,8 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         return indicatorButton;
     }
 
-    private Node createAutoModeOverlay(final PlankGrainDirectionIndicator control, final Region indicatorButton) {
+    private Node createAutoModeOverlay(final PlankGrainDirectionIndicator control, final Region indicatorButton,
+                                       final PlankField<?> autoConnection) {
         final Rectangle autoStateBackground = new Rectangle();
         autoStateBackground.setFill(Color.rgb(255, 255, 255, 0.5));
         autoStateBackground.widthProperty()
@@ -61,21 +62,20 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         autoStateText.visibleProperty()
                 .bind(control.inAutoModeProperty());
 
-        final PlankField<?> autoConnection = control.getAutoConnection();
         if (autoConnection != null) {
             final Runnable updateAutoValue = () -> {
                 if (control.isInAutoMode()) {
                     PlankGrainDirection direction;
-                    if(autoConnection.getPlankHeight().isEmpty() || autoConnection.getPlankWidth().isEmpty()){
+                    if (autoConnection.getPlankHeight().isEmpty() || autoConnection.getPlankWidth().isEmpty()) {
                         direction = PlankGrainDirection.IRRELEVANT;
-                    }else if (autoConnection.getPlankHeight().get().equals(autoConnection.getPlankWidth().get())) {
+                    } else if (autoConnection.getPlankHeight().get().equals(autoConnection.getPlankWidth().get())) {
                         direction = PlankGrainDirection.IRRELEVANT;
                     } else if (autoConnection.getPlankHeight().get() > autoConnection.getPlankWidth().get()) {
                         direction = PlankGrainDirection.VERTICAL;
                     } else {
                         direction = PlankGrainDirection.HORIZONTAL;
                     }
-                    control.setValue(direction);
+                    control.setAutoValue(direction);
                 }
             };
             control.inAutoModeProperty()
@@ -89,23 +89,23 @@ public class PlankGrainDirectionIndicatorSkin extends SkinBase<PlankGrainDirecti
         return new StackPane(autoStateBackground, autoStateText);
     }
 
-    protected PlankGrainDirectionIndicatorSkin(final PlankGrainDirectionIndicator control) {
+    protected PlankGrainDirectionIndicatorSkin(
+            final PlankGrainDirectionIndicator control, final PlankField<?> autoConnection) {
         super(control);
 
         final Button indicatorButton = createIndicatorButton(control);
-        final Node autoModeOverlay = createAutoModeOverlay(control, indicatorButton);
+        final Node autoModeOverlay = createAutoModeOverlay(control, indicatorButton, autoConnection);
 
         // Handle mouse events controlling the value and the auto mode state
         final StackPane indicatorNode = new StackPane(indicatorButton, autoModeOverlay);
         indicatorNode.setOnMouseClicked(mevt -> {
             switch (mevt.getButton()) {
                 case PRIMARY -> {
-                    control.setValueUserDefined(true);
                     // indicatorButton.fireEvent(mevt); // FIXME This event does not reach the underlying button
                     indicatorButton.getOnAction()
                             .handle(null);
                 }
-                case SECONDARY -> control.setValueUserDefined(false);
+                case SECONDARY -> control.enableAutoMode();
                 default -> {
                     // No-op
                 }
