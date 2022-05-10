@@ -1,6 +1,11 @@
 /* noinspection CssInvalidPseudoSelector */
 :invalid {
     -fx-border-color: red;
+    -fx-focus-color: red;
+}
+
+:invalid > * {
+    -fx-focus-color: green; /* Prevent valid children being marked as invalid due to inheritance of focus color */
 }
 
 .screen {
