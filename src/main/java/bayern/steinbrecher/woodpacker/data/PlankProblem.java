@@ -10,6 +10,8 @@ import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
@@ -45,7 +47,7 @@ import java.util.stream.Collectors;
 public class PlankProblem implements Serializable {
     @Serial
     private static final long serialVersionUID = 92870523745L;
-    private static final long INTERNAL_SERIAL_VERSION = 2L;
+    private static final long INTERNAL_SERIAL_VERSION = 3L;
     /**
      * Sort {@link PlankSolutionRow} by descending area and ascending by the name of the pivot element ascending.
      */
@@ -73,6 +75,9 @@ public class PlankProblem implements Serializable {
 
     // Since internal serial version 2
     private transient /*final*/ IntegerProperty cuttingWidth;
+
+    // Since internal serial version 3
+    private transient /*final*/ StringProperty problemName;
 
     public PlankProblem() {
         initializeTransientMember();
@@ -102,6 +107,7 @@ public class PlankProblem implements Serializable {
         basePlankOversize = new SimpleIntegerProperty(0);
         proposedSolution = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
         cuttingWidth = new SimpleIntegerProperty(0);
+        problemName = new SimpleStringProperty();
     }
 
     private double determineCandidateQuality(final PlankSolutionRow candidate) {
@@ -317,6 +323,11 @@ public class PlankProblem implements Serializable {
         } else {
             setCuttingWidth(0);
         }
+
+        // Internal serial version 3
+        if (inputSerialVersion >= 3) {
+            setProblemName(input.readUTF());
+        }
     }
 
     @Serial
@@ -331,6 +342,9 @@ public class PlankProblem implements Serializable {
 
         // Internal serial version 2
         output.writeInt(getCuttingWidth());
+
+        // Internal serial version 3
+        output.writeUTF(getProblemName());
     }
 
     public ObservableMap<PlankSolutionCriterion, Double> criterionWeightsProperty() {
@@ -406,6 +420,18 @@ public class PlankProblem implements Serializable {
             throw new IllegalArgumentException("The cutting width has to be non-negative");
         }
         cuttingWidthProperty().set(cuttingWidth);
+    }
+
+    public StringProperty problemNameProperty() {
+        return problemName;
+    }
+
+    public String getProblemName() {
+        return problemNameProperty().get();
+    }
+
+    public void setProblemName(final String name) {
+        problemNameProperty().set(name);
     }
 
     private static class RemainingBasePlank {
