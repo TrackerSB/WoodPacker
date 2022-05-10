@@ -22,6 +22,8 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A utility for generating drawing actions that can be used with {@link ScaledCanvas}. The colors used by any draw
@@ -32,6 +34,8 @@ import java.util.function.Consumer;
  * @since 0.1
  */
 public final class DrawActionGenerator {
+    private static final Logger LOGGER = Logger.getLogger(DrawActionGenerator.class.getName());
+
     // Base planks drawing action configuration
     private static final int MIN_NUM_GRAIN_INDICATION_STEPS = 10;
     private static final int MAX_NUM_GRAIN_INDICATION_STEPS = 50;
@@ -231,30 +235,35 @@ public final class DrawActionGenerator {
         final double vertDimLabelMaxAvailHeight = (plankWidth - estimatedLabelWidth - 2 * edgeBandInset) / 2;
         final double maxDimLabelFontSize = Math.min(horizDimLabelMaxAvailHeight, vertDimLabelMaxAvailHeight);
 
-        final String horizDimLabelText = String.valueOf(plank.getWidth());
-        final String vertDimLabelText = String.valueOf(plank.getHeight());
+        if (maxDimLabelFontSize > 0) {
+            final String horizDimLabelText = String.valueOf(plank.getWidth());
+            final String vertDimLabelText = String.valueOf(plank.getHeight());
 
-        // Determine max font size such that they do not intersect with each other
-        double dimLabelFontSize = maxDimLabelFontSize;
-        while (doDimLabelsIntersect(plankWidth, plankHeight, horizDimLabelText, vertDimLabelText,
-                Font.font(dimLabelFontSize))) {
-            dimLabelFontSize *= 0.9;
+            // Determine max font size such that they do not intersect with each other
+            double dimLabelFontSize = maxDimLabelFontSize;
+            while (doDimLabelsIntersect(plankWidth, plankHeight, horizDimLabelText, vertDimLabelText,
+                    Font.font(dimLabelFontSize))) {
+                dimLabelFontSize *= 0.9;
+            }
+
+            context.save();
+            context.setFont(Font.font(dimLabelFontSize));
+            context.setTextBaseline(VPos.TOP);
+            context.setFill(Color.BLACK);
+            context.fillText(horizDimLabelText,
+                    plankXPos + plank.getWidth() / 2d,
+                    plankYPos + edgeBandInset,
+                    plank.getWidth());
+            context.rotate(-90);
+            context.fillText(vertDimLabelText,
+                    -plankYPos - plank.getHeight() / 2d,
+                    plankXPos + edgeBandInset,
+                    plank.getHeight());
+            context.restore();
+        } else {
+            LOGGER.log(Level.FINE, "There is not enough space for drawing dimension labels onto %s",
+                    new Object[]{plank.getPlankId()});
         }
-
-        context.save();
-        context.setFont(Font.font(dimLabelFontSize));
-        context.setTextBaseline(VPos.TOP);
-        context.setFill(Color.BLACK);
-        context.fillText(horizDimLabelText,
-                plankXPos + plank.getWidth() / 2d,
-                plankYPos + edgeBandInset,
-                plank.getWidth());
-        context.rotate(-90);
-        context.fillText(vertDimLabelText,
-                -plankYPos - plank.getHeight() / 2d,
-                plankXPos + edgeBandInset,
-                plank.getHeight());
-        context.restore();
     }
 
     public static Consumer<GraphicsContext> forCuttingPlan(final CuttingPlan cuttingPlan) {
