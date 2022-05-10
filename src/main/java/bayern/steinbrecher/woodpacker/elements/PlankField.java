@@ -40,7 +40,7 @@ public class PlankField<T extends Plank> extends Control implements CheckedContr
     private final StringProperty plankId = new SimpleStringProperty("");
     private final ObjectProperty<Optional<Integer>> plankWidth = new SimpleObjectProperty<>(Optional.empty());
     private final ObjectProperty<Optional<Integer>> plankHeight = new SimpleObjectProperty<>(Optional.empty());
-    private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>();
+    private final ObjectProperty<PlankGrainDirection> grainDirection = new SimpleObjectProperty<>(PlankGrainDirection.IRRELEVANT);
     private final ReadOnlyObjectWrapper<PlankMaterial> material = new ReadOnlyObjectWrapper<>(PlankMaterial.UNDEFINED);
     private final ObjectProperty<PlankMaterial> selectedMaterial = new SimpleObjectProperty<>(PlankMaterial.UNDEFINED);
     private final StringProperty comment = new SimpleStringProperty("");
