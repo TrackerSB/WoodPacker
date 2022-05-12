@@ -23,11 +23,13 @@ since: 0.1
             fitToHeight="true"
             stylesheets="@PlankDemandScreen.css">
     <BorderPane>
+        <top>
+            <CheckedTextField fx:id="cuttingPlanName"
+                              promptText="%cuttingPlanName"
+                              text="%myCuttingPlan"/>
+        </top>
         <left>
             <VBox>
-                <CheckedTextField fx:id="cuttingPlanName"
-                                  promptText="%cuttingPlanName"
-                                  text="%myCuttingPlan"/>
                 <HBox VBox.vgrow="ALWAYS">
                     <VBox>
                         <Label id="basePlankListLabel"
