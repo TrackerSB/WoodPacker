@@ -323,6 +323,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                 control.getPlanks().clear();
             }
         });
+        ButtonBar.setButtonData(clearAllPlanksButton, ButtonData.CANCEL_CLOSE);
 
         final ChangeListener<Boolean> onPlankListEmptyChanged
                 = (obs, wasEmpty, isEmpty) -> clearAllPlanksButton.setDisable(isEmpty);

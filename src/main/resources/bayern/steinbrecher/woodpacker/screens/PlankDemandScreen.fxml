@@ -16,6 +16,9 @@ since: 0.1
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.Group?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -29,37 +32,44 @@ since: 0.1
                               text="%myCuttingPlan"/>
         </top>
         <left>
-            <VBox>
-                <HBox VBox.vgrow="ALWAYS">
-                    <VBox>
-                        <Label id="basePlankListLabel"
-                               text="%basePlankList"
-                               styleClass="heading"/>
-                        <PlankList fx:id="basePlankList"
-                                   genericRuntimeType="bayern.steinbrecher.woodpacker.data.BasePlank"
-                                   VBox.vgrow="ALWAYS"/>
-                    </VBox>
-                    <VBox>
-                        <Label id="requiredPlanksListLabel"
-                               text="%demandList"
-                               styleClass="heading"/>
-                        <PlankList fx:id="requiredPlanksView"
-                                   genericRuntimeType="bayern.steinbrecher.woodpacker.data.RequiredPlank"
-                                   VBox.vgrow="ALWAYS"/>
-                    </VBox>
-                </HBox>
-                <ButtonBar>
-                    <buttons>
-                        <Button id="exportPlanksButton"
-                                text="%exportPlanks"
-                                onAction="#askUserExportPlankProblem"
-                                disable="${!controller.plankProblemValid}"/>
-                        <Button text="%backToMainMenu"
-                                onAction="#trySwitchToPreviousScreen"
-                                styleClass="to-previous-screen"/>
-                    </buttons>
-                </ButtonBar>
-            </VBox>
+            <HBox>
+                <ToolBar orientation="VERTICAL">
+                    <!--
+                    NOTE 2022-05-12: Wrapping each element in a group ensures that the rotation is taken into account
+                    during layout and positioning within the tool bar.
+                    -->
+                    <Group>
+                        <ToggleButton fx:id="basePlankListToggle"
+                                      text="%basePlankList"
+                                      selected="true"
+                                      rotate="-90"/>
+                    </Group>
+                    <Group>
+                        <ToggleButton fx:id="demandListToggle"
+                                      text="%demandList"
+                                      selected="true"
+                                      rotate="-90"/>
+                    </Group>
+                </ToolBar>
+                <VBox visible="${basePlankListToggle.selected}"
+                      managed="${basePlankListToggle.selected}">
+                    <Label id="basePlankListLabel"
+                           text="%basePlankList"
+                           styleClass="heading"/>
+                    <PlankList fx:id="basePlankList"
+                               genericRuntimeType="bayern.steinbrecher.woodpacker.data.BasePlank"
+                               VBox.vgrow="ALWAYS"/>
+                </VBox>
+                <VBox visible="${demandListToggle.selected}"
+                      managed="${demandListToggle.selected}">
+                    <Label id="demandListLabel"
+                           text="%demandList"
+                           styleClass="heading"/>
+                    <PlankList fx:id="requiredPlanksView"
+                               genericRuntimeType="bayern.steinbrecher.woodpacker.data.RequiredPlank"
+                               VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </HBox>
         </left>
         <center>
             <VBox>
@@ -67,42 +77,66 @@ since: 0.1
                                     VBox.vgrow="ALWAYS"/>
                 <ButtonBar>
                     <buttons>
+                        <Button id="exportPlanksButton"
+                                text="%exportPlanks"
+                                onAction="#askUserExportPlankProblem"
+                                disable="${!controller.plankProblemValid}"/>
                         <Button id="printPreview"
                                 text="%print"
                                 onAction="#exportPreview"
                                 disable="${!controller.plankProblemValid}"/>
+                        <Button text="%backToMainMenu"
+                                onAction="#trySwitchToPreviousScreen"
+                                styleClass="to-previous-screen"
+                                ButtonBar.buttonData="BACK_PREVIOUS"/>
                     </buttons>
                 </ButtonBar>
             </VBox>
         </center>
         <right>
-            <ScrollPane fitToWidth="true"
-                        fitToHeight="true"
-                        hbarPolicy="NEVER">
-                <VBox>
-                    <VBox alignment="TOP_CENTER">
-                        <Text text="%settings"
-                              styleClass="heading"
-                              textAlignment="CENTER"/>
-                        <Text text="%oversize"/>
-                        <CheckedIntegerSpinner fx:id="oversizeSpinner"
-                                               editable="true"
-                                               promptText="%oversize"/>
-                        <Text text="%cuttingWidth"/>
-                        <CheckedIntegerSpinner fx:id="cuttingWidthSpinner"
-                                               editable="true"
-                                               promptText="%cuttingWidth"/>
+            <HBox>
+                <ScrollPane fitToWidth="true"
+                            fitToHeight="true"
+                            hbarPolicy="NEVER"
+                            visible="${settingsToggle.selected}"
+                            managed="${settingsToggle.selected}">
+                    <VBox>
+                        <VBox alignment="TOP_CENTER">
+                            <Text text="%settings"
+                                  styleClass="heading"
+                                  textAlignment="CENTER"/>
+                            <Text text="%oversize"/>
+                            <CheckedIntegerSpinner fx:id="oversizeSpinner"
+                                                   editable="true"
+                                                   promptText="%oversize"/>
+                            <Text text="%cuttingWidth"/>
+                            <CheckedIntegerSpinner fx:id="cuttingWidthSpinner"
+                                                   editable="true"
+                                                   promptText="%cuttingWidth"/>
+                        </VBox>
+                        <VBox fx:id="criteriaPane"
+                              alignment="TOP_CENTER">
+                            <Text text="%optimizationCriteria"
+                                  styleClass="heading"
+                                  textAlignment="CENTER"/>
+                            <Text text="%optimizationCriteriaLegend"/>
+                            <Label/> <!-- FIXME Find proper way of adding a gap after the legend -->
+                        </VBox>
                     </VBox>
-                    <VBox fx:id="criteriaPane"
-                          alignment="TOP_CENTER">
-                        <Text text="%optimizationCriteria"
-                              styleClass="heading"
-                              textAlignment="CENTER"/>
-                        <Text text="%optimizationCriteriaLegend"/>
-                        <Label/> <!-- FIXME Find proper way of adding a gap after the legend -->
-                    </VBox>
-                </VBox>
-            </ScrollPane>
+                </ScrollPane>
+                <ToolBar orientation="VERTICAL">
+                    <!--
+                    NOTE 2022-05-12: Wrapping each element in a group ensures that the rotation is taken into account
+                    during layout and positioning within the tool bar.
+                    -->
+                    <Group>
+                        <ToggleButton fx:id="settingsToggle"
+                                      text="%settings"
+                                      selected="true"
+                                      rotate="-90"/>
+                    </Group>
+                </ToolBar>
+            </HBox>
         </right>
     </BorderPane>
 </ScrollPane>

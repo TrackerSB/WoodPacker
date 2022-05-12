@@ -15,6 +15,10 @@ Slider {
     -fx-graphic: url("woods.png");
 }
 
+#basePlankListToggle {
+    -fx-graphic: url("woods_small_rotated.png");
+}
+
 #exportPlanksButton {
     -fx-graphic: url("export.png");
 }
@@ -23,8 +27,16 @@ Slider {
     -fx-graphic: url("printer.png");
 }
 
-#requiredPlanksListLabel {
+#demandListLabel {
     -fx-graphic: url("rulers.png");
+}
+
+#demandListToggle {
+    -fx-graphic: url("rulers_small_rotated.png");
+}
+
+#settingsToggle {
+    -fx-graphic: url("settings_small_rotated.png");
 }
 
 #cuttingPlanName {
