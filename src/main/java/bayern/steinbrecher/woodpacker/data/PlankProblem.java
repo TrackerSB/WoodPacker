@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.data;
 
 import bayern.steinbrecher.javaUtility.SupplyingMap;
+import bayern.steinbrecher.woodpacker.WoodPacker;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -327,6 +328,8 @@ public class PlankProblem implements Serializable {
         // Internal serial version 3
         if (inputSerialVersion >= 3) {
             setProblemName(input.readUTF());
+        } else {
+            setProblemName(WoodPacker.getResource("myCuttingPlan"));
         }
     }
 

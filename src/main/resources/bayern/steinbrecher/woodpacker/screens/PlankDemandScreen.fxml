@@ -26,7 +26,8 @@ since: 0.1
         <left>
             <VBox>
                 <CheckedTextField fx:id="cuttingPlanName"
-                                  promptText="%cuttingPlanName"/>
+                                  promptText="%cuttingPlanName"
+                                  text="%myCuttingPlan"/>
                 <HBox VBox.vgrow="ALWAYS">
                     <VBox>
                         <Label id="basePlankListLabel"
