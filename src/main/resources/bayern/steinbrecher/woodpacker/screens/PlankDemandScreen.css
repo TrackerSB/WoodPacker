@@ -35,6 +35,10 @@ Slider {
     -fx-graphic: url("rulers_small_rotated.png");
 }
 
+#settingsToggle {
+    -fx-graphic: url("settings_small_rotated.png");
+}
+
 #cuttingPlanName {
     -fx-alignment: CENTER;
     -fx-font-size: 30;
