@@ -1,6 +1,7 @@
 package bayern.steinbrecher.woodpacker.screens;
 
 import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner;
+import bayern.steinbrecher.checkedElements.textfields.CheckedTextField;
 import bayern.steinbrecher.javaUtility.DialogCreationException;
 import bayern.steinbrecher.javaUtility.DialogFactory;
 import bayern.steinbrecher.screenswitcher.ScreenController;
@@ -67,6 +68,8 @@ public class PlankDemandScreenController extends ScreenController {
     private PlankList<BasePlank> basePlankList;
     @FXML
     private PlankList<RequiredPlank> requiredPlanksView;
+    @FXML
+    private CheckedTextField cuttingPlanName;
     @FXML
     private SnapshotPagination cuttingPlanPages;
     @FXML
@@ -303,12 +306,16 @@ public class PlankDemandScreenController extends ScreenController {
          */
         plankProblemValid.bind(
                 plankProblem.basePlankProperty().isNotNull()
-                        .and(plankProblem.requiredPlanksProperty().emptyProperty().not()));
+                        .and(plankProblem.requiredPlanksProperty().emptyProperty().not())
+                        .and(cuttingPlanName.emptyProperty().not()));
     }
 
     @FXML
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void initialize() {
+        plankProblem.problemNameProperty()
+                .bindBidirectional(cuttingPlanName.textProperty());
+
         initializeBasePlankList();
         initializeRequiredPlanksList();
         initializeSettingsPane();
@@ -323,6 +330,7 @@ public class PlankDemandScreenController extends ScreenController {
                 .putAll(setup.criterionWeightsProperty());
         plankProblem.setBasePlankOversize(setup.getBasePlankOversize());
         plankProblem.setCuttingWidth(setup.getCuttingWidth());
+        plankProblem.setProblemName(setup.getProblemName());
         plankProblemSaved.set(true);
     }
 

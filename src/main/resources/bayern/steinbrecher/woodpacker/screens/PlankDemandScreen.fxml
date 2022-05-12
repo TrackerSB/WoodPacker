@@ -5,6 +5,7 @@ since: 0.1
 -->
 
 <?import bayern.steinbrecher.checkedElements.spinner.CheckedIntegerSpinner?>
+<?import bayern.steinbrecher.checkedElements.textfields.CheckedTextField?>
 <?import bayern.steinbrecher.woodpacker.elements.PlankList?>
 <?import bayern.steinbrecher.woodpacker.elements.SnapshotPagination?>
 <?import javafx.scene.control.Button?>
@@ -22,6 +23,11 @@ since: 0.1
             fitToHeight="true"
             stylesheets="@PlankDemandScreen.css">
     <BorderPane>
+        <top>
+            <CheckedTextField fx:id="cuttingPlanName"
+                              promptText="%cuttingPlanName"
+                              text="%myCuttingPlan"/>
+        </top>
         <left>
             <VBox>
                 <HBox VBox.vgrow="ALWAYS">

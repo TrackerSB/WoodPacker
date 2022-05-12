@@ -26,3 +26,9 @@ Slider {
 #requiredPlanksListLabel {
     -fx-graphic: url("rulers.png");
 }
+
+#cuttingPlanName {
+    -fx-alignment: CENTER;
+    -fx-font-size: 30;
+    -fx-font-weight: bolder;
+}
