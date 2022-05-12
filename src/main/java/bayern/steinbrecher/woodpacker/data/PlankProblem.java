@@ -18,6 +18,7 @@ import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -108,7 +109,7 @@ public class PlankProblem implements Serializable {
         basePlankOversize = new SimpleIntegerProperty(0);
         proposedSolution = new ReadOnlyObjectWrapper<>(new Pair<>(List.of(), Set.of()));
         cuttingWidth = new SimpleIntegerProperty(0);
-        problemName = new SimpleStringProperty();
+        problemName = new SimpleStringProperty(WoodPacker.getResource("myCuttingPlan"));
     }
 
     private double determineCandidateQuality(final PlankSolutionRow candidate) {
@@ -328,8 +329,6 @@ public class PlankProblem implements Serializable {
         // Internal serial version 3
         if (inputSerialVersion >= 3) {
             setProblemName(input.readUTF());
-        } else {
-            setProblemName(WoodPacker.getResource("myCuttingPlan"));
         }
     }
 
@@ -433,7 +432,7 @@ public class PlankProblem implements Serializable {
         return problemNameProperty().get();
     }
 
-    public void setProblemName(final String name) {
+    public void setProblemName(@NotNull final String name) {
         problemNameProperty().set(name);
     }
 
