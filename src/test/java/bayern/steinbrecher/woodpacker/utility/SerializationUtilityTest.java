@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -122,9 +124,22 @@ public final class SerializationUtilityTest {
                 new RequiredPlank("second", 14, 13, PlankGrainDirection.HORIZONTAL, "second comment")));
         PLANK_PROBLEM_V2.setCuttingWidth(3);
 
+        final PlankProblem PLANK_PROBLEM_V3 = new PlankProblem();
+        PLANK_PROBLEM_V3.setBasePlank(new BasePlank(
+                "BasePlank reference", 86, 42, PlankGrainDirection.IRRELEVANT, PlankMaterial.OAK));
+        PLANK_PROBLEM_V3.setCriterionWeight(PlankSolutionCriterion.BREATH_DIFFERENCES, 1);
+        PLANK_PROBLEM_V3.setCriterionWeight(PlankSolutionCriterion.NUM_PLANKS, 2);
+        PLANK_PROBLEM_V3.setCriterionWeight(PlankSolutionCriterion.ROW_SPACE_WASTE, 3);
+        PLANK_PROBLEM_V3.setRequiredPlanks(FXCollections.observableSet(
+                new RequiredPlank("first", 11, 12, PlankGrainDirection.VERTICAL, "first comment"),
+                new RequiredPlank("second", 14, 13, PlankGrainDirection.HORIZONTAL, "second comment")));
+        PLANK_PROBLEM_V3.setCuttingWidth(3);
+        PLANK_PROBLEM_V3.setProblemName("My fancy plan");
+
         checkSerializationForClass(Map.of(
                 1L, PLANK_PROBLEM_V1,
-                2L, PLANK_PROBLEM_V2
+                2L, PLANK_PROBLEM_V2,
+                3L, PLANK_PROBLEM_V3
         ), PlankProblem.class, "getProposedSolution");
     }
 }
