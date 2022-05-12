@@ -18,6 +18,7 @@ since: 0.1
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.Group?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -33,12 +34,22 @@ since: 0.1
         <left>
             <HBox>
                 <ToolBar orientation="VERTICAL">
-                    <ToggleButton fx:id="basePlankListToggle"
-                                  text="%basePlankList"
-                                  selected="true"/>
-                    <ToggleButton fx:id="demandListToggle"
-                                  text="%demandList"
-                                  selected="true"/>
+                    <!--
+                    NOTE 2022-05-12: Wrapping each element in a group ensures that the rotation is taken into account
+                    during layout and positioning within the tool bar.
+                    -->
+                    <Group>
+                        <ToggleButton fx:id="basePlankListToggle"
+                                      text="%basePlankList"
+                                      selected="true"
+                                      rotate="-90"/>
+                    </Group>
+                    <Group>
+                        <ToggleButton fx:id="demandListToggle"
+                                      text="%demandList"
+                                      selected="true"
+                                      rotate="-90"/>
+                    </Group>
                 </ToolBar>
                 <VBox visible="${basePlankListToggle.selected}"
                       managed="${basePlankListToggle.selected}">
@@ -51,7 +62,7 @@ since: 0.1
                 </VBox>
                 <VBox visible="${demandListToggle.selected}"
                       managed="${demandListToggle.selected}">
-                    <Label id="requiredPlanksListLabel"
+                    <Label id="demandListLabel"
                            text="%demandList"
                            styleClass="heading"/>
                     <PlankList fx:id="requiredPlanksView"
