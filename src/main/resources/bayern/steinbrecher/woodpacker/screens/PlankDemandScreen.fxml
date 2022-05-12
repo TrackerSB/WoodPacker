@@ -72,8 +72,26 @@ since: 0.1
             </HBox>
         </left>
         <center>
-            <SnapshotPagination fx:id="cuttingPlanPages"
-                                VBox.vgrow="ALWAYS"/>
+            <VBox>
+                <SnapshotPagination fx:id="cuttingPlanPages"
+                                    VBox.vgrow="ALWAYS"/>
+                <ButtonBar>
+                    <buttons>
+                        <Button id="exportPlanksButton"
+                                text="%exportPlanks"
+                                onAction="#askUserExportPlankProblem"
+                                disable="${!controller.plankProblemValid}"/>
+                        <Button id="printPreview"
+                                text="%print"
+                                onAction="#exportPreview"
+                                disable="${!controller.plankProblemValid}"/>
+                        <Button text="%backToMainMenu"
+                                onAction="#trySwitchToPreviousScreen"
+                                styleClass="to-previous-screen"
+                                ButtonBar.buttonData="BACK_PREVIOUS"/>
+                    </buttons>
+                </ButtonBar>
+            </VBox>
         </center>
         <right>
             <HBox>
@@ -120,23 +138,5 @@ since: 0.1
                 </ToolBar>
             </HBox>
         </right>
-        <bottom>
-            <ButtonBar>
-                <buttons>
-                    <Button id="exportPlanksButton"
-                            text="%exportPlanks"
-                            onAction="#askUserExportPlankProblem"
-                            disable="${!controller.plankProblemValid}"/>
-                    <Button id="printPreview"
-                            text="%print"
-                            onAction="#exportPreview"
-                            disable="${!controller.plankProblemValid}"/>
-                    <Button text="%backToMainMenu"
-                            onAction="#trySwitchToPreviousScreen"
-                            styleClass="to-previous-screen"
-                            ButtonBar.buttonData="BACK_PREVIOUS"/>
-                </buttons>
-            </ButtonBar>
-        </bottom>
     </BorderPane>
 </ScrollPane>
