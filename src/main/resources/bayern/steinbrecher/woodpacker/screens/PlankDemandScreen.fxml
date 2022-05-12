@@ -16,6 +16,8 @@ since: 0.1
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="bayern.steinbrecher.woodpacker.screens.PlankDemandScreenController"
@@ -29,51 +31,38 @@ since: 0.1
                               text="%myCuttingPlan"/>
         </top>
         <left>
-            <VBox>
-                <HBox VBox.vgrow="ALWAYS">
-                    <VBox>
-                        <Label id="basePlankListLabel"
-                               text="%basePlankList"
-                               styleClass="heading"/>
-                        <PlankList fx:id="basePlankList"
-                                   genericRuntimeType="bayern.steinbrecher.woodpacker.data.BasePlank"
-                                   VBox.vgrow="ALWAYS"/>
-                    </VBox>
-                    <VBox>
-                        <Label id="requiredPlanksListLabel"
-                               text="%demandList"
-                               styleClass="heading"/>
-                        <PlankList fx:id="requiredPlanksView"
-                                   genericRuntimeType="bayern.steinbrecher.woodpacker.data.RequiredPlank"
-                                   VBox.vgrow="ALWAYS"/>
-                    </VBox>
-                </HBox>
-                <ButtonBar>
-                    <buttons>
-                        <Button id="exportPlanksButton"
-                                text="%exportPlanks"
-                                onAction="#askUserExportPlankProblem"
-                                disable="${!controller.plankProblemValid}"/>
-                        <Button text="%backToMainMenu"
-                                onAction="#trySwitchToPreviousScreen"
-                                styleClass="to-previous-screen"/>
-                    </buttons>
-                </ButtonBar>
-            </VBox>
+            <HBox>
+                <ToolBar orientation="VERTICAL">
+                    <ToggleButton fx:id="basePlankListToggle"
+                                  text="%basePlankList"
+                                  selected="true"/>
+                    <ToggleButton fx:id="demandListToggle"
+                                  text="%demandList"
+                                  selected="true"/>
+                </ToolBar>
+                <VBox visible="${basePlankListToggle.selected}"
+                      managed="${basePlankListToggle.selected}">
+                    <Label id="basePlankListLabel"
+                           text="%basePlankList"
+                           styleClass="heading"/>
+                    <PlankList fx:id="basePlankList"
+                               genericRuntimeType="bayern.steinbrecher.woodpacker.data.BasePlank"
+                               VBox.vgrow="ALWAYS"/>
+                </VBox>
+                <VBox visible="${demandListToggle.selected}"
+                      managed="${demandListToggle.selected}">
+                    <Label id="requiredPlanksListLabel"
+                           text="%demandList"
+                           styleClass="heading"/>
+                    <PlankList fx:id="requiredPlanksView"
+                               genericRuntimeType="bayern.steinbrecher.woodpacker.data.RequiredPlank"
+                               VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </HBox>
         </left>
         <center>
-            <VBox>
-                <SnapshotPagination fx:id="cuttingPlanPages"
-                                    VBox.vgrow="ALWAYS"/>
-                <ButtonBar>
-                    <buttons>
-                        <Button id="printPreview"
-                                text="%print"
-                                onAction="#exportPreview"
-                                disable="${!controller.plankProblemValid}"/>
-                    </buttons>
-                </ButtonBar>
-            </VBox>
+            <SnapshotPagination fx:id="cuttingPlanPages"
+                                VBox.vgrow="ALWAYS"/>
         </center>
         <right>
             <ScrollPane fitToWidth="true"
@@ -104,5 +93,23 @@ since: 0.1
                 </VBox>
             </ScrollPane>
         </right>
+        <bottom>
+            <ButtonBar>
+                <buttons>
+                    <Button id="exportPlanksButton"
+                            text="%exportPlanks"
+                            onAction="#askUserExportPlankProblem"
+                            disable="${!controller.plankProblemValid}"/>
+                    <Button id="printPreview"
+                            text="%print"
+                            onAction="#exportPreview"
+                            disable="${!controller.plankProblemValid}"/>
+                    <Button text="%backToMainMenu"
+                            onAction="#trySwitchToPreviousScreen"
+                            styleClass="to-previous-screen"
+                            ButtonBar.buttonData="BACK_PREVIOUS"/>
+                </buttons>
+            </ButtonBar>
+        </bottom>
     </BorderPane>
 </ScrollPane>
