@@ -10,6 +10,7 @@ import bayern.steinbrecher.woodpacker.utility.PredefinedFileChooser;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
@@ -73,6 +74,13 @@ public class WoodPacker extends Application {
             try {
                 confirmCloseAlert = dialogFactory.createInteractiveAlert(
                         AlertType.WARNING, getResource("confirmClose"), ButtonType.YES, ButtonType.NO);
+                /* NOTE 2022-05-12: Currently the "yes" button is the default button. Ensure the "no" button is the
+                 * default button.
+                 */
+                for (ButtonType type : confirmCloseAlert.getButtonTypes()) {
+                    ((Button) confirmCloseAlert.getDialogPane().lookupButton(type))
+                            .setDefaultButton(type == ButtonType.NO);
+                }
             } catch (DialogCreationException ex) {
                 LOGGER.log(Level.WARNING, "Could not warn user graphically before closing the application. "
                         + "Close the application anyways.");
