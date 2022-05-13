@@ -282,6 +282,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
             }
         });
         ButtonBar.setButtonData(updatePlankViewButton, ButtonData.APPLY);
+        updatePlankViewButton.setDefaultButton(true);
 
         updatePlankViewButton.disableProperty()
                 .bind(plankField.validProperty().not()
