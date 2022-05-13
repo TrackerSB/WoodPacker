@@ -282,7 +282,20 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
             }
         });
         ButtonBar.setButtonData(updatePlankViewButton, ButtonData.APPLY);
-        updatePlankViewButton.setDefaultButton(true);
+        control.getScene()
+                .focusOwnerProperty()
+                .addListener((obs, previousOwner, currentOwner) -> {
+                    boolean ownerIsChildOfList = false;
+                    Node currentNode = currentOwner;
+                    while (currentNode != null) {
+                        if (currentNode == control) {
+                            ownerIsChildOfList = true;
+                            break;
+                        }
+                        currentNode = currentNode.getParent();
+                    }
+                    updatePlankViewButton.setDefaultButton(ownerIsChildOfList);
+                });
 
         updatePlankViewButton.disableProperty()
                 .bind(plankField.validProperty().not()
