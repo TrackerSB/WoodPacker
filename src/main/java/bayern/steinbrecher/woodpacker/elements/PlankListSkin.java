@@ -313,6 +313,13 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                 final Alert confirmClearAllAlert = WoodPacker.getDialogFactory()
                         .createInteractiveAlert(AlertType.WARNING,
                                 WoodPacker.getResource("confirmClearAll"), ButtonType.YES, ButtonType.NO);
+                /* NOTE 2022-05-13: Currently the "yes" button is the default button. Ensure the "no" button is the
+                 * default button.
+                 */
+                for (ButtonType type : confirmClearAllAlert.getButtonTypes()) {
+                    ((Button) confirmClearAllAlert.getDialogPane().lookupButton(type))
+                            .setDefaultButton(type == ButtonType.NO);
+                }
                 final Optional<ButtonType> pressedButton = DialogFactory.showAndWait(confirmClearAllAlert);
                 clearAllConfirmed = pressedButton.isPresent()
                         && pressedButton.get() == ButtonType.YES;
