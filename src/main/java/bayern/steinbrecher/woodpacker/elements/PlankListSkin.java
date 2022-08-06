@@ -329,7 +329,7 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                 /* NOTE 2022-05-13: Currently the "yes" button is the default button. Ensure the "no" button is the
                  * default button.
                  */
-                for (ButtonType type : confirmClearAllAlert.getButtonTypes()) {
+                for (final ButtonType type : confirmClearAllAlert.getButtonTypes()) {
                     ((Button) confirmClearAllAlert.getDialogPane().lookupButton(type))
                             .setDefaultButton(type == ButtonType.NO);
                 }

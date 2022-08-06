@@ -77,7 +77,7 @@ public class WoodPacker extends Application {
                 /* NOTE 2022-05-12: Currently the "yes" button is the default button. Ensure the "no" button is the
                  * default button.
                  */
-                for (ButtonType type : confirmCloseAlert.getButtonTypes()) {
+                for (final ButtonType type : confirmCloseAlert.getButtonTypes()) {
                     ((Button) confirmCloseAlert.getDialogPane().lookupButton(type))
                             .setDefaultButton(type == ButtonType.NO);
                 }
