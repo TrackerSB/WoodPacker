@@ -282,6 +282,20 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
             }
         });
         ButtonBar.setButtonData(updatePlankViewButton, ButtonData.APPLY);
+        control.getScene()
+                .focusOwnerProperty()
+                .addListener((obs, previousOwner, currentOwner) -> {
+                    boolean ownerIsChildOfList = false;
+                    Node currentNode = currentOwner;
+                    while (currentNode != null) {
+                        if (currentNode == control) {
+                            ownerIsChildOfList = true;
+                            break;
+                        }
+                        currentNode = currentNode.getParent();
+                    }
+                    updatePlankViewButton.setDefaultButton(ownerIsChildOfList);
+                });
 
         updatePlankViewButton.disableProperty()
                 .bind(plankField.validProperty().not()
@@ -312,6 +326,13 @@ public class PlankListSkin<T extends Plank> extends SkinBase<PlankList<T>> {
                 final Alert confirmClearAllAlert = WoodPacker.getDialogFactory()
                         .createInteractiveAlert(AlertType.WARNING,
                                 WoodPacker.getResource("confirmClearAll"), ButtonType.YES, ButtonType.NO);
+                /* NOTE 2022-05-13: Currently the "yes" button is the default button. Ensure the "no" button is the
+                 * default button.
+                 */
+                for (final ButtonType type : confirmClearAllAlert.getButtonTypes()) {
+                    ((Button) confirmClearAllAlert.getDialogPane().lookupButton(type))
+                            .setDefaultButton(type == ButtonType.NO);
+                }
                 final Optional<ButtonType> pressedButton = DialogFactory.showAndWait(confirmClearAllAlert);
                 clearAllConfirmed = pressedButton.isPresent()
                         && pressedButton.get() == ButtonType.YES;
